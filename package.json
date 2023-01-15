@@ -1,0 +1,13 @@
+{
+  "name": "gatos",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "cd packages/website && npm run dev"
+  },
+  "engines": {
+    "node": ">=16",
+    "pnpm": ">=6"
+  },
+  "private": true,
+  "packageManager": "pnpm@7.25.0"
+}
