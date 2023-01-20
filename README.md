@@ -17,4 +17,4 @@ pnpm install
 pnpm dev
 ```
 
-To run and generate a run configuration for the frontend in IntelliJ you can open `packages/website/package.json` and press the play button next to the line with `dev` in it.
+To run and generate a run configuration for the frontend in IntelliJ you can open `package.json` and press the play button.
