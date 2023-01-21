@@ -11,6 +11,7 @@ importers:
       '@solidjs/router': ^0.6.0
       '@solidjs/testing-library': ^0.5.1
       '@testing-library/jest-dom': ^5.16.5
+      '@thisbeyond/solid-dnd': ^0.7.3
       '@types/testing-library__jest-dom': ^5.14.5
       '@vitest/coverage-c8': ^0.26.2
       '@vitest/ui': ^0.26.2
@@ -22,6 +23,8 @@ importers:
       undici: ^5.12.0
       vite: ^3.2.4
       vitest: ^0.26.2
+    dependencies:
+      '@thisbeyond/solid-dnd': 0.7.3_solid-js@1.6.9
     devDependencies:
       '@solidjs/meta': 0.28.2_solid-js@1.6.9
       '@solidjs/router': 0.6.0_solid-js@1.6.9
@@ -1525,6 +1528,14 @@ packages:
       redent: 3.0.0
     dev: true
 
+  /@thisbeyond/solid-dnd/0.7.3_solid-js@1.6.9:
+    resolution: {integrity: sha512-mX9AE//jyNm9bz9+w60LPukMJ8nkYrUh+RPm8E5SiFdmSI8EoP1hhNgDHFTHbxauoAMLFosi1QBwpgeg/XijDQ==}
+    peerDependencies:
+      solid-js: ^1.5
+    dependencies:
+      solid-js: 1.6.9
+    dev: false
+
   /@tootallnate/once/2.0.0:
     resolution: {integrity: sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==}
     engines: {node: '>= 10'}
@@ -2070,7 +2081,6 @@ packages:
 
   /csstype/3.1.1:
     resolution: {integrity: sha512-DJR/VvkAvSZW9bTouZue2sSxDwdTN92uHjqeKVm+0dAqdfNykRzQ95tay8aXMBAAPpUiq4Qcug2L7neoRh2Egw==}
-    dev: true
 
   /data-urls/3.0.2:
     resolution: {integrity: sha512-Jy/tj3ldjZJo63sVAvg6LHt2mHvl4V6AgRAmNDtLdm7faqtsx+aJG42rsyCo9JCoRVKwPFzKlIPx3DIibwSIaQ==}
@@ -3971,7 +3981,6 @@ packages:
     resolution: {integrity: sha512-kV3fMmm+1C2J95c8eDOPKGfZHnuAkHUBLG4hX1Xu08bXeAIPqmxuz/QdH3B8SIdTp3EatBVIyA6RCes3hrGzpg==}
     dependencies:
       csstype: 3.1.1
-    dev: true
 
   /solid-refresh/0.4.2_solid-js@1.6.9:
     resolution: {integrity: sha512-6g1HsgQkY0X0ZmsaydNgHwRaQIhH3bAbagZiYwWnGO7mqli50ehlwQUN18RZ2MH3fTIs9Y1bankZapVhMVuijg==}
