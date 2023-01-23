@@ -10,6 +10,7 @@ import {
   Scripts,
   Title,
 } from "solid-start";
+import "./root.css";
 import { ErrorBoundary } from "solid-start/error-boundary";
 
 export default function Root() {
