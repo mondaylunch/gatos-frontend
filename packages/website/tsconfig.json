@@ -5,7 +5,6 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "node",
-    "noImplicitAny": false,
     "jsxImportSource": "solid-js",
     "jsx": "preserve",
     "strict": true,
