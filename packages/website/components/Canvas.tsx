@@ -1,6 +1,9 @@
 import { createEffect, createSignal, onCleanup } from "solid-js";
 import styles from "./Canvas.module.css";
 
+const MIN_ZOOM = -2;
+const MAX_ZOOM = 2;
+
 export function Canvas() {
   // Keep track of origin and zoom
   const [originX, setOriginX] = createSignal(0);
@@ -70,7 +73,6 @@ export function Canvas() {
     }`;
 
   // Zoom handling
-  // TODO: handle CTRL + +/- if possible
   function scale(factor: number) {
     setZoom((v) => v + factor);
 
@@ -90,19 +92,26 @@ export function Canvas() {
     setOriginY((y) => y + dy);
   }
 
-  const zoomIn = () => scale(0.05);
-  const zoomOut = () => scale(-0.05);
+  function clampScale(factor: number) {
+    const currentValue = zoom();
+    const target = Math.max(
+      Math.min(currentValue + factor, MAX_ZOOM),
+      MIN_ZOOM
+    );
+
+    scale(target - currentValue);
+  }
 
   function onKeyDown(event: KeyboardEvent) {
     if (event.ctrlKey) {
       switch (event.key) {
         case "=":
           event.preventDefault();
-          zoomIn();
+          clampScale(0.05);
           break;
         case "-":
           event.preventDefault();
-          zoomOut();
+          clampScale(-0.05);
           break;
       }
     }
