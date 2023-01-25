@@ -102,6 +102,10 @@ export function Canvas() {
     scale(target - currentValue);
   }
 
+  function onWheel(event: WheelEvent) {
+    clampScale(- event.deltaY * 0.001);
+  }
+
   function onKeyDown(event: KeyboardEvent) {
     if (event.ctrlKey) {
       switch (event.key) {
@@ -133,6 +137,7 @@ export function Canvas() {
       onTouchStart={startPan}
       onTouchEnd={stopPan}
       onTouchMove={onPan}
+      onWheel={onWheel}
     >
       <foreignObject x={100} y={100} width={100} height={100}>
         {() => (
