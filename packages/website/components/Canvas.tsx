@@ -10,8 +10,10 @@ export function Canvas() {
   // Handle panning of canvas
   const [pan, setPan] = createSignal(false);
   const startPan = (event: MouseEvent | TouchEvent) => {
-    event.preventDefault();
-    setPan(true);
+    if (event.target instanceof SVGSVGElement) {
+      event.preventDefault();
+      setPan(true);
+    }
   };
   const stopPan = () => setPan(false);
   const onPan = (event: MouseEvent | TouchEvent) => {
