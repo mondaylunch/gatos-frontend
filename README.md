@@ -13,8 +13,15 @@ This repository contains the Gatos website.
 # install dependencies
 pnpm install
 
-# run the frontend#
+# run the frontend
 pnpm dev
 ```
 
 To run and generate a run configuration for the frontend in IntelliJ you can open `package.json` and press the play button.
+
+## Open the documentation
+
+```bash
+# run Docusaurus
+pnpm run docs
+```
