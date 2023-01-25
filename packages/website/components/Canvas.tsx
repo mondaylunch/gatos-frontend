@@ -94,13 +94,17 @@ export function Canvas() {
   const zoomOut = () => scale(-0.05);
 
   function onKeyDown(event: KeyboardEvent) {
-    switch (event.key) {
-      case "=":
-        zoomIn();
-        break;
-      case "-":
-        zoomOut();
-        break;
+    if (event.ctrlKey) {
+      switch (event.key) {
+        case "=":
+          event.preventDefault();
+          zoomIn();
+          break;
+        case "-":
+          event.preventDefault();
+          zoomOut();
+          break;
+      }
     }
   }
 
