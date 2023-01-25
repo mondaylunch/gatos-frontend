@@ -1,13 +1,11 @@
-import { Button } from "~/components/inputs/Button";
+import { Button_Success } from "~/components/inputs/buttons/Button_Success";
 import "./index.css";
 
 export default function Home() {
   return (
     <main>
       <h1>Gatos</h1>
-      <Button class="outline outline-offset-2 outline-blue-500">
-        text in the button
-      </Button>
+      <Button_Success>text in the button</Button_Success>
     </main>
   );
 }
