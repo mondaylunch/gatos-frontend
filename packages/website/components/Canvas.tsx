@@ -1,4 +1,5 @@
-import { createEffect, createSignal } from "solid-js";
+import { createEffect, createSignal, onCleanup } from "solid-js";
+import styles from "./Canvas.module.css";
 
 export function Canvas() {
   // Keep track of origin and zoom
@@ -8,10 +9,15 @@ export function Canvas() {
 
   // Handle panning of canvas
   const [pan, setPan] = createSignal(false);
-  const startPan = () => setPan(true);
+  const startPan = (event: MouseEvent | TouchEvent) => {
+    event.preventDefault();
+    setPan(true);
+  };
   const stopPan = () => setPan(false);
   const onPan = (event: MouseEvent | TouchEvent) => {
     if (pan()) {
+      event.preventDefault();
+
       setOriginX(
         (ox) =>
           ox -
@@ -32,6 +38,7 @@ export function Canvas() {
   const [height, setHeight] = createSignal(0);
   let svgRef: SVGSVGElement | undefined;
 
+  // Keep track of the element's w/h
   function updateSize() {
     setWidth(svgRef!.clientWidth);
     setHeight(svgRef!.clientHeight);
@@ -55,44 +62,51 @@ export function Canvas() {
       height() / zoomFactor()
     }`;
 
+  // Zoom handling
+  // TODO: handle CTRL + +/- if possible
+  const zoomIn = () => setZoom((v) => v + 0.2);
+  const zoomOut = () => setZoom((v) => v - 0.2);
+
+  function onKeyDown(event: KeyboardEvent) {
+    switch (event.key) {
+      case "=":
+        zoomIn();
+        break;
+      case "-":
+        zoomOut();
+        break;
+    }
+  }
+
+  document.addEventListener("keydown", onKeyDown);
+  onCleanup(() => document.removeEventListener("keydown", onKeyDown));
+
   return (
-    <>
-      <svg
-        ref={svgRef}
-        width="100%"
-        height="400px"
-        viewBox={viewBox()}
-        onMouseDown={startPan}
-        onMouseUp={stopPan}
-        onMouseMove={onPan}
-        onTouchStart={startPan}
-        onTouchEnd={stopPan}
-        onTouchMove={onPan}
-      >
-        <foreignObject x={100} y={100} width={100} height={100}>
-          {() => (
-            <div
-              style={{ width: "100px", height: "100px", background: "gray" }}
-            >
-              hello i am a box
-            </div>
-          )}
-        </foreignObject>
-        <foreignObject x={220} y={140} width={100} height={100}>
-          {() => (
-            <div
-              style={{ width: "100px", height: "100px", background: "purple" }}
-            >
-              get real
-            </div>
-          )}
-        </foreignObject>
-      </svg>
-      <div>
-        <div>zoom: {zoom()}</div>
-        <button onClick={() => setZoom((v) => v + 0.2)}>zoom in</button>
-        <button onClick={() => setZoom((v) => v - 0.2)}>zoom out</button>
-      </div>
-    </>
+    <svg
+      class={styles.canvas}
+      ref={svgRef}
+      viewBox={viewBox()}
+      onMouseDown={startPan}
+      onMouseUp={stopPan}
+      onMouseMove={onPan}
+      onTouchStart={startPan}
+      onTouchEnd={stopPan}
+      onTouchMove={onPan}
+    >
+      <foreignObject x={100} y={100} width={100} height={100}>
+        {() => (
+          <div style={{ width: "100px", height: "100px", background: "gray" }}>
+            a
+          </div>
+        )}
+      </foreignObject>
+      <foreignObject x={220} y={140} width={100} height={100}>
+        {() => (
+          <div style={{ width: "100px", height: "100px", background: "gray" }}>
+            b
+          </div>
+        )}
+      </foreignObject>
+    </svg>
   );
 }
