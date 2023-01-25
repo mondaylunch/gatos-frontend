@@ -7,6 +7,10 @@ export function Canvas() {
   const [originY, setOriginY] = createSignal(0);
   const [zoom, setZoom] = createSignal(0);
 
+  // Keep track of mouse position for calculating zoom
+  const [mouseX, setMouseX] = createSignal(0);
+  const [mouseY, setMouseY] = createSignal(0);
+
   // Handle panning of canvas
   const [pan, setPan] = createSignal(false);
   const startPan = (event: MouseEvent | TouchEvent) => {
@@ -17,6 +21,11 @@ export function Canvas() {
   };
   const stopPan = () => setPan(false);
   const onPan = (event: MouseEvent | TouchEvent) => {
+    if (event instanceof MouseEvent) {
+      setMouseX(event.offsetX);
+      setMouseY(event.offsetY);
+    }
+
     if (pan()) {
       event.preventDefault();
 
@@ -35,7 +44,8 @@ export function Canvas() {
   };
 
   // Determine constants
-  const zoomFactor = () => 2 ** zoom();
+  const computeZoom = (v: number) => 2 ** v;
+  const zoomFactor = () => computeZoom(zoom());
   const [width, setWidth] = createSignal(0);
   const [height, setHeight] = createSignal(0);
   let svgRef: SVGSVGElement | undefined;
@@ -61,8 +71,27 @@ export function Canvas() {
 
   // Zoom handling
   // TODO: handle CTRL + +/- if possible
-  const zoomIn = () => setZoom((v) => v + 0.2);
-  const zoomOut = () => setZoom((v) => v - 0.2);
+  function scale(factor: number) {
+    setZoom((v) => v + factor);
+
+    const zoomDelta = computeZoom(factor);
+    const currentZoom = zoomFactor();
+    const targetZoom = currentZoom * zoomDelta;
+
+    const mX = mouseX();
+    const mY = mouseY();
+
+    const [dx, dy] = [
+      -mX / targetZoom + mX / currentZoom,
+      -mY / targetZoom + mY / currentZoom,
+    ];
+
+    setOriginX((x) => x + dx);
+    setOriginY((y) => y + dy);
+  }
+
+  const zoomIn = () => scale(0.05);
+  const zoomOut = () => scale(-0.05);
 
   function onKeyDown(event: KeyboardEvent) {
     switch (event.key) {
