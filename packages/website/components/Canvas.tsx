@@ -40,17 +40,12 @@ export function Canvas() {
   const [height, setHeight] = createSignal(0);
   let svgRef: SVGSVGElement | undefined;
 
-  // Keep track of the element's w/h
-  function updateSize() {
-    setWidth(svgRef!.clientWidth);
-    setHeight(svgRef!.clientHeight);
-  }
-
+  // Keep track of the canvas size
   createEffect(() => {
     if (svgRef) {
-      const observer = new ResizeObserver((_entries) => {
-        // TODO: probably bad performance if this monitors child elements
-        updateSize();
+      const observer = new ResizeObserver(() => {
+        setWidth(svgRef!.clientWidth);
+        setHeight(svgRef!.clientHeight);
       });
 
       observer.observe(svgRef!);
@@ -80,8 +75,10 @@ export function Canvas() {
     }
   }
 
-  document.addEventListener("keydown", onKeyDown);
-  onCleanup(() => document.removeEventListener("keydown", onKeyDown));
+  if (typeof document !== "undefined") {
+    document.addEventListener("keydown", onKeyDown);
+    onCleanup(() => document.removeEventListener("keydown", onKeyDown));
+  }
 
   return (
     <svg
