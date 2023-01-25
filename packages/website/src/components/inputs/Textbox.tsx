@@ -6,5 +6,9 @@ type Props = JSX.HTMLAttributes<HTMLInputElement>;
  * Common textbox element
  */
 export function Textbox(props: Props) {
-    return <input {...props} class="bg-gray-200 p-4" />;
+  return <input {...props} class="bg-gray-200 p-4" />;
+}
+
+export function Hidden_Textbox(props: Props) {
+  return <input {...props} class="hidden" />;
 }
