@@ -8,8 +8,8 @@ import {
   export default function Home() {
     return (
     
-        <div class="flex h-screen w-screen items-center justify-center bg-slate-700">
-            <div class="block pt-6 pr-6 pl-6 pb-4 rounded-lg shadow-lg max-w-sm bg-slate-800">
+        <div class="flex h-screen w-screen items-center justify-center bg-neutral-900">
+            <div class="block pt-6 pr-6 pl-6 pb-4 rounded-[35px] shadow-lg max-w-sm bg-neutral-800">
             
                 <div class="pb-2">
                 <Email_Textbox id="email" />
