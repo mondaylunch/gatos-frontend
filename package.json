@@ -2,7 +2,9 @@
   "name": "gatos",
   "version": "1.0.0",
   "scripts": {
-    "dev": "cd packages/website && npm run dev"
+    "dev": "cd packages/website && npm run dev",
+    "test:integration": "pnpm --filter playwright test",
+    "test:install": "pnpm --filter playwright playwright install"
   },
   "engines": {
     "node": ">=16",
