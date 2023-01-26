@@ -65,10 +65,7 @@ export function Canvas() {
     }`;
 
   // Zoom handling
-  function scale(
-    factor: number,
-    origin: [number, number] = [mouseX(), mouseY()]
-  ) {
+  function scale(factor: number, origin: [number, number]) {
     setZoom((v) => v + factor);
 
     const zoomDelta = computeZoom(factor);
@@ -85,7 +82,7 @@ export function Canvas() {
     setOriginY((y) => y + dy);
   }
 
-  function clampScale(factor: number, origin?: [number, number]) {
+  function clampScale(factor: number, origin: [number, number]) {
     const currentValue = zoom();
     const target = Math.max(
       Math.min(currentValue + factor, MAX_ZOOM),
@@ -97,20 +94,22 @@ export function Canvas() {
 
   // Create event listener for handling mouse zoom
   function onWheel(event: WheelEvent) {
-    clampScale(-event.deltaY * 0.001);
+    clampScale(-event.deltaY * 0.001, [mouseX(), mouseY()]);
   }
 
   // Create event handler for overriding browser zoom keys
   function onKeyDown(event: KeyboardEvent) {
+    const origin = () => [width() / 2, height() / 2] as [number, number];
+
     if (event.ctrlKey) {
       switch (event.key) {
         case "=":
           event.preventDefault();
-          clampScale(0.05);
+          clampScale(0.05, origin());
           break;
         case "-":
           event.preventDefault();
-          clampScale(-0.05);
+          clampScale(-0.05, origin());
           break;
       }
     }
