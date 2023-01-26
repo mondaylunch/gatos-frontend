@@ -1,7 +1,14 @@
 import { createEffect, createSignal, onCleanup } from "solid-js";
 import styles from "./Canvas.module.css";
 
+/**
+ * Minimum linear zoom factor
+ */
 const MIN_ZOOM = -2;
+
+/**
+ * Maximum linear zoom factor
+ */
 const MAX_ZOOM = 2;
 
 export function Canvas() {
@@ -17,7 +24,11 @@ export function Canvas() {
   // Handle panning of canvas
   const [pan, setPan] = createSignal(false);
 
-  // Create event handlers for mouse panning
+  /**
+   * Handle mouse down event
+   * This indicates the user has started to pan
+   * @param event Mouse Event
+   */
   const onMouseDown = (event: MouseEvent) => {
     if (event.target instanceof SVGSVGElement) {
       event.preventDefault();
@@ -25,12 +36,23 @@ export function Canvas() {
     }
   };
 
+  /**
+   * Handle mouse up event
+   * This indicates the user has stopped panning
+   * @param event Mouse Event
+   */
   const onMouseUp = () => setPan(false);
 
+  /**
+   * Handle mouse move event
+   * @param event Mouse Event
+   */
   const onMouseMove = (event: MouseEvent) => {
+    // Keep track of the mouse location at all times
     setMouseX(event.offsetX);
     setMouseY(event.offsetY);
 
+    // If we are panning, then adjust the origin based on mouse movement
     if (pan()) {
       event.preventDefault();
       setOriginX((ox) => ox - event.movementX / zoomFactor());
@@ -53,18 +75,27 @@ export function Canvas() {
         setHeight(svgRef!.clientHeight);
       });
 
+      // note: by default children are not observed,
+      // so it is unlikely we'll have any perf. issues
       observer.observe(svgRef!);
       return () => observer.disconnect();
     }
   }, [svgRef]);
 
-  // Determine which portion of the SVG to display
+  /**
+   * Compute which portion of the SVG to display
+   * @returns SVG viewbox
+   */
   const viewBox = () =>
     `${originX()} ${originY()} ${width() / zoomFactor()} ${
       height() / zoomFactor()
     }`;
 
-  // Zoom handling
+  /**
+   * Scale the canvas around a given origin point by the given factor
+   * @param factor linear scale factor
+   * @param origin origin coordinates
+   */
   function scale(factor: number, origin: [number, number]) {
     setZoom((v) => v + factor);
 
@@ -82,6 +113,12 @@ export function Canvas() {
     setOriginY((y) => y + dy);
   }
 
+  /**
+   * Scale the canvas around a given origin point by the given factor
+   * This function will clamp the zoom on both extremes
+   * @param factor linear scale factor
+   * @param origin origin coordinates
+   */
   function clampScale(factor: number, origin: [number, number]) {
     const currentValue = zoom();
     const target = Math.max(
@@ -92,12 +129,17 @@ export function Canvas() {
     scale(target - currentValue, origin);
   }
 
-  // Create event listener for handling mouse zoom
+  /**
+   * Handle mouse wheel scroll
+   * @param event Wheel Event
+   */
   function onWheel(event: WheelEvent) {
     clampScale(-event.deltaY * 0.001, [mouseX(), mouseY()]);
   }
-
-  // Create event handler for overriding browser zoom keys
+  /**
+   * Handle key down event for intercepting shortcuts
+   * @param event Keyboard Event
+   */
   function onKeyDown(event: KeyboardEvent) {
     const origin = () => [width() / 2, height() / 2] as [number, number];
 
@@ -115,28 +157,43 @@ export function Canvas() {
     }
   }
 
+  // If not in SSR, bind the global key press events.
   if (typeof document !== "undefined") {
     document.addEventListener("keydown", onKeyDown);
     onCleanup(() => document.removeEventListener("keydown", onKeyDown));
   }
 
-  // Handle touch events for zoom and pan
+  // Keep track of touch event information from last received event
   const [trackedTouches, setTrackedTouches] = createSignal<
     undefined | TouchList
   >();
 
+  /**
+   * Handle touch start and save touch data
+   * @param event Touch Event
+   */
   function onTouchStart(event: TouchEvent) {
-    if (event.touches.length) setTrackedTouches(event.touches);
+    setTrackedTouches(event.touches);
   }
 
+  /**
+   * Handle touch end and wipe known touch data if no touches present
+   * @param event Touch Event
+   */
   function onTouchEnd(event: TouchEvent) {
     if (!event.touches.length) setTrackedTouches(undefined);
   }
 
+  /**
+   * Handle touch move and pan / zoom depending on gesture
+   * @param event Touch Event
+   */
   function onTouchMove(event: TouchEvent) {
+    // If we are missing data, just skip
     const list = trackedTouches();
     if (!list) return;
 
+    // Determine what has changed since the last even
     const touchDelta = [...list]
       .map(
         (touch) =>
@@ -158,7 +215,7 @@ export function Canvas() {
       );
 
     if (touchDelta.length === 1) {
-      // Pan
+      // Only Pan
       const [[dx, dy]] = touchDelta;
       setOriginX((x) => x - dx / zoomFactor());
       setOriginY((y) => y - dy / zoomFactor());
@@ -175,22 +232,26 @@ export function Canvas() {
       let xScale = 0,
         yScale = 0;
 
+      // Check on X axis
       if ((dx1 < 0 && dx2 >= 0) || (dx2 < 0 && dx1 >= 0)) {
         xScale += dx2 - dx1;
       } else {
+        // Pan on X axis
         setOriginX((x) => x - dx1 / zoomFactor());
       }
 
+      // Check on Y axis
       if ((dy1 < 0 && dy2 >= 0) || (dy2 < 0 && dy1 >= 0)) {
         yScale += dy2 - dy1;
       } else {
+        // Pan on Y axis
         setOriginY((x) => x - dx1 / zoomFactor());
       }
 
       // Determine scale factor and whether we are zooming
       let scale = Math.sqrt(xScale ** 2 + yScale ** 2);
       if (scale) {
-        // Determine direction of zoom
+        // Determine magnitude of line between touch points before and after
         let startMagntiude = Math.sqrt(
           (startX2 - startX1) ** 2 + (startY2 - startY1) ** 2
         );
@@ -199,6 +260,7 @@ export function Canvas() {
           (finalX2 - finalX1) ** 2 + (finalY2 - finalY1) ** 2
         );
 
+        // Determine direction of zoom
         const direction = finalMagntiude - startMagntiude > 0 ? 1 : -1;
 
         // Find the center point of the zoom operation
@@ -212,6 +274,7 @@ export function Canvas() {
       }
     }
 
+    // Save the new touch data
     setTrackedTouches(event.touches);
   }
 
