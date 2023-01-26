@@ -1,5 +1,5 @@
 import { Meta } from "solid-start";
-import { Canvas } from "../../../components/Canvas";
+import { Canvas } from "../../components/editor/Canvas";
 import styles from "./editor.module.css";
 
 export default function Home() {
