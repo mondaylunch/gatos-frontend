@@ -1,5 +1,4 @@
 import type { JSX } from "solid-js";
-import "../icons.css";
 
 type Props = JSX.HTMLAttributes<HTMLButtonElement>;
 

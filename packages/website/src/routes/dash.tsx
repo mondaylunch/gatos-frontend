@@ -2,7 +2,6 @@
     Square_New,
     Square_File
   } from "~/components/dashboard/squares";
-  import "../components/icons.css";
   
   export default function Home() {
     return (
