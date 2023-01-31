@@ -2,7 +2,8 @@
   "name": "gatos",
   "version": "1.0.0",
   "scripts": {
-    "dev": "cd packages/website && npm run dev"
+    "dev": "cd packages/website && npm run dev",
+    "docs": "cd packages/documentation && npm run start"
   },
   "engines": {
     "node": ">=16",
