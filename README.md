@@ -13,7 +13,7 @@ This repository contains the Gatos website.
 # install dependencies
 pnpm i
 
-# run the frontend#
+# run the frontend
 pnpm dev
 ```
 
@@ -40,4 +40,11 @@ Run tests:
 ```bash
 # run integration tests
 pnpm test:integration
+```
+
+## Open the documentation
+
+```bash
+# run Docusaurus
+pnpm run docs
 ```

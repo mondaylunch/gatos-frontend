@@ -4,12 +4,16 @@
   "scripts": {
     "dev": "cd packages/website && npm run dev",
     "test:integration": "pnpm --filter playwright test",
-    "test:install": "pnpm --filter playwright playwright install"
+    "test:install": "pnpm --filter playwright playwright install",
+    "docs": "cd packages/documentation && npm run start"
   },
   "engines": {
     "node": ">=16",
     "pnpm": ">=6"
   },
   "private": true,
-  "packageManager": "pnpm@7.25.0"
+  "packageManager": "pnpm@7.25.0",
+  "dependencies": {
+    "prettier": "^2.8.3"
+  }
 }

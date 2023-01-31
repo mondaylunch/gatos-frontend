@@ -12,6 +12,7 @@ import {
 } from "solid-start";
 import "./root.css";
 import { ErrorBoundary } from "solid-start/error-boundary";
+import "./root.css";
 
 export default function Root() {
   return (
