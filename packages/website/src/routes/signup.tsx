@@ -1,6 +1,6 @@
 import { Component, createEffect } from "solid-js";
 import { useForm } from "~/components/forms/useForm";
-import { Button_Option, Button_Primary } from "~/components/inputs/Buttons";
+import { Button } from "~/components/inputs/Buttons";
 import {
     Email_Textbox,
     Password_Textbox,
@@ -82,9 +82,9 @@ export default function Home() {
                         <div class="flex space-x-2 justify-center">
                             {" "}
                             {/*Needs to point to function */}
-                            <Button_Primary class="form-submit submit" type="submit">Sign up</Button_Primary>
+                            <Button variant="primary" class="form-submit submit" type="submit">Sign up</Button>
                             <a href="/login">
-                                <Button_Option>Log in</Button_Option>
+                                <Button variant="option">Log in</Button>
                             </a>
                         </div>
                     </div>
