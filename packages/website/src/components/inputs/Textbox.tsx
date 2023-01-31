@@ -1,6 +1,6 @@
 import type { JSX } from "solid-js";
 
-type Props = JSX.HTMLAttributes<HTMLInputElement>;
+type Props = JSX.InputHTMLAttributes<HTMLInputElement>;
 
 /**
  * Common textbox element
