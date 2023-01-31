@@ -3,7 +3,10 @@ lockfileVersion: 5.4
 importers:
 
   .:
-    specifiers: {}
+    specifiers:
+      prettier: ^2.8.3
+    dependencies:
+      prettier: 2.8.3
 
   packages/documentation:
     specifiers:
@@ -8180,6 +8183,10 @@ packages:
     dependencies:
       lodash: 4.17.21
       renderkid: 3.0.0
+  /prettier/2.8.3:
+    resolution: {integrity: sha512-tJ/oJ4amDihPoufT5sM0Z1SKEuKay8LfVAMlbbhnnkvt6BUserZylqo2PN+p9KeljLr0OHa2rXHU1T8reeoTrw==}
+    engines: {node: '>=10.13.0'}
+    hasBin: true
     dev: false
 
   /pretty-format/27.5.1:
