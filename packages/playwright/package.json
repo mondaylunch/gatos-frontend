@@ -1,0 +1,16 @@
+{
+  "name": "playwright",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "playwright test",
+    "playwright": "playwright"
+  },
+  "keywords": [],
+  "private": true,
+  "dependencies": {
+    "@playwright/test": "^1.29"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.11"
+  }
+}
