@@ -17,3 +17,25 @@ export function Variable_Node() {
         </div>
     )
 }
+
+export function Start_Node() {
+    return (
+        <div class="rounded-t-full h-32 w-64 flex bg-neutral-900 m-2 flex items-center justify-center">
+            <p class="font-bold text-white">
+             HTTP request
+        </p>
+
+        </div>
+    )
+}
+
+export function End_Node() {
+    return (
+        <div class="rounded-b-full h-32 w-64 flex bg-neutral-900 m-2 flex items-center justify-center">
+            <p class="font-bold text-white">
+             OUTPUT
+        </p>
+
+        </div>
+    )
+}

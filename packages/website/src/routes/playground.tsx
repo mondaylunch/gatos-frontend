@@ -6,7 +6,7 @@ import {
     createDraggable,
     DragOverlay,
 } from "@thisbeyond/solid-dnd";
-import { Action_Node, Variable_Node } from "~/components/nodes/Node";
+import { Action_Node, Variable_Node, Start_Node, End_Node } from "~/components/nodes/Node";
 
 type DraggableProps = {
     id: number;
@@ -22,7 +22,7 @@ const Draggable = (props: DraggableProps) => {
             classList={{ "opacity-0": draggable.isActiveDraggable }}
             style={{ top: 0, left: (props.id === 1 ? 0 : 300) + "px" }}
         >
-            <Variable_Node />
+            <End_Node />
         </div>
     );
 };
@@ -50,7 +50,7 @@ const DragMoveExample = () => {
                 <Draggable id={2} />
             </div>
             <DragOverlay>
-                {((draggable: DraggableProps) => <Variable_Node />) as any}
+                {((draggable: DraggableProps) => <End_Node />) as any}
             </DragOverlay>
         </DragDropProvider>
     );
