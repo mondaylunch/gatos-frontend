@@ -1,10 +1,3 @@
-import {
-  Button_Success,
-  Button_Danger,
-  Button_Option,
-  Button_Primary,
-} from "~/components/inputs/Buttons";
-import { Email_Textbox, Password_Textbox } from "~/components/inputs/Textbox";
 import "./index.css";
 
 export default function Home() {
