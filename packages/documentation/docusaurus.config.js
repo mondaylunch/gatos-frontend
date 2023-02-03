@@ -36,7 +36,7 @@ const config = {
           sidebarPath: require.resolve('./sidebars.js'),
           routeBasePath: '/',
           editUrl:
-            'https://github.com/mondaylunch/gatos-frontend/tree/main/packages/documentation/',
+            'https://github.com/mondaylunch/gatos-frontend/tree/master/packages/documentation/',
         },
       }),
     ],
