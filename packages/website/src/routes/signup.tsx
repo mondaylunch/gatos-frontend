@@ -1,5 +1,5 @@
 import { Component, createEffect } from "solid-js";
-import { useForm } from "~/components/forms/useForm";
+import { useForm } from "~/components/forms/useSignupForm";
 import { Button } from "~/components/inputs/Buttons";
 import {
   Email_Textbox,

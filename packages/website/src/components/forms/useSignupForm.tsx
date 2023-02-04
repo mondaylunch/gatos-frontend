@@ -1,5 +1,7 @@
 import { Accessor } from "solid-js";
+import axios from 'axios';
 import { createStore } from "solid-js/store";
+import { respondWith } from "solid-start/server/server-functions/server";
 
 type FormFields = {
     username?: string;
@@ -13,8 +15,23 @@ const submit = (form: FormFields) => {
     email: form.email,
     password: form.password
   };
-  // TODO: Send data to server
-  alert(JSON.stringify(dataToSubmit, null, 2));
+
+  fetch('/api/v1/sign_up', {
+    method: 'POST',
+    headers: {
+      'x-auth-token': 'token',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(dataToSubmit)
+  })
+    .then(response => response.json())
+    .then(data => {
+      alert(data);
+      console.log(data);
+    })
+    .catch(error => {
+      alert(error);
+    });
 };
 const useForm = () => {
   const [form, setForm] = createStore<FormFields>({
