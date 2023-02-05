@@ -44,8 +44,10 @@ const submit = (form: FormFields) => {
       }
     })
     .then(response => {
-      alert(response.data);
-      console.log(response.data);
+      //TODO: store the user's id and username in localStorage once i figure out how solid does that
+      if (response.status.toString().charAt(0) !== '4' && response.status.toString().charAt(0) !== '5') {
+        window.location.href = '/dash';
+      }
     })
     .catch(error => {
       alert(error);

@@ -1,10 +1,5 @@
 import { useForm } from "~/components/forms/useSignupForm";
 import { Button } from "~/components/inputs/Buttons";
-import {
-  Email_Textbox,
-  Password_Textbox,
-  Username_Textbox,
-} from "~/components/inputs/Textbox";
 import "./index.css";
 
 export default function Home() {
