@@ -7,37 +7,58 @@ type FormFields = {
     username?: string;
     email?: string;
     password?: string;
+    password_confirm?: string;
 };
 
 const submit = (form: FormFields) => {
   const dataToSubmit = {
     username: form.username,
     email: form.email,
-    password: form.password
+    password: form.password,
+    password_confirm: form.password_confirm
   };
 
-  fetch('/api/v1/sign_up', {
-    method: 'POST',
-    headers: {
-      'x-auth-token': 'token',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(dataToSubmit)
-  })
-    .then(response => response.json())
-    .then(data => {
-      alert(data);
-      console.log(data);
+  // Add a check to see if the password is 8 characters long
+  if (form.password && form.password.length < 8) {
+    alert("Password must be 8 characters long");
+    return;
+  }
+
+  // Add a check to see if the password and password_confirm fields match
+  if (form.password !== form.password_confirm) {
+    alert("Passwords do not match");
+    return;
+  }
+
+  //Add a check to see if the username is already taken by making a GET request to the /api/v1/sign_up/check_username/:username endpoint
+  //The endpoint will return json {"in_use": true} if the username is already taken
+  axios.get(`/api/v1/sign_up/check_username/${form.username}`).then((res) => {
+    if (res.data.in_use) {
+      alert("Username already taken");
+      return;
+    }
+    axios.post('/api/v1/sign_up', dataToSubmit, {
+      headers: {
+        'x-auth-token': 'token',
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      alert(response.data);
+      console.log(response.data);
     })
     .catch(error => {
       alert(error);
     });
+  });
+  
 };
 const useForm = () => {
   const [form, setForm] = createStore<FormFields>({
     username: "",
     email: "",
-    password: ""
+    password: "",
+    password_confirm: ""
   });
 
   const clearField = (fieldName: string) => {
@@ -59,7 +80,7 @@ const useForm = () => {
     }
   };
 
-  return { form, submit, updateFormField, clearField };
+  return { form, submit, updateFormField, clearField,};
 };
 
 export { useForm };

@@ -1,4 +1,3 @@
-import { Component, createEffect } from "solid-js";
 import { useForm } from "~/components/forms/useSignupForm";
 import { Button } from "~/components/inputs/Buttons";
 import {
@@ -74,9 +73,22 @@ export default function Home() {
             </div>
           </div>
           <div class="py-2">
-            <Password_Textbox id="password_confirm">
-              Confirm Password
-            </Password_Textbox>
+            <div class="relative z-0">
+            <input
+                type="password"
+                id="password_confirm"
+                class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                placeholder=" "
+                value={form.password_confirm}
+                onInput={updateFormField("password_confirm")}
+              />
+              <label
+                for="password_confirm"
+                class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+              >
+                Confirm Password
+              </label>
+            </div>
           </div>
           <div class="py-2">
             <div class="flex space-x-2 justify-center">
@@ -93,7 +105,6 @@ export default function Home() {
             </div>
           </div>
         </form>
-        <pre class="text-white">{JSON.stringify(form, null, 2)}</pre>
       </div>
     </div>
   );
