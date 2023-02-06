@@ -2,6 +2,7 @@ import { Accessor } from "solid-js";
 import axios from 'axios';
 import { createStore } from "solid-js/store";
 import { respondWith } from "solid-start/server/server-functions/server";
+import { setUsername } from "./useLoginForm";
 
 type FormFields = {
     username?: string;
@@ -44,8 +45,8 @@ const submit = (form: FormFields) => {
       }
     })
     .then(response => {
-      //TODO: store the user's id and username in localStorage once i figure out how solid does that
       if (response.status.toString().charAt(0) !== '4' && response.status.toString().charAt(0) !== '5') {
+        setUsername(response.data.username);
         window.location.href = '/dash';
       }
     })

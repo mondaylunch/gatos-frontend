@@ -1,4 +1,4 @@
-import { Accessor } from "solid-js";
+import { Accessor, createSignal } from "solid-js";
 import axios from 'axios';
 import { createStore } from "solid-js/store";
 import { respondWith } from "solid-start/server/server-functions/server";
@@ -7,6 +7,8 @@ type FormFields = {
     email?: string;
     password?: string;
 };
+
+const [username, setUsername] = createSignal("hjgkgk");
 
 const submit = (form: FormFields) => {
   const dataToSubmit = {
@@ -28,7 +30,8 @@ const submit = (form: FormFields) => {
       'Content-Type': 'application/json'
     }
   }).then(response => {
-    //TODO: store the user's id and username in localStorage once i figure out how solid does that
+    setUsername(response.data.username);
+    // alert(username());
     if (response.status.toString().charAt(0) !== '4' && response.status.toString().charAt(0) !== '5') {
       window.location.href = '/dash';
     }
@@ -66,3 +69,4 @@ const useForm = () => {
 };
 
 export { useForm };
+export { username, setUsername };
