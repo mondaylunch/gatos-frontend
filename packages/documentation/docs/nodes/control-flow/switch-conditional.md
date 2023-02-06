@@ -1,4 +1,4 @@
-# Switch
+# Switch: Conditional
 
 This node will execute one of two paths depending on a given boolean.
 
