@@ -1,4 +1,11 @@
-import { createEffect, createSignal, JSX, onCleanup } from "solid-js";
+import {
+  Accessor,
+  createEffect,
+  createSignal,
+  JSX,
+  onCleanup,
+  Ref,
+} from "solid-js";
 import styles from "./Canvas.module.css";
 
 /**
@@ -15,7 +22,12 @@ interface Props {
   /**
    * Canvas elements
    */
-  children?: JSX.Element
+  children?: JSX.Element;
+
+  /**
+   * Zoom factor ref
+   */
+  zoomRef?: Ref<Accessor<number>>;
 }
 
 export function Canvas(props: Props) {
@@ -73,6 +85,10 @@ export function Canvas(props: Props) {
   const [width, setWidth] = createSignal(0);
   const [height, setHeight] = createSignal(0);
   let svgRef: SVGSVGElement | undefined;
+
+  if (props.zoomRef) {
+    props.zoomRef(zoomFactor);
+  }
 
   // Keep track of the canvas size
   createEffect(() => {
