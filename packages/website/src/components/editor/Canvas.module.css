@@ -1,3 +1,8 @@
 .canvas {
     flex-grow: 1;
 }
+
+.element > * {
+    width: var(--width);
+    height: var(--height);
+}

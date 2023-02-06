@@ -1,4 +1,4 @@
-import { createEffect, createSignal, onCleanup } from "solid-js";
+import { createEffect, createSignal, JSX, onCleanup } from "solid-js";
 import styles from "./Canvas.module.css";
 
 /**
@@ -11,7 +11,14 @@ const MIN_ZOOM = -2;
  */
 const MAX_ZOOM = 2;
 
-export function Canvas() {
+interface Props {
+  /**
+   * Canvas elements
+   */
+  children?: JSX.Element
+}
+
+export function Canvas(props: Props) {
   // Keep track of origin and zoom
   const [originX, setOriginX] = createSignal(0);
   const [originY, setOriginY] = createSignal(0);
@@ -291,20 +298,7 @@ export function Canvas() {
       onTouchMove={onTouchMove}
       onWheel={onWheel}
     >
-      <foreignObject x={100} y={100} width={100} height={100}>
-        {() => (
-          <div style={{ width: "100px", height: "100px", background: "gray" }}>
-            a
-          </div>
-        )}
-      </foreignObject>
-      <foreignObject x={220} y={140} width={100} height={100}>
-        {() => (
-          <div style={{ width: "100px", height: "100px", background: "gray" }}>
-            b
-          </div>
-        )}
-      </foreignObject>
+      {props.children}
     </svg>
   );
 }
