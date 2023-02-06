@@ -1,4 +1,4 @@
- import "./index.css";
+import "./index.css";
 import {
     DragDropProvider,
     DragDropSensors,
@@ -7,9 +7,11 @@ import {
     DragOverlay,
 } from "@thisbeyond/solid-dnd";
 import { Action_Node, Variable_Node, Start_Node, End_Node } from "~/components/nodes/Node";
+import {JSX} from "solid-js";
 
 type DraggableProps = {
     id: number;
+    children?: JSX.Element;
 }
 
 const Draggable = (props: DraggableProps) => {
@@ -22,7 +24,7 @@ const Draggable = (props: DraggableProps) => {
             classList={{ "opacity-0": draggable.isActiveDraggable }}
             style={{ top: 0, left: (props.id === 1 ? 0 : 300) + "px" }}
         >
-            <End_Node />
+            {props.children}
         </div>
     );
 };
@@ -46,11 +48,15 @@ const DragMoveExample = () => {
         <DragDropProvider onDragMove={onDragMove} onDragEnd={onDragEnd}>
             <DragDropSensors />
             <div class="min-h-15 w-full h-full relative">
-                <Draggable id={1} />
-                <Draggable id={2} />
+                <Draggable id={1}>
+                    <Variable_Node />
+                </Draggable>
+                <Draggable id={2}>
+                    <Action_Node />
+                </Draggable>
             </div>
             <DragOverlay>
-                {((draggable: DraggableProps) => <End_Node />) as any}
+                {((draggable: DraggableProps) => <Variable_Node />) as any}
             </DragOverlay>
         </DragDropProvider>
     );

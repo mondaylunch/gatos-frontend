@@ -32,8 +32,3 @@ export function End_Node() {
     </div>
   );
 }
-
-<div class="group relative w-72 h-32 rounded-[35px] bg-white flex align-text-top justify-center">
-  <p class="font-bold capitalize select-none">Concatenate</p>
-  <div class="flex-col w-60 h-28 rounded-[35px] bg-neutral-800 flex align-text-top justify-center"></div>
-</div>;
