@@ -9,6 +9,8 @@ export default function Home() {
         name="viewport"
         content="width=device-width, initial-scale=1, user-scalable=no"
       />
+      <div class="w-40 h-full shadow-md bg-neutral-900 px-1 absolute">
+</div>
       <Canvas />
     </main>
   );
