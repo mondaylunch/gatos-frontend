@@ -5,6 +5,7 @@ import {
     DragEventHandler,
     createDraggable,
     DragOverlay,
+    createDroppable,
 } from "@thisbeyond/solid-dnd";
 import { Action_Node, Variable_Node, Start_Node, End_Node } from "~/components/nodes/Node";
 import {JSX} from "solid-js";
@@ -24,6 +25,21 @@ const Draggable = (props: DraggableProps) => {
             classList={{ "opacity-0": draggable.isActiveDraggable }}
             style={{ top: 0, left: (props.id === 1 ? 0 : 300) + "px" }}
         >
+            {props.children}
+        </div>
+    );
+};
+
+const Droppable = (props: DraggableProps) => {
+    const droppable = createDroppable(props.id);
+    return (
+        <div
+            // @ts-expect-error type incompatibility with solid.js
+            use:droppable
+            class="droppable"
+            classList={{ "!droppable-accept": droppable.isActiveDroppable }}
+        >
+            Droppable.
             {props.children}
         </div>
     );
@@ -52,7 +68,11 @@ const DragMoveExample = () => {
                     <Variable_Node />
                 </Draggable>
                 <Draggable id={2}>
-                    <Action_Node />
+                    <Action_Node>
+                        <Droppable id={1}>
+                            <div class="flex-col w-60 h-16 rounded-[35px] bg-neutral-800 flex align-text-top justify-center"></div>
+                        </Droppable>
+                    </Action_Node>
                 </Draggable>
             </div>
             <DragOverlay>
