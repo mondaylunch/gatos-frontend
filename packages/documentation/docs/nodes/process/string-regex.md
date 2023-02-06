@@ -14,12 +14,19 @@ For example, given the input string "Hello" and Regex `/H(e)(l)lo/`, this node w
 
 - isMatch: `true`
 - match: `Hello`
-- group[0]: `e`
-- group[1]: `l`
+- group 1: `e`
+- group 2: `l`
 
 For example, given the input string "World" and Regex `/H(e)(l)lo/`, this node will output:
 
 - isMatch: `false`
 - match: null
-- group[0]: null
-- group[1]: null
+- group 1: null
+- group 2: null
+
+For example, given the input string "Hello" and Regex `/H(e)(?<tail>llo)/`, this node will output:
+
+- isMatch: `true`
+- match: `Hello`
+- group 1: `e`
+- group tail: `llo`
