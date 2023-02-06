@@ -5,3 +5,12 @@ sidebar_position: 1
 # Welcome to Gatos
 
 Doc of the gato
+
+## Data Types
+
+string
+bool
+object
+number
+list[x]
+optional[x] (alternative syntax `?x`)
