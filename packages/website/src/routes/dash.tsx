@@ -6,6 +6,7 @@ const [flows, setFlows] = createSignal([] as Flow[]);
 type Flow = {
   id: string;
   name: string;
+  description: string;
   authorId: string;
 };
 
@@ -30,13 +31,11 @@ export default function Dash() {
   loadFlows();
   return (
     <div class="flex flex-col items-center justify-center w-screen h-screen bg-neutral-800">
-      <div class="flex">
-        <div class="mr-5">
-          <Square_New />
-        </div>
+      <div class="grid grid-cols-4 gap-5">
+        <Square_New />
         <For each={flows()}>
           {(flow) => (
-            <Square_File title={flow.name} description="My description" />
+            <Square_File title={flow.name} description={flow.description} />
           )}
         </For>
       </div>
