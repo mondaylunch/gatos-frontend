@@ -4,63 +4,7 @@ import { Canvas } from "../../components/editor/Canvas";
 import styles from "./editor.module.css";
 import "./temp.css";
 
-import {
-  DragDropProvider,
-  DragDropSensors,
-  DragEventHandler,
-  createDraggable,
-  createDroppable,
-} from "@thisbeyond/solid-dnd";
 import { Accessor, createSignal, For, Match, Show, Switch } from "solid-js";
-
-const Draggable = () => {
-  const draggable = createDraggable(1);
-  return (
-    <div
-      // @ts-expect-error a
-      use:draggable
-      class="draggable"
-    >
-      Draggable
-    </div>
-  );
-};
-
-const Droppable = (props: any) => {
-  const droppable = createDroppable(1);
-  return (
-    <div
-      // @ts-expect-error a
-      use:droppable
-      class="droppable"
-      classList={{ "!droppable-accept": droppable.isActiveDroppable }}
-    >
-      Droppable.
-      {props.children}
-    </div>
-  );
-};
-
-function allElementsFromPoint(x: number, y: number) {
-  // https://stackoverflow.com/a/27884653
-  var element,
-    elements = [];
-  var old_visibility = [];
-  while (true) {
-    element = document.elementFromPoint(x, y) as HTMLElement;
-    if (!element || element === document.documentElement) {
-      break;
-    }
-    elements.push(element);
-    old_visibility.push(element.style.visibility);
-    element.style.visibility = "hidden"; // Temporarily hide the element (without changing the layout)
-  }
-  for (var k = 0; k < elements.length; k++) {
-    elements[k].style.visibility = old_visibility[k];
-  }
-  elements.reverse();
-  return elements;
-}
 
 export default function Home() {
   const [move, setMove] = createSignal(false);
@@ -131,6 +75,7 @@ export default function Home() {
                 setVY(100);
 
                 const els = document.querySelectorAll("svg > *");
+                // TODO: optimisation: search at and below top element below cursor "elementsFromPoint"
                 for (const el of els) {
                   const droppable = el.querySelector("#yes");
                   if (droppable) {
