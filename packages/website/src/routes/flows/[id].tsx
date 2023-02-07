@@ -5,6 +5,7 @@ import styles from "./editor.module.css";
 
 import { Accessor, createSignal, For, Match, Show, Switch } from "solid-js";
 import { createStore } from "solid-js/store";
+import { PortalAbove } from "~/components/editor/PortalAbove";
 
 type DataTypes = "integer" | "boolean" | "string" | "optional" | "list";
 
@@ -93,12 +94,16 @@ export default function Home() {
   const [dropped, setDropped] = createSignal([] as number[]);
 
   let zoomRef: Accessor<number> | undefined;
+  let transformRef:
+    | ((clientCoords: [number, number]) => [number, number])
+    | undefined;
 
   function variableSource(el: HTMLElement, variable: Accessor<any>) {
     function grab(ev: MouseEvent) {
       setGrabbed(variable());
-      setVX(ev.clientX);
-      setVY(ev.clientY);
+      const [x, y] = transformRef!([ev.clientX, ev.clientY]);
+      setVX(x);
+      setVY(y);
     }
 
     el.addEventListener("mousedown", grab);
@@ -111,7 +116,7 @@ export default function Home() {
 
   return (
     <main
-      class={styles.container + " select-none"}
+      class={styles.container}
       onMouseMove={(e) => {
         if (move()) {
           setX((x) => x + e.movementX / zoomRef!());
@@ -119,8 +124,9 @@ export default function Home() {
         }
 
         if (grabbed()) {
-          setVX((x) => x + e.movementX / zoomRef!());
-          setVY((y) => y + e.movementY / zoomRef!());
+          const [x, y] = transformRef!([e.clientX, e.clientY]);
+          setVX(x);
+          setVY(y);
         }
       }}
       onMouseUp={(ev) => {
@@ -172,7 +178,19 @@ export default function Home() {
         name="viewport"
         content="width=device-width, initial-scale=1, user-scalable=no"
       />
-      <Canvas zoomRef={(ref) => (zoomRef = ref)}>
+      <div class={styles.sidebar}>
+        <div
+          use:variableSource="i am some data"
+          style="background: #eb6e6e; border-radius: 16px; padding: 4px"
+        >
+          variable
+        </div>
+      </div>
+      <Canvas
+        class={styles.canvas}
+        zoomRef={(ref) => (zoomRef = ref)}
+        transformRef={(ref) => (transformRef = ref)}
+      >
         <For each={Object.keys(graph.nodes)}>
           {(id) => {
             const node = graph.nodes[id];
@@ -250,7 +268,9 @@ export default function Home() {
         </CanvasElement>
         <Show when={grabbed()}>
           <CanvasElement x={virtualX()} y={virtualY()} width={100} height={100}>
-            <div style="background: red">{grabbed()}</div>
+            <PortalAbove centre>
+              <div style="background: red">{grabbed()}</div>
+            </PortalAbove>
           </CanvasElement>
         </Show>
       </Canvas>

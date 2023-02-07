@@ -5,6 +5,7 @@ import {
   JSX,
   onCleanup,
   Ref,
+  splitProps,
 } from "solid-js";
 import styles from "./Canvas.module.css";
 
@@ -18,19 +19,26 @@ const MIN_ZOOM = -2;
  */
 const MAX_ZOOM = 2;
 
-interface Props {
-  /**
-   * Canvas elements
-   */
-  children?: JSX.Element;
+/**
+ * Functional ref
+ */
+type FuncRef<T> = (t: T) => void;
 
+type Props = JSX.SvgSVGAttributes<SVGSVGElement> & {
   /**
    * Zoom factor ref
    */
-  zoomRef?: Ref<Accessor<number>>;
-}
+  zoomRef?: FuncRef<Accessor<number>>;
+
+  /**
+   * Transform client coords to virtual coords ref
+   */
+  transformRef?: FuncRef<(clientCoords: [number, number]) => [number, number]>;
+};
 
 export function Canvas(props: Props) {
+  const [local, remote] = splitProps(props, ["zoomRef", "transformRef"]);
+
   // Keep track of origin and zoom
   const [originX, setOriginX] = createSignal(0);
   const [originY, setOriginY] = createSignal(0);
@@ -86,8 +94,15 @@ export function Canvas(props: Props) {
   const [height, setHeight] = createSignal(0);
   let svgRef: SVGSVGElement | undefined;
 
-  if (props.zoomRef) {
-    props.zoomRef(zoomFactor);
+  if (local.zoomRef) {
+    local.zoomRef(zoomFactor);
+  }
+
+  if (local.transformRef) {
+    local.transformRef(([x, y]) => [
+      originX() + (x - svgRef!.getBoundingClientRect().left) / zoomFactor(),
+      originY() + (y - svgRef!.getBoundingClientRect().top) / zoomFactor(),
+    ]);
   }
 
   // Keep track of the canvas size
@@ -303,7 +318,7 @@ export function Canvas(props: Props) {
 
   return (
     <svg
-      class={styles.canvas}
+      {...remote}
       ref={svgRef}
       viewBox={viewBox()}
       onMouseDown={onMouseDown}
@@ -313,8 +328,6 @@ export function Canvas(props: Props) {
       onTouchEnd={onTouchEnd}
       onTouchMove={onTouchMove}
       onWheel={onWheel}
-    >
-      {props.children}
-    </svg>
+    />
   );
 }
