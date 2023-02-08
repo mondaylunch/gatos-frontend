@@ -3,7 +3,6 @@ import { createServerAction$, redirect } from "solid-start/server";
 import { FormInput } from "~/components/forms/FormInput";
 import { Button } from "~/components/inputs/Buttons";
 import { register } from "~/lib/session";
-import "./index.css";
 
 export default function SignUp() {
   const [form, { Form }] = createServerAction$(async (form: FormData) => {
