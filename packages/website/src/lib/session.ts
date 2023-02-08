@@ -1,6 +1,6 @@
 import { createCookieSessionStorage } from "solid-start";
 
-const ENDPOINT = process.env.API_URL ?? "http://localhost:4390";
+const ENDPOINT = process.env.API_URL ?? "http://127.0.0.1:4390";
 
 type User = {
   _id: string;
@@ -11,14 +11,14 @@ type User = {
 };
 
 export function resolveUserByToken(token: string): Promise<User> {
-  return fetch(ENDPOINT + "/api/v1/flows/list", {
+  return fetch(ENDPOINT + "/api/v1/login/self", {
     headers: {
       "x-auth-token": token,
     },
   }).then((x) => x.json());
 }
 
-const storage = createCookieSessionStorage({
+export const storage = createCookieSessionStorage({
   cookie: {
     name: "session",
     secure: process.env.NODE_ENV === "production",
