@@ -1,7 +1,10 @@
-import { JSX } from "solid-js";
+import { JSX, splitProps } from "solid-js";
 import styles from "./Canvas.module.css";
 
-interface Props {
+type Props = Omit<
+  JSX.ForeignObjectSVGAttributes<SVGForeignObjectElement>,
+  "children"
+> & {
   /**
    * Element X position
    */
@@ -28,19 +31,20 @@ interface Props {
    * * Must only have one descendant
    */
   children: JSX.Element;
-}
+};
 
 export function CanvasElement(props: Props) {
+  const [local, remote] = splitProps(props, ["x", "y", "width", "height"]);
+
   return (
     <foreignObject
+      {...remote}
+      x={local.x}
+      y={local.y}
+      width={local.width}
+      height={local.height}
       class={styles.element}
-      x={props.x}
-      y={props.y}
-      width={props.width}
-      height={props.height}
-      style={{ "--width": props.width + "px", "--height": props.height + "px" }}
-    >
-      {props.children}
-    </foreignObject>
+      style={{ "--width": local.width + "px", "--height": local.height + "px" }}
+    />
   );
 }

@@ -85,13 +85,11 @@ export default function Home() {
     },
   });
 
-  const [move, setMove] = createSignal(false);
+  const [move, setMove] = createSignal<string | undefined>(undefined);
   const [grabbed, setGrabbed] = createSignal<string | undefined>(undefined);
-  const [x, setX] = createSignal(100);
-  const [y, setY] = createSignal(100);
+
   const [virtualX, setVX] = createSignal(350);
   const [virtualY, setVY] = createSignal(100);
-  const [dropped, setDropped] = createSignal([] as number[]);
 
   let zoomRef: Accessor<number> | undefined;
   let transformRef:
@@ -100,6 +98,8 @@ export default function Home() {
 
   function variableSource(el: HTMLElement, variable: Accessor<any>) {
     function grab(ev: MouseEvent) {
+      ev.stopPropagation();
+
       setGrabbed(variable());
       const [x, y] = transformRef!([ev.clientX, ev.clientY]);
       setVX(x);
@@ -119,8 +119,19 @@ export default function Home() {
       class={styles.container}
       onMouseMove={(e) => {
         if (move()) {
-          setX((x) => x + e.movementX / zoomRef!());
-          setY((y) => y + e.movementY / zoomRef!());
+          updateGraph(
+            "metadataByNode",
+            move()!,
+            "xPos",
+            (x) => x + e.movementX / zoomRef!()
+          );
+
+          updateGraph(
+            "metadataByNode",
+            move()!,
+            "yPos",
+            (y) => y + e.movementY / zoomRef!()
+          );
         }
 
         if (grabbed()) {
@@ -130,6 +141,10 @@ export default function Home() {
         }
       }}
       onMouseUp={(ev) => {
+        if (move()) {
+          setMove(undefined);
+        }
+
         if (grabbed()) {
           setGrabbed(undefined);
           setVX(350);
@@ -204,6 +219,7 @@ export default function Home() {
                 y={metadata.yPos}
                 width={200}
                 height={200}
+                onMouseDown={() => setMove(id)}
               >
                 <Switch>
                   <Match when={node.type === "Input"}>
@@ -240,32 +256,6 @@ export default function Home() {
           }}
         </For>
 
-        <CanvasElement x={x()} y={y()} width={200} height={200}>
-          <div
-            style="background: gray"
-            onMouseDown={() => setMove(true)}
-            onMouseUp={() => setMove(false)}
-          >
-            text
-            <div
-              style="background: black; color: white; width: 128px; height: 128px; display: flex; flex-wrap: wrap;"
-              id="yes"
-            >
-              <Switch fallback={<>A</>}>
-                <Match when={dropped().length}>
-                  <For each={dropped()}>
-                    {() => (
-                      <div style="background: red; height: 48px;">var</div>
-                    )}
-                  </For>
-                </Match>
-              </Switch>
-            </div>
-          </div>
-        </CanvasElement>
-        <CanvasElement x={350} y={100} width={100} height={100}>
-          <div style="background: red">arbitrary variable</div>
-        </CanvasElement>
         <Show when={grabbed()}>
           <CanvasElement x={virtualX()} y={virtualY()} width={100} height={100}>
             <PortalAbove centre>
