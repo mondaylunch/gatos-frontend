@@ -6,14 +6,15 @@ import { register } from "~/lib/session";
 
 export default function SignUp() {
   const [form, { Form }] = createServerAction$(async (form: FormData) => {
-    const email = form.get("email") as string;
-    const username = form.get("username") as string;
     const password = form.get("password") as string;
     const confirm_password = form.get("confirm-password") as string;
 
     if (password !== confirm_password) {
       throw "Passwords do not match";
     }
+
+    const email = form.get("email") as string;
+    const username = form.get("username") as string;
 
     await register({
       email,
