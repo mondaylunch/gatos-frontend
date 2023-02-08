@@ -1,21 +1,40 @@
-import { createCookieSessionStorage } from "solid-start";
+import {
+  createCookieSessionStorage,
+  redirect,
+  ServerFunctionEvent,
+} from "solid-start";
 
 const ENDPOINT = process.env.API_URL ?? "http://127.0.0.1:4390";
 
-type User = {
+export type User = {
   _id: string;
   username: string;
   email: string;
   password: string;
-  auth_token: string;
+  authToken: string;
 };
 
-export function resolveUserByToken(token: string): Promise<User> {
+export function resolveUserByToken(token: string): Promise<User | undefined> {
   return fetch(ENDPOINT + "/api/v1/login/self", {
     headers: {
       "x-auth-token": token,
     },
-  }).then((x) => x.json());
+  }).then((x) => (x.ok ? x.json() : undefined));
+}
+
+export async function resolveUserByRequest(request: Request): Promise<User> {
+  const cookie = request.headers.get("Cookie") ?? "";
+  const session = await storage.getSession(cookie);
+  const token = session.get("authToken");
+  const user = await resolveUserByToken(token);
+  if (!user) throw redirect("/login");
+  return user;
+}
+
+export function resolveUserByRouteEvent(
+  data: ServerFunctionEvent
+): Promise<User> {
+  return resolveUserByRequest(data.request);
 }
 
 export const storage = createCookieSessionStorage({
@@ -37,7 +56,13 @@ export function login(data: Pick<User, "email" | "password">): Promise<User> {
     headers: {
       "Content-Type": "application/json",
     },
-  }).then((x) => x.json());
+  }).then((res) =>
+    res.ok
+      ? res.json()
+      : res.json().then(({ message }) => {
+          throw message;
+        })
+  );
 }
 
 export function register(
@@ -49,13 +74,11 @@ export function register(
     headers: {
       "Content-Type": "application/json",
     },
-  }).then((x) => x.json());
-}
-
-// Expose globals
-if (typeof window !== "undefined") {
-  (window as any).auth = {
-    login,
-    register,
-  };
+  }).then((res) =>
+    res.ok
+      ? res.json()
+      : res.json().then(({ message }) => {
+          throw message;
+        })
+  );
 }
