@@ -11,7 +11,19 @@ test("page has two buttons", async ({ page }) => {
     expect(all_buttons).toBe(2);
 });
 
-test("page has 4 fields", async ({ page }) => {
+test("page has 2 fields", async ({ page }) => {
     const all_fields = await page.locator("input").count();
     expect(all_fields).toBe(2);
+});
+
+test("page has the correct email field", async ({ page }) => {
+    const email_address = page.locator("input#email");
+    await expect(email_address).toBeEmpty();
+    await expect(email_address).toHaveAttribute("type", "email");
+});
+
+test("page has the correct password field", async ({ page }) => {
+    const password = page.locator("input#password");
+    await expect(password).toBeEmpty();
+    await expect(password).toHaveAttribute("type", "password");
 });

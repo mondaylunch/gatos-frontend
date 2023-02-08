@@ -15,3 +15,34 @@ test("page has 4 fields", async ({ page }) => {
     const all_fields = await page.locator("input").count();
     expect(all_fields).toBe(4);
 });
+
+test("page has the correct username field", async ({ page }) => {
+    const username = page.locator("input#username");
+    await expect(username).toHaveId("username");
+    await expect(username).toHaveAttribute("type", "text");
+});
+
+test("page has the correct email field", async ({ page }) => {
+    const email_address = page.locator("input#email");
+    await expect(email_address).toBeEmpty();
+    await expect(email_address).toHaveAttribute("type", "email");
+
+    await email_address.fill("wrongEmail");
+    await expect(email_address).toHaveValue("wrongEmail");
+    await page.getByRole("button", {name: "Sign up"}).click();
+    expect(email_address).toThrowError;
+    
+    await email_address.fill("jeroen.isthebest@example.org");
+    await expect(email_address).toHaveValue("jeroen.isthebest@example.org");
+    await page.getByRole("button", {name: "Sign up"}).click();
+    expect(email_address).not.toThrowError;
+});
+
+test("page has the correct password fields", async ({ page }) => {
+    const password = page.locator("input#password");
+    const confirm_password = page.locator("input#password_confirm");
+    await expect(password).toBeEmpty();
+    await expect(confirm_password).toBeEmpty();
+    await expect(password).toHaveAttribute("type", "password");
+    await expect(confirm_password).toHaveAttribute("type", "password");
+});
