@@ -5,7 +5,7 @@ import styles from "./editor.module.css";
 
 import { Accessor, createSignal, For, Match, Show, Switch } from "solid-js";
 import { createStore } from "solid-js/store";
-import { PortalAbove } from "~/components/editor/PortalAbove";
+import { Portal } from "solid-js/web";
 
 type DataTypes = "integer" | "boolean" | "string" | "optional" | "list";
 
@@ -101,9 +101,8 @@ export default function Home() {
       ev.stopPropagation();
 
       setGrabbed(variable());
-      const [x, y] = transformRef!([ev.clientX, ev.clientY]);
-      setVX(x);
-      setVY(y);
+      setVX(ev.clientX);
+      setVY(ev.clientY);
     }
 
     el.addEventListener("mousedown", grab);
@@ -135,9 +134,8 @@ export default function Home() {
         }
 
         if (grabbed()) {
-          const [x, y] = transformRef!([e.clientX, e.clientY]);
-          setVX(x);
-          setVY(y);
+          setVX(e.clientX);
+          setVY(e.clientY);
         }
       }}
       onMouseUp={(ev) => {
@@ -257,11 +255,21 @@ export default function Home() {
         </For>
 
         <Show when={grabbed()}>
-          <CanvasElement x={virtualX()} y={virtualY()} width={100} height={100}>
-            <PortalAbove centre>
-              <div style="background: red">{grabbed()}</div>
-            </PortalAbove>
-          </CanvasElement>
+          <Portal>
+            <div
+              style={{
+                position: "fixed",
+                left: virtualX() - 50 + "px",
+                top: virtualY() - 50 + "px",
+                width: "100px",
+                height: "100px",
+                background: "red",
+                transform: "rotateZ(-3deg)",
+              }}
+            >
+              {grabbed()}
+            </div>
+          </Portal>
         </Show>
       </Canvas>
     </main>
