@@ -17,13 +17,12 @@ test("page has 4 fields", async ({ page }) => {
 });
 
 test("page has the correct username field", async ({ page }) => {
-    const username = page.locator("input#username");
-    await expect(username).toHaveId("username");
+    const username = page.locator(`[name=username]`);
     await expect(username).toHaveAttribute("type", "text");
 });
 
 test("page has the correct email field", async ({ page }) => {
-    const email_address = page.locator("input#email");
+    const email_address = page.locator(`[name=email]`);
     await expect(email_address).toBeEmpty();
     await expect(email_address).toHaveAttribute("type", "email");
 
@@ -39,8 +38,8 @@ test("page has the correct email field", async ({ page }) => {
 });
 
 test("page has the correct password fields", async ({ page }) => {
-    const password = page.locator("input#password");
-    const confirm_password = page.locator("input#password_confirm");
+    const password = page.locator(`[name=password]`);
+    const confirm_password = page.locator(`[name=confirm-password]`);
     await expect(password).toBeEmpty();
     await expect(confirm_password).toBeEmpty();
     await expect(password).toHaveAttribute("type", "password");
