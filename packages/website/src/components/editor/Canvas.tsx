@@ -1,4 +1,12 @@
-import { createEffect, createSignal, onCleanup } from "solid-js";
+import {
+  Accessor,
+  createEffect,
+  createSignal,
+  JSX,
+  onCleanup,
+  Ref,
+  splitProps,
+} from "solid-js";
 import styles from "./Canvas.module.css";
 
 /**
@@ -11,7 +19,26 @@ const MIN_ZOOM = -2;
  */
 const MAX_ZOOM = 2;
 
-export function Canvas() {
+/**
+ * Functional ref
+ */
+type FuncRef<T> = (t: T) => void;
+
+type Props = JSX.SvgSVGAttributes<SVGSVGElement> & {
+  /**
+   * Zoom factor ref
+   */
+  zoomRef?: FuncRef<Accessor<number>>;
+
+  /**
+   * Transform client coords to virtual coords ref
+   */
+  transformRef?: FuncRef<(clientCoords: [number, number]) => [number, number]>;
+};
+
+export function Canvas(props: Props) {
+  const [local, remote] = splitProps(props, ["zoomRef", "transformRef"]);
+
   // Keep track of origin and zoom
   const [originX, setOriginX] = createSignal(0);
   const [originY, setOriginY] = createSignal(0);
@@ -66,6 +93,17 @@ export function Canvas() {
   const [width, setWidth] = createSignal(0);
   const [height, setHeight] = createSignal(0);
   let svgRef: SVGSVGElement | undefined;
+
+  if (local.zoomRef) {
+    local.zoomRef(zoomFactor);
+  }
+
+  if (local.transformRef) {
+    local.transformRef(([x, y]) => [
+      originX() + (x - svgRef!.getBoundingClientRect().left) / zoomFactor(),
+      originY() + (y - svgRef!.getBoundingClientRect().top) / zoomFactor(),
+    ]);
+  }
 
   // Keep track of the canvas size
   createEffect(() => {
@@ -280,7 +318,7 @@ export function Canvas() {
 
   return (
     <svg
-      class={styles.canvas}
+      {...remote}
       ref={svgRef}
       viewBox={viewBox()}
       onMouseDown={onMouseDown}
@@ -290,21 +328,6 @@ export function Canvas() {
       onTouchEnd={onTouchEnd}
       onTouchMove={onTouchMove}
       onWheel={onWheel}
-    >
-      <foreignObject x={100} y={100} width={100} height={100}>
-        {() => (
-          <div style={{ width: "100px", height: "100px", background: "gray" }}>
-            a
-          </div>
-        )}
-      </foreignObject>
-      <foreignObject x={220} y={140} width={100} height={100}>
-        {() => (
-          <div style={{ width: "100px", height: "100px", background: "gray" }}>
-            b
-          </div>
-        )}
-      </foreignObject>
-    </svg>
+    />
   );
 }

@@ -5,7 +5,8 @@
     "dev": "cd packages/website && npm run dev",
     "test:integration": "pnpm --filter playwright test",
     "test:install": "pnpm --filter playwright playwright install",
-    "docs": "cd packages/documentation && npm run start"
+    "docs": "cd packages/documentation && npm run start",
+    "fmt": "prettier --write 'packages/website/src/**/*.{js,jsx,ts,tsx}'"
   },
   "engines": {
     "node": ">=16",

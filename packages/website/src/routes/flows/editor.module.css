@@ -1,5 +1,15 @@
 .container {
     height: 100vh;
     display: flex;
+    user-select: none;
     flex-direction: row;
+}
+
+.sidebar {
+    width: 240px;
+    background: #eee;
+}
+
+.canvas {
+    flex-grow: 1;
 }
