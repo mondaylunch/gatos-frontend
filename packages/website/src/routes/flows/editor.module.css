@@ -7,9 +7,10 @@
 
 .sidebar {
     width: 240px;
-    background: #eee;
+    @apply bg-neutral-700;
 }
 
 .canvas {
     flex-grow: 1;
+    @apply bg-neutral-800;
 }

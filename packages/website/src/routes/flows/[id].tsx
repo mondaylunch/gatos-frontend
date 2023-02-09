@@ -92,15 +92,38 @@ export default function Home() {
   });
 
   const [move, setMove] = createSignal<string | undefined>(undefined);
+  const [moving, setMoving] = createSignal<{ id: string } | undefined>(
+    undefined
+  ); // => T
   const [grabbed, setGrabbed] = createSignal<string | undefined>(undefined);
 
   const [virtualX, setVX] = createSignal(350);
   const [virtualY, setVY] = createSignal(100);
 
   let zoomRef: Accessor<number> | undefined;
-  let transformRef:
-    | ((clientCoords: [number, number]) => [number, number])
-    | undefined;
+
+  // => prop
+  function handleMove<T extends { id: string }>(
+    ref: T,
+    [movementX, movementY]: [number, number]
+  ) {
+    updateGraph("metadataByNode", ref.id, "xPos", (x) => x + movementX);
+    updateGraph("metadataByNode", ref.id, "yPos", (y) => y + movementY);
+  }
+
+  // => movable<T>
+  function movable<T extends { id: string }>(
+    el: HTMLElement,
+    ref: Accessor<T>
+  ) {
+    function onMouseDown(ev: MouseEvent) {
+      // => select for panning
+      setMoving(ref);
+    }
+
+    el.addEventListener("mousedown", onMouseDown);
+    return () => el.removeEventListener("mousedown", onMouseDown);
+  }
 
   // => grabSource<T>
   function variableSource(el: HTMLElement, variable: Accessor<any>) {
@@ -125,20 +148,11 @@ export default function Home() {
     <main
       class={styles.container}
       onMouseMove={(e) => {
-        if (move()) {
-          updateGraph(
-            "metadataByNode",
-            move()!,
-            "xPos",
-            (x) => x + e.movementX / zoomRef!()
-          );
-
-          updateGraph(
-            "metadataByNode",
-            move()!,
-            "yPos",
-            (y) => y + e.movementY / zoomRef!()
-          );
+        if (moving()) {
+          handleMove(moving()!, [
+            e.movementX / zoomRef!(),
+            e.movementY / zoomRef!(),
+          ]);
         }
 
         if (grabbed()) {
@@ -147,6 +161,10 @@ export default function Home() {
         }
       }}
       onMouseUp={(ev) => {
+        if (moving()) {
+          setMoving(undefined);
+        }
+
         if (move()) {
           setMove(undefined);
         }
@@ -206,11 +224,7 @@ export default function Home() {
           variable
         </div>
       </div>
-      <Canvas
-        class={styles.canvas}
-        zoomRef={(ref) => (zoomRef = ref)}
-        transformRef={(ref) => (transformRef = ref)}
-      >
+      <Canvas class={styles.canvas} zoomRef={(ref) => (zoomRef = ref)}>
         <For each={Object.keys(graph.nodes)}>
           {(id) => {
             const node = graph.nodes[id];
@@ -224,32 +238,33 @@ export default function Home() {
                 y={metadata.yPos}
                 width={node.type === "Process" ? 288 : 256}
                 height={200}
-                onMouseDown={() => setMove(id)}
               >
-                <Switch>
-                  <Match when={node.type === "Input"}>
-                    <Start_Node />
-                    <div use:variableSource="i am some data">
-                      <Variable_Node />
-                    </div>
-                  </Match>
-                  <Match when={node.type === "Process"}>
-                    <Action_Node>
-                      <div
-                        use:variableDropZone={id}
-                        style="color: white; min-height: 50px"
-                      >
-                        <Switch fallback={"drop variables here"}>
-                          <Match when={connections().length}>
-                            <For each={connections()}>
-                              {() => <Variable_Node />}
-                            </For>
-                          </Match>
-                        </Switch>
+                <div use:movable={{ id }}>
+                  <Switch>
+                    <Match when={node.type === "Input"}>
+                      <Start_Node />
+                      <div use:variableSource="i am some data">
+                        <Variable_Node />
                       </div>
-                    </Action_Node>
-                  </Match>
-                </Switch>
+                    </Match>
+                    <Match when={node.type === "Process"}>
+                      <Action_Node>
+                        <div
+                          use:variableDropZone={id}
+                          style="color: white; min-height: 50px"
+                        >
+                          <Switch fallback={"drop variables here"}>
+                            <Match when={connections().length}>
+                              <For each={connections()}>
+                                {() => <Variable_Node />}
+                              </For>
+                            </Match>
+                          </Switch>
+                        </div>
+                      </Action_Node>
+                    </Match>
+                  </Switch>
+                </div>
               </CanvasElement>
             );
           }}

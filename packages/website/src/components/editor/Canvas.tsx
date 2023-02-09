@@ -7,7 +7,6 @@ import {
   Ref,
   splitProps,
 } from "solid-js";
-import styles from "./Canvas.module.css";
 
 /**
  * Minimum linear zoom factor
@@ -29,15 +28,10 @@ type Props = JSX.SvgSVGAttributes<SVGSVGElement> & {
    * Zoom factor ref
    */
   zoomRef?: FuncRef<Accessor<number>>;
-
-  /**
-   * Transform client coords to virtual coords ref
-   */
-  transformRef?: FuncRef<(clientCoords: [number, number]) => [number, number]>;
 };
 
 export function Canvas(props: Props) {
-  const [local, remote] = splitProps(props, ["zoomRef", "transformRef"]);
+  const [local, remote] = splitProps(props, ["zoomRef"]);
 
   // Keep track of origin and zoom
   const [originX, setOriginX] = createSignal(0);
@@ -96,13 +90,6 @@ export function Canvas(props: Props) {
 
   if (local.zoomRef) {
     local.zoomRef(zoomFactor);
-  }
-
-  if (local.transformRef) {
-    local.transformRef(([x, y]) => [
-      originX() + (x - svgRef!.getBoundingClientRect().left) / zoomFactor(),
-      originY() + (y - svgRef!.getBoundingClientRect().top) / zoomFactor(),
-    ]);
   }
 
   // Keep track of the canvas size

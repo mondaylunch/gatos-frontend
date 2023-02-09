@@ -1,5 +1,4 @@
 import { JSX, splitProps } from "solid-js";
-import styles from "./Canvas.module.css";
 
 type Props = Omit<
   JSX.ForeignObjectSVGAttributes<SVGForeignObjectElement>,
@@ -43,7 +42,6 @@ export function CanvasElement(props: Props) {
       y={local.y}
       width={local.width}
       height={local.height}
-      class={styles.element}
       style={{ "--width": local.width + "px", "--height": local.height + "px" }}
     />
   );
