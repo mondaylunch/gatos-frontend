@@ -11,6 +11,7 @@ import {
   Start_Node,
   Action_Node,
   Variable_Node,
+  End_Node,
 } from "~/components/nodes/Node";
 
 type DataTypes = "integer" | "boolean" | "string" | "optional" | "list";
@@ -73,6 +74,13 @@ export default function Home() {
         inputs: {},
         outputs: {},
       },
+      "004": {
+        id: "004",
+        type: "Output",
+        settings: {},
+        inputs: {},
+        outputs: {},
+      },
     },
     connections: [],
     metadataByNode: {
@@ -87,6 +95,10 @@ export default function Home() {
       "003": {
         xPos: 750,
         yPos: 350,
+      },
+      "004": {
+        xPos: 250,
+        yPos: 650,
       },
     },
   });
@@ -263,11 +275,29 @@ export default function Home() {
                         </div>
                       </Action_Node>
                     </Match>
+                    <Match when={node.type === "Output"}>
+                      <End_Node />
+                    </Match>
                   </Switch>
                 </div>
               </CanvasElement>
             );
           }}
+        </For>
+
+        <For each={graph.connections}>
+          {(connection, index) => (
+            <text
+              x={graph.metadataByNode[connection.from.nodeId].xPos}
+              y={
+                graph.metadataByNode[connection.from.nodeId].yPos +
+                180 +
+                index() * 20
+              }
+              textContent={`draw line connection to ${connection.to.nodeId}`}
+              fill="white"
+            />
+          )}
         </For>
 
         <Show when={grabbed()}>
