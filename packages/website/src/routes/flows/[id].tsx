@@ -7,6 +7,12 @@ import { Accessor, createSignal, For, Match, Show, Switch } from "solid-js";
 import { createStore } from "solid-js/store";
 import { Portal } from "solid-js/web";
 
+import {
+  Start_Node,
+  Action_Node,
+  Variable_Node,
+} from "~/components/nodes/Node";
+
 type DataTypes = "integer" | "boolean" | "string" | "optional" | "list";
 
 type DataType<T extends DataTypes> = {
@@ -71,7 +77,7 @@ export default function Home() {
     connections: [],
     metadataByNode: {
       "001": {
-        xPos: 150,
+        xPos: 50,
         yPos: 350,
       },
       "002": {
@@ -79,7 +85,7 @@ export default function Home() {
         yPos: 350,
       },
       "003": {
-        xPos: 650,
+        xPos: 750,
         yPos: 350,
       },
     },
@@ -96,6 +102,7 @@ export default function Home() {
     | ((clientCoords: [number, number]) => [number, number])
     | undefined;
 
+  // => grabSource<T>
   function variableSource(el: HTMLElement, variable: Accessor<any>) {
     function grab(ev: MouseEvent) {
       ev.stopPropagation();
@@ -109,6 +116,7 @@ export default function Home() {
     return () => el.removeEventListener("mousedown", grab);
   }
 
+  // => dropZone<T>
   function variableDropZone(el: HTMLElement, nodeId: Accessor<string>) {
     el.setAttribute("data-accept-variable", nodeId());
   }
@@ -180,7 +188,6 @@ export default function Home() {
                     },
                   },
                 ]);
-                // setDropped((x) => [...x, 0]);
               }
             }
           }
@@ -215,38 +222,32 @@ export default function Home() {
               <CanvasElement
                 x={metadata.xPos}
                 y={metadata.yPos}
-                width={200}
+                width={node.type === "Process" ? 288 : 256}
                 height={200}
                 onMouseDown={() => setMove(id)}
               >
                 <Switch>
                   <Match when={node.type === "Input"}>
-                    <div style="background: gray">
-                      i am a node
-                      <div
-                        use:variableSource="i am some data"
-                        style="background: #eb6e6e; border-radius: 16px; padding: 4px"
-                      >
-                        variable
-                      </div>
+                    <Start_Node />
+                    <div use:variableSource="i am some data">
+                      <Variable_Node />
                     </div>
                   </Match>
                   <Match when={node.type === "Process"}>
-                    <div style="background: gray">
-                      i do something with:
+                    <Action_Node>
                       <div
                         use:variableDropZone={id}
-                        style="background: black; color: white; min-height: 50px"
+                        style="color: white; min-height: 50px"
                       >
                         <Switch fallback={"drop variables here"}>
                           <Match when={connections().length}>
                             <For each={connections()}>
-                              {() => <div style="background: red;">var</div>}
+                              {() => <Variable_Node />}
                             </For>
                           </Match>
                         </Switch>
                       </div>
-                    </div>
+                    </Action_Node>
                   </Match>
                 </Switch>
               </CanvasElement>
