@@ -4,9 +4,12 @@ importers:
 
   .:
     specifiers:
-      prettier: ^2.8.3
+      axios: ^1.3.1
+      solid-js: ^1.6.2
     dependencies:
-      prettier: 2.8.3
+      solid-js: 1.6.9
+    devDependencies:
+      axios: 1.3.2
 
   packages/documentation:
     specifiers:
@@ -51,6 +54,7 @@ importers:
       '@vitest/ui': ^0.26.2
       autoprefixer: ^10.4.13
       jsdom: ^20.0.2
+      solid-icons: ^1.0.4
       solid-js: ^1.6.2
       solid-start: ^0.2.5
       solid-start-node: ^0.2.5
@@ -61,7 +65,9 @@ importers:
       vitest: ^0.26.2
     dependencies:
       '@thisbeyond/solid-dnd': 0.7.3_solid-js@1.6.9
+      '@types/node': 18.11.18
       autoprefixer: 10.4.13
+      solid-icons: 1.0.4_solid-js@1.6.9
       tailwindcss: 3.2.4
     devDependencies:
       '@solidjs/meta': 0.28.2_solid-js@1.6.9
@@ -3607,7 +3613,17 @@ packages:
   /axios/0.25.0_debug@4.3.4:
     resolution: {integrity: sha512-cD8FOb0tRH3uuEe6+evtAbgJtfxr7ly3fQjYcMcuPlgkwVS9xboaVIpcDV+cYQe+yGykgwZCs1pzjntcGa6l5g==}
     dependencies:
-      follow-redirects: 1.15.2_debug@4.3.4
+      follow-redirects: 1.15.2
+    transitivePeerDependencies:
+      - debug
+    dev: true
+
+  /axios/1.3.2:
+    resolution: {integrity: sha512-1M3O703bYqYuPhbHeya5bnhpYVsDDRyQSabNja04mZtboLNSuZ4YrltestrLXfHgmzua4TpUqRiVKbiQuo2epw==}
+    dependencies:
+      follow-redirects: 1.15.2
+      form-data: 4.0.0
+      proxy-from-env: 1.1.0
     transitivePeerDependencies:
       - debug
     dev: true
@@ -5699,19 +5715,6 @@ packages:
     peerDependenciesMeta:
       debug:
         optional: true
-    dev: false
-
-  /follow-redirects/1.15.2_debug@4.3.4:
-    resolution: {integrity: sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==}
-    engines: {node: '>=4.0'}
-    peerDependencies:
-      debug: '*'
-    peerDependenciesMeta:
-      debug:
-        optional: true
-    dependencies:
-      debug: 4.3.4
-    dev: true
 
   /for-each/0.3.3:
     resolution: {integrity: sha512-jqYfLp7mo9vIyQf8ykW2v7A+2N4QjeCeI5+Dz9XraiO1ign81wjiH7Fb9vSOWvQfNtmSa4H2RoQTrrXivdUZmw==}
@@ -8292,6 +8295,10 @@ packages:
       ipaddr.js: 1.9.1
     dev: false
 
+  /proxy-from-env/1.1.0:
+    resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
+    dev: true
+
   /psl/1.9.0:
     resolution: {integrity: sha512-E/ZsdU4HLs/68gYzgGTkMicWTLPdAftJLfJFlLUAAKZGkStNU72sZjT66SnMDVOfOWY/YAoiD7Jxa9iHvngcag==}
     dev: true
@@ -9169,6 +9176,15 @@ packages:
       faye-websocket: 0.11.4
       uuid: 8.3.2
       websocket-driver: 0.7.4
+    dev: false
+
+  /solid-icons/1.0.4_solid-js@1.6.9:
+    resolution: {integrity: sha512-gJTp4in3+OYCs9WvDkSLt4Los2unR3Uoder8wjh15GsfP20xiNOLfPTJllXmn+fI8+k3x7bRYtLGIgWd9fUQug==}
+    engines: {node: '>= 16'}
+    peerDependencies:
+      solid-js: '*'
+    dependencies:
+      solid-js: 1.6.9
     dev: false
 
   /solid-js/1.6.9:

@@ -1,4 +1,8 @@
-.element > * {
-    width: var(--width);
-    height: var(--height);
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.canvas {
+    flex-grow: 1;
+    @apply bg-neutral-800;
 }
