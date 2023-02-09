@@ -4,18 +4,12 @@ importers:
 
   .:
     specifiers:
-<<<<<<< HEAD
-      solid-js: ^1.6.2
-    dependencies:
-      solid-js: 1.6.9
-=======
       axios: ^1.3.1
       solid-js: ^1.6.2
     dependencies:
       solid-js: 1.6.9
     devDependencies:
       axios: 1.3.2
->>>>>>> master
 
   packages/documentation:
     specifiers:
@@ -54,10 +48,7 @@ importers:
       '@solidjs/testing-library': ^0.5.1
       '@testing-library/jest-dom': ^5.16.5
       '@thisbeyond/solid-dnd': ^0.7.3
-<<<<<<< HEAD
-=======
       '@types/node': ^18.11.11
->>>>>>> master
       '@types/testing-library__jest-dom': ^5.14.5
       '@vitest/coverage-c8': ^0.26.2
       '@vitest/ui': ^0.26.2
@@ -3626,15 +3617,6 @@ packages:
       - debug
     dev: true
 
-<<<<<<< HEAD
-  /babel-loader/8.3.0_la66t7xldg4uecmyawueag5wkm:
-    resolution: {integrity: sha512-H8SvsMF+m9t15HNLMipppzkC+Y2Yq+v3SonZyU70RBL/h1gxPkH08Ot8pEE9Z4Kd+czyWJClmFS8qzIP9OZ04Q==}
-    engines: {node: '>= 8.9'}
-    peerDependencies:
-      '@babel/core': ^7.0.0
-      webpack: '>=2'
-    dependencies:
-=======
   /axios/1.3.2:
     resolution: {integrity: sha512-1M3O703bYqYuPhbHeya5bnhpYVsDDRyQSabNja04mZtboLNSuZ4YrltestrLXfHgmzua4TpUqRiVKbiQuo2epw==}
     dependencies:
@@ -3652,7 +3634,6 @@ packages:
       '@babel/core': ^7.0.0
       webpack: '>=2'
     dependencies:
->>>>>>> master
       '@babel/core': 7.20.12
       find-cache-dir: 3.3.2
       loader-utils: 2.0.4
@@ -10126,42 +10107,6 @@ packages:
       - supports-color
     dev: true
 
-<<<<<<< HEAD
-  /vite/3.2.5:
-    resolution: {integrity: sha512-4mVEpXpSOgrssFZAOmGIr85wPHKvaDAcXqxVxVRZhljkJOMZi1ibLibzjLHzJvcok8BMguLc7g1W6W/GqZbLdQ==}
-    engines: {node: ^14.18.0 || >=16.0.0}
-    hasBin: true
-    peerDependencies:
-      '@types/node': '>= 14'
-      less: '*'
-      sass: '*'
-      stylus: '*'
-      sugarss: '*'
-      terser: ^5.4.0
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-      less:
-        optional: true
-      sass:
-        optional: true
-      stylus:
-        optional: true
-      sugarss:
-        optional: true
-      terser:
-        optional: true
-    dependencies:
-      esbuild: 0.15.18
-      postcss: 8.4.21
-      resolve: 1.22.1
-      rollup: 2.79.1
-    optionalDependencies:
-      fsevents: 2.3.2
-    dev: true
-
-=======
->>>>>>> master
   /vite/3.2.5_@types+node@18.11.18:
     resolution: {integrity: sha512-4mVEpXpSOgrssFZAOmGIr85wPHKvaDAcXqxVxVRZhljkJOMZi1ibLibzjLHzJvcok8BMguLc7g1W6W/GqZbLdQ==}
     engines: {node: ^14.18.0 || >=16.0.0}
