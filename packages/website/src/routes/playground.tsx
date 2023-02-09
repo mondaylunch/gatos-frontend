@@ -1,4 +1,3 @@
- import "./index.css";
 import {
     DragDropProvider,
     DragDropSensors,
