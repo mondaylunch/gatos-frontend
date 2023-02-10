@@ -3,7 +3,15 @@ import { CanvasElement } from "~/components/editor/CanvasElement";
 import { Canvas } from "../../components/editor/Canvas";
 import styles from "./editor.module.css";
 
-import { Accessor, createSignal, For, Match, Show, Switch } from "solid-js";
+import {
+  Accessor,
+  createContext,
+  createSignal,
+  For,
+  Match,
+  Show,
+  Switch,
+} from "solid-js";
 import { createStore } from "solid-js/store";
 import { Portal } from "solid-js/web";
 
@@ -13,6 +21,18 @@ import {
   Variable_Node,
   End_Node,
 } from "~/components/nodes/Node";
+
+import { movable } from "~/components/editor/directives/movable";
+import { CanvasContext } from "~/components/editor/context";
+import { grabSource } from "~/components/editor/directives/grabSource";
+import { dropZone } from "~/components/editor/directives/dropZone";
+
+/**
+ * typescript will prune these if not referenced
+ */
+movable;
+grabSource;
+dropZone;
 
 type DataTypes = "integer" | "boolean" | "string" | "optional" | "list";
 
@@ -123,39 +143,6 @@ export default function Home() {
     updateGraph("metadataByNode", ref.id, "yPos", (y) => y + movementY);
   }
 
-  // => movable<T>
-  function movable<T extends { id: string }>(
-    el: HTMLElement,
-    ref: Accessor<T>
-  ) {
-    function onMouseDown(ev: MouseEvent) {
-      // => select for panning
-      setMoving(ref);
-    }
-
-    el.addEventListener("mousedown", onMouseDown);
-    return () => el.removeEventListener("mousedown", onMouseDown);
-  }
-
-  // => grabSource<T>
-  function variableSource(el: HTMLElement, variable: Accessor<any>) {
-    function grab(ev: MouseEvent) {
-      ev.stopPropagation();
-
-      setGrabbed(variable());
-      setVX(ev.clientX);
-      setVY(ev.clientY);
-    }
-
-    el.addEventListener("mousedown", grab);
-    return () => el.removeEventListener("mousedown", grab);
-  }
-
-  // => dropZone<T>
-  function variableDropZone(el: HTMLElement, nodeId: Accessor<string>) {
-    el.setAttribute("data-accept-variable", nodeId());
-  }
-
   return (
     <main
       class={styles.container}
@@ -189,7 +176,7 @@ export default function Home() {
           const els = document.querySelectorAll("svg > *");
           // TODO: optimisation: search at and below top element below cursor "elementsFromPoint"
           for (const el of els) {
-            const droppable = el.querySelector("[data-accept-variable]");
+            const droppable = el.querySelector("[data-drop-zone]");
             if (droppable) {
               const pos = droppable.getBoundingClientRect();
               if (
@@ -198,7 +185,7 @@ export default function Home() {
                 ev.clientY > pos.top &&
                 ev.clientY < pos.bottom
               ) {
-                const id = droppable.getAttribute("data-accept-variable")!;
+                const id = droppable.getAttribute("data-drop-zone")!;
                 updateGraph("connections", [
                   ...graph.connections,
                   {
@@ -228,96 +215,106 @@ export default function Home() {
         name="viewport"
         content="width=device-width, initial-scale=1, user-scalable=no"
       />
-      <div class={styles.sidebar}>
-        <div
-          use:variableSource="i am some data"
-          style="background: #eb6e6e; border-radius: 16px; padding: 4px"
-        >
-          variable
+      <CanvasContext.Provider
+        value={{
+          setMoving,
+          setGrabbed(ref, virtualX, virtualY) {
+            setGrabbed(ref);
+            setVX(virtualX);
+            setVY(virtualY);
+          },
+        }}
+      >
+        <div class={styles.sidebar}>
+          <div
+            use:grabSource="i am some data"
+            style="background: #eb6e6e; border-radius: 16px; padding: 4px"
+          >
+            variable
+          </div>
         </div>
-      </div>
-      <Canvas class={styles.canvas} zoomRef={(ref) => (zoomRef = ref)}>
-        <For each={Object.keys(graph.nodes)}>
-          {(id) => {
-            const node = graph.nodes[id];
-            const metadata = graph.metadataByNode[id];
-            const connections = () =>
-              graph.connections.filter((x) => x.to.nodeId === id);
+        <Canvas class={styles.canvas} zoomRef={(ref) => (zoomRef = ref)}>
+          <For each={Object.keys(graph.nodes)}>
+            {(id) => {
+              const node = graph.nodes[id];
+              const metadata = graph.metadataByNode[id];
+              const connections = () =>
+                graph.connections.filter((x) => x.to.nodeId === id);
 
-            return (
-              <CanvasElement
-                x={metadata.xPos}
-                y={metadata.yPos}
-                width={node.type === "Process" ? 288 : 256}
-                height={200}
-              >
-                <div use:movable={{ id }}>
-                  <Switch>
-                    <Match when={node.type === "Input"}>
-                      <Start_Node />
-                      <div use:variableSource="i am some data">
-                        <Variable_Node />
-                      </div>
-                    </Match>
-                    <Match when={node.type === "Process"}>
-                      <Action_Node>
-                        <div
-                          use:variableDropZone={id}
-                          style="color: white; min-height: 50px"
-                        >
-                          <Switch fallback={"drop variables here"}>
-                            <Match when={connections().length}>
-                              <For each={connections()}>
-                                {() => <Variable_Node />}
-                              </For>
-                            </Match>
-                          </Switch>
+              return (
+                <CanvasElement
+                  x={metadata.xPos}
+                  y={metadata.yPos}
+                  width={node.type === "Process" ? 288 : 256}
+                  height={200}
+                >
+                  <div use:movable={{ id }}>
+                    <Switch>
+                      <Match when={node.type === "Input"}>
+                        <Start_Node />
+                        <div use:grabSource="i am some data">
+                          <Variable_Node />
                         </div>
-                      </Action_Node>
-                    </Match>
-                    <Match when={node.type === "Output"}>
-                      <End_Node />
-                    </Match>
-                  </Switch>
-                </div>
-              </CanvasElement>
-            );
-          }}
-        </For>
+                      </Match>
+                      <Match when={node.type === "Process"}>
+                        <Action_Node>
+                          <div
+                            use:dropZone={id}
+                            style="color: white; min-height: 50px"
+                          >
+                            <Switch fallback={"drop variables here"}>
+                              <Match when={connections().length}>
+                                <For each={connections()}>
+                                  {() => <Variable_Node />}
+                                </For>
+                              </Match>
+                            </Switch>
+                          </div>
+                        </Action_Node>
+                      </Match>
+                      <Match when={node.type === "Output"}>
+                        <End_Node />
+                      </Match>
+                    </Switch>
+                  </div>
+                </CanvasElement>
+              );
+            }}
+          </For>
 
-        <For each={graph.connections}>
-          {(connection, index) => (
-            <text
-              x={graph.metadataByNode[connection.from.nodeId].xPos}
-              y={
-                graph.metadataByNode[connection.from.nodeId].yPos +
-                180 +
-                index() * 20
-              }
-              textContent={`draw line connection to ${connection.to.nodeId}`}
-              fill="white"
-            />
-          )}
-        </For>
+          <For each={graph.connections}>
+            {(connection, index) => (
+              <text
+                x={graph.metadataByNode[connection.from.nodeId].xPos}
+                y={
+                  graph.metadataByNode[connection.from.nodeId].yPos +
+                  180 +
+                  index() * 20
+                }
+                textContent={`draw line connection to ${connection.to.nodeId}`}
+                fill="white"
+              />
+            )}
+          </For>
 
-        <Show when={grabbed()}>
-          <Portal>
-            <div
-              style={{
-                position: "fixed",
-                left: virtualX() - 50 + "px",
-                top: virtualY() - 50 + "px",
-                width: "100px",
-                height: "100px",
-                background: "red",
-                transform: "rotateZ(-3deg)",
-              }}
-            >
-              {grabbed()}
-            </div>
-          </Portal>
-        </Show>
-      </Canvas>
+          <Show when={grabbed()}>
+            <Portal>
+              <div
+                style={{
+                  position: "fixed",
+                  left: virtualX() - 50 + "px",
+                  top: virtualY() - 50 + "px",
+                  width: "100px",
+                  height: "100px",
+                  transform: "rotateZ(-3deg)",
+                }}
+              >
+                <Variable_Node />
+              </div>
+            </Portal>
+          </Show>
+        </Canvas>
+      </CanvasContext.Provider>
     </main>
   );
 }
