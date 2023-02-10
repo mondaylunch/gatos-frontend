@@ -1,4 +1,12 @@
-import { Accessor, createSignal, JSX, onCleanup, Show } from "solid-js";
+import {
+  Accessor,
+  ComponentProps,
+  createEffect,
+  createSignal,
+  JSX,
+  onCleanup,
+  Show,
+} from "solid-js";
 import { Portal } from "solid-js/web";
 import { Canvas } from "./Canvas";
 import { CanvasContext } from "./context";
@@ -40,9 +48,14 @@ type Props<MoveRef, GrabRef> = {
   renderVirtualElement(ref: GrabRef): JSX.Element;
 
   /**
-   * Properties applies to the container element
+   * Properties applied to the canvas component
    */
-  containerProps: JSX.HTMLAttributes<HTMLDivElement>;
+  canvasProps?: Omit<ComponentProps<typeof Canvas>, "zoomRef">;
+
+  /**
+   * Properties applied to the container element
+   */
+  containerProps?: JSX.HTMLAttributes<HTMLDivElement>;
 };
 
 /**
@@ -118,15 +131,17 @@ export function InteractiveCanvas<M, G>(props: Props<M, G>) {
     }
   }
 
-  // Register all mouse events globally
-  document.addEventListener("mouseup", onMouseUp);
-  document.addEventListener("mousemove", onMouseMove);
+  if (typeof window !== "undefined") {
+    // Register all mouse events globally
+    document.addEventListener("mouseup", onMouseUp);
+    document.addEventListener("mousemove", onMouseMove);
 
-  // Remove mouse events when component is unmounted
-  onCleanup(() => {
-    document.removeEventListener("mouseup", onMouseUp);
-    document.removeEventListener("mousemove", onMouseMove);
-  });
+    // Remove mouse events when component is unmounted
+    onCleanup(() => {
+      document.removeEventListener("mouseup", onMouseUp);
+      document.removeEventListener("mousemove", onMouseMove);
+    });
+  }
 
   return (
     <CanvasContext.Provider
@@ -157,7 +172,9 @@ export function InteractiveCanvas<M, G>(props: Props<M, G>) {
         onMouseLeave={() => setMoving(undefined)}
       >
         {props.preCanvas}
-        <Canvas zoomRef={(ref) => (zoomRef = ref)}>{props.children}</Canvas>
+        <Canvas {...props.canvasProps} zoomRef={(ref) => (zoomRef = ref)}>
+          {props.children}
+        </Canvas>
         {props.postCanvas}
       </div>
 
