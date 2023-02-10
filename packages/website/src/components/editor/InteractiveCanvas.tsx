@@ -1,4 +1,5 @@
-import { Accessor, createSignal, JSX, onCleanup } from "solid-js";
+import { Accessor, createSignal, JSX, onCleanup, Show } from "solid-js";
+import { Portal } from "solid-js/web";
 import { Canvas } from "./Canvas";
 import { CanvasContext } from "./context";
 
@@ -120,6 +121,21 @@ export function InteractiveCanvas<M, G>(props: Props<M, G>) {
         <Canvas zoomRef={(ref) => (zoomRef = ref)}>{props.children}</Canvas>
         {props.postCanvas}
       </div>
+
+      <Show when={grabbed()}>
+        <Portal>
+          <div
+            style={{
+              position: "fixed",
+              left: virtualCoords()[0] + "px",
+              top: virtualCoords()[1] + "px",
+              transform: "translate(-50%, -50%) rotateZ(-3deg)",
+            }}
+          >
+            {props.renderVirtualElement(grabbed()!)}
+          </div>
+        </Portal>
+      </Show>
     </CanvasContext.Provider>
   );
 }
