@@ -123,7 +123,6 @@ export default function Home() {
     },
   });
 
-  const [move, setMove] = createSignal<string | undefined>(undefined);
   const [moving, setMoving] = createSignal<{ id: string } | undefined>(
     undefined
   ); // => T
@@ -162,10 +161,6 @@ export default function Home() {
       onMouseUp={(ev) => {
         if (moving()) {
           setMoving(undefined);
-        }
-
-        if (move()) {
-          setMove(undefined);
         }
 
         if (grabbed()) {
@@ -302,11 +297,9 @@ export default function Home() {
               <div
                 style={{
                   position: "fixed",
-                  left: virtualX() - 50 + "px",
-                  top: virtualY() - 50 + "px",
-                  width: "100px",
-                  height: "100px",
-                  transform: "rotateZ(-3deg)",
+                  left: virtualX() + "px",
+                  top: virtualY() + "px",
+                  transform: "translate(-50%, -50%) rotateZ(-3deg)",
                 }}
               >
                 <Variable_Node />
