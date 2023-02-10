@@ -45,7 +45,14 @@ type Props<MoveRef, GrabRef> = {
   containerProps: JSX.HTMLAttributes<HTMLDivElement>;
 };
 
+/**
+ * Search for an applicable drop zone under the cursor.
+ * @param clientX
+ * @param clientY
+ * @returns
+ */
 function searchForDropZone(clientX: number, clientY: number) {
+  // Try to use DOM methods to find the element first
   const els = document.elementsFromPoint(clientX, clientY);
   for (const el of els) {
     if (el.hasAttribute("data-drop-zone")) {
@@ -53,6 +60,10 @@ function searchForDropZone(clientX: number, clientY: number) {
     }
   }
 
+  // If nothing is found, double check the result by scanning
+  // through the top element's children, this is necessary as
+  // in some events the information returned by elementsFromPoint
+  // is not accurate or otherwise not appropriate for what we want.
   const zones = els[0]!.querySelectorAll("data-drop-zone");
   for (const zone of zones) {
     const pos = zone.getBoundingClientRect();
@@ -67,6 +78,9 @@ function searchForDropZone(clientX: number, clientY: number) {
   }
 }
 
+/**
+ * Canvas with additional interactivity tools built-in
+ */
 export function InteractiveCanvas<M, G>(props: Props<M, G>) {
   const [moving, setMoving] = createSignal<M | undefined>();
   const [grabbed, setGrabbed] = createSignal<G | undefined>();
@@ -74,6 +88,10 @@ export function InteractiveCanvas<M, G>(props: Props<M, G>) {
 
   let zoomRef: Accessor<number> | undefined;
 
+  /**
+   * Handle items being dropped in canvas
+   * @param ev Mouse Event
+   */
   function onMouseUp(ev: MouseEvent) {
     if (moving()) {
       setMoving(undefined);
@@ -90,15 +108,21 @@ export function InteractiveCanvas<M, G>(props: Props<M, G>) {
     }
   }
 
+  /**
+   * Handle mouse being moved in the canvas area
+   * @param ev Mouse Event
+   */
   function onMouseMove(ev: MouseEvent) {
     if (grabbed()) {
       setVirtualCoords([ev.clientX, ev.clientY]);
     }
   }
 
+  // Register all mouse events globally
   document.addEventListener("mouseup", onMouseUp);
   document.addEventListener("mousemove", onMouseMove);
 
+  // Remove mouse events when component is unmounted
   onCleanup(() => {
     document.removeEventListener("mouseup", onMouseUp);
     document.removeEventListener("mousemove", onMouseMove);
@@ -107,6 +131,7 @@ export function InteractiveCanvas<M, G>(props: Props<M, G>) {
   return (
     <CanvasContext.Provider
       value={{
+        // Handle incoming instructions from the directives
         setGrabbed(ref, virtualX, virtualY) {
           setGrabbed(ref);
           setVirtualCoords([virtualX, virtualY]);
@@ -119,6 +144,8 @@ export function InteractiveCanvas<M, G>(props: Props<M, G>) {
       <div
         {...props.containerProps}
         onMouseMove={(e) => {
+          // Check if we are moving an element,
+          // if so transform mouse movement and apply.
           const movingRef = moving();
           if (movingRef) {
             props.handleMove(movingRef, [
