@@ -34,14 +34,13 @@ export function RenderNodes(props: { graph: Graph }) {
     <For each={props.graph.nodes}>
       {(node) => {
         const metadata = props.graph.metadata[node.id];
-
-        const Component = COMPONENTS[node.type as keyof typeof NODE_TYPES];
         const nodeType = NODE_TYPES[node.type as keyof typeof NODE_TYPES];
+        const Component = COMPONENTS[node.type as keyof typeof NODE_TYPES];
 
         return (
           <CanvasElement x={metadata.xPos} y={metadata.yPos}>
             <div use:movable={{ id: node.id }}>
-              <Component title="node title">
+              <Component title={nodeType.name}>
                 <For each={nodeType.inputs}>
                   {(input) => {
                     const connections = () =>
