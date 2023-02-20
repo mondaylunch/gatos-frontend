@@ -1,19 +1,9 @@
 import { Meta } from "solid-start";
 import { CanvasElement } from "~/components/editor/CanvasElement";
-import { Canvas } from "../../components/editor/Canvas";
 import styles from "./editor.module.css";
 
-import {
-  Accessor,
-  createContext,
-  createSignal,
-  For,
-  Match,
-  Show,
-  Switch,
-} from "solid-js";
+import { For, Match, Switch } from "solid-js";
 import { createStore } from "solid-js/store";
-import { Portal } from "solid-js/web";
 
 import {
   Start_Node,
@@ -23,10 +13,10 @@ import {
 } from "~/components/nodes/Node";
 
 import { movable } from "~/components/editor/directives/movable";
-import { CanvasContext } from "~/components/editor/context";
 import { grabSource } from "~/components/editor/directives/grabSource";
 import { dropZone } from "~/components/editor/directives/dropZone";
 import { InteractiveCanvas } from "~/components/editor/InteractiveCanvas";
+import { Graph, Metadata, SAMPLE_FLOW_DATA } from "~/lib/types";
 
 /**
  * typescript will prune these if not referenced
@@ -35,120 +25,58 @@ movable;
 grabSource;
 dropZone;
 
-type DataTypes = "integer" | "boolean" | "string" | "optional" | "list";
+function populate(graph: Graph): Graph {
+  const metadata = { ...graph.metadata };
+  for (const node of graph.nodes) {
+    if (!metadata[node.id]) {
+      metadata[node.id] = {
+        xPos: 0,
+        yPos: 0,
+      };
+    }
+  }
 
-type DataType<T extends DataTypes> = {
-  type: T;
-};
-
-type NodeConnector<T extends DataTypes> = {
-  nodeId: string;
-  name: string;
-  dataType: DataType<T>;
-};
-
-type NodeConnection<T extends DataTypes> = {
-  from: NodeConnector<T>;
-  to: NodeConnector<T>;
-};
-
-type NodeMetadata = {
-  xPos: number;
-  yPos: number;
-};
-
-type Node = {
-  id: string;
-  type: any;
-  settings: Record<string, any>;
-  inputs: Record<string, NodeConnector<DataTypes>>;
-  outputs: Record<string, NodeConnector<DataTypes>>;
-};
-
-type Graph = {
-  nodes: Record<string, Node>;
-  connections: NodeConnection<DataTypes>[];
-  metadataByNode: Record<string, NodeMetadata>;
-};
+  return {
+    ...graph,
+    metadata,
+  };
+}
 
 export default function FlowEditor() {
-  const [graph, updateGraph] = createStore<Graph>({
-    nodes: {
-      "001": {
-        id: "001",
-        type: "Input",
-        settings: {},
-        inputs: {},
-        outputs: {},
-      },
-      "002": {
-        id: "002",
-        type: "Process",
-        settings: {},
-        inputs: {},
-        outputs: {},
-      },
-      "003": {
-        id: "003",
-        type: "Process",
-        settings: {},
-        inputs: {},
-        outputs: {},
-      },
-      "004": {
-        id: "004",
-        type: "Output",
-        settings: {},
-        inputs: {},
-        outputs: {},
-      },
-    },
-    connections: [],
-    metadataByNode: {
-      "001": {
-        xPos: 50,
-        yPos: 350,
-      },
-      "002": {
-        xPos: 400,
-        yPos: 350,
-      },
-      "003": {
-        xPos: 750,
-        yPos: 350,
-      },
-      "004": {
-        xPos: 250,
-        yPos: 650,
-      },
-    },
-  });
+  const [graph, updateGraph] = createStore<Graph>(
+    populate(SAMPLE_FLOW_DATA.graph)
+  );
+
+  function getMetadata(id: string): Metadata {
+    return (
+      graph.metadata[id] ?? {
+        xPos: 0,
+        yPos: 0,
+      }
+    );
+  }
 
   function handleMove(
     ref: { id: string },
     [movementX, movementY]: [number, number]
   ) {
-    updateGraph("metadataByNode", ref.id, "xPos", (x) => x + movementX);
-    updateGraph("metadataByNode", ref.id, "yPos", (y) => y + movementY);
+    updateGraph("metadata", ref.id, "xPos", (x) => x + movementX);
+    updateGraph("metadata", ref.id, "yPos", (y) => y + movementY);
   }
 
   function handleDrop(ref: { id: string }, targetNodeId: string) {
     updateGraph("connections", [
       ...graph.connections,
       {
-        from: {
-          nodeId: "001",
+        output: {
+          nodeId: ref.id,
           name: "test",
-          dataType: {
-            type: "string",
-          },
+          type: "integer",
         },
-        to: {
+        input: {
           nodeId: targetNodeId,
           name: "test",
-          dataType: {
-            type: "string",
-          },
+          type: "integer",
         },
       },
     ]);
@@ -186,12 +114,11 @@ export default function FlowEditor() {
       handleDrop={handleDrop}
       renderVirtualElement={renderVirtualElement}
     >
-      <For each={Object.keys(graph.nodes)}>
-        {(id) => {
-          const node = graph.nodes[id];
-          const metadata = graph.metadataByNode[id];
+      <For each={graph.nodes}>
+        {(node) => {
+          const metadata = getMetadata(node.id);
           const connections = () =>
-            graph.connections.filter((x) => x.to.nodeId === id);
+            graph.connections.filter((x) => x.input.nodeId === node.id);
 
           return (
             <CanvasElement
@@ -200,18 +127,18 @@ export default function FlowEditor() {
               width={node.type === "Process" ? 288 : 256}
               height={200}
             >
-              <div use:movable={{ id }}>
+              <div use:movable={{ id: node.id }}>
                 <Switch>
-                  <Match when={node.type === "Input"}>
+                  <Match when={node.type === "test_start"}>
                     <Start_Node />
-                    <div use:grabSource="i am some data">
+                    <div use:grabSource={{ id: node.id }}>
                       <Variable_Node />
                     </div>
                   </Match>
-                  <Match when={node.type === "Process"}>
+                  <Match when={node.type === "test_process"}>
                     <Action_Node>
                       <div
-                        use:dropZone={id}
+                        use:dropZone={node.id}
                         style="color: white; min-height: 50px"
                       >
                         <Switch fallback={"drop variables here"}>
@@ -224,7 +151,7 @@ export default function FlowEditor() {
                       </div>
                     </Action_Node>
                   </Match>
-                  <Match when={node.type === "Output"}>
+                  <Match when={node.type === "test_end"}>
                     <End_Node />
                   </Match>
                 </Switch>
@@ -234,18 +161,18 @@ export default function FlowEditor() {
         }}
       </For>
       <For each={graph.connections}>
-        {(connection, index) => (
-          <text
-            x={graph.metadataByNode[connection.from.nodeId].xPos}
-            y={
-              graph.metadataByNode[connection.from.nodeId].yPos +
-              180 +
-              index() * 20
-            }
-            textContent={`draw line connection to ${connection.to.nodeId}`}
-            fill="white"
-          />
-        )}
+        {(connection, index) => {
+          const outputMetadata = getMetadata(connection.output.nodeId);
+
+          return (
+            <text
+              x={outputMetadata.xPos}
+              y={outputMetadata.yPos + 180 + index() * 20}
+              textContent={`draw line connection to ${connection.input.nodeId}`}
+              fill="white"
+            />
+          );
+        }}
       </For>
     </InteractiveCanvas>
   );
