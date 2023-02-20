@@ -6,10 +6,11 @@ import { For, Match, Switch } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import {
-  Start_Node,
-  Action_Node,
-  Variable_Node,
-  End_Node,
+  InputNode,
+  OutputNode,
+  ProcessNode,
+  VariableDropZone,
+  VariableNode,
 } from "~/components/nodes/Node";
 
 import { movable } from "~/components/editor/directives/movable";
@@ -82,8 +83,8 @@ export default function FlowEditor() {
     ]);
   }
 
-  function renderVirtualElement() {
-    return <Variable_Node />;
+  function renderVirtualElement(ref: { id: string }) {
+    return <VariableNode name={ref.id} />;
   }
 
   return (
@@ -121,38 +122,32 @@ export default function FlowEditor() {
             graph.connections.filter((x) => x.input.nodeId === node.id);
 
           return (
-            <CanvasElement
-              x={metadata.xPos}
-              y={metadata.yPos}
-              width={node.type === "Process" ? 288 : 256}
-              height={200}
-            >
+            <CanvasElement x={metadata.xPos} y={metadata.yPos}>
               <div use:movable={{ id: node.id }}>
                 <Switch>
                   <Match when={node.type === "test_start"}>
-                    <Start_Node />
+                    <InputNode title="Integer Input" />
                     <div use:grabSource={{ id: node.id }}>
-                      <Variable_Node />
+                      <VariableNode name="sus" />
                     </div>
                   </Match>
                   <Match when={node.type === "test_process"}>
-                    <Action_Node>
-                      <div
-                        use:dropZone={node.id}
-                        style="color: white; min-height: 50px"
-                      >
-                        <Switch fallback={"drop variables here"}>
-                          <Match when={connections().length}>
-                            <For each={connections()}>
-                              {() => <Variable_Node />}
-                            </For>
-                          </Match>
-                        </Switch>
-                      </div>
-                    </Action_Node>
+                    <ProcessNode title="sus">
+                      <VariableDropZone>
+                        <div use:dropZone={node.id}>
+                          <Switch fallback={"drop variables here"}>
+                            <Match when={connections().length}>
+                              <For each={connections()}>
+                                {() => <VariableNode name="sus" />}
+                              </For>
+                            </Match>
+                          </Switch>
+                        </div>
+                      </VariableDropZone>
+                    </ProcessNode>
                   </Match>
                   <Match when={node.type === "test_end"}>
-                    <End_Node />
+                    <OutputNode title="Integer Output" />
                   </Match>
                 </Switch>
               </div>
