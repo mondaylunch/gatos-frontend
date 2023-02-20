@@ -1,4 +1,4 @@
-import { Component, For, JSX, Match, Show, Switch } from "solid-js";
+import { Component, For, JSX, Match, Switch } from "solid-js";
 import { Graph, NODE_TYPES } from "~/lib/types";
 
 import { movable } from "../editor/directives/movable";

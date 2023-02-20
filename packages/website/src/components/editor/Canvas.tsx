@@ -4,7 +4,6 @@ import {
   createSignal,
   JSX,
   onCleanup,
-  Ref,
   splitProps,
 } from "solid-js";
 

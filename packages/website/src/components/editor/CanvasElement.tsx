@@ -15,13 +15,14 @@ type Props = Omit<
   y: number;
 
   /**
-   * Child element
-   *
-   * * Must only have one descendant
+   * Child elements
    */
   children: JSX.Element;
 };
 
+/**
+ * Wrapper element for rendering into the canvas
+ */
 export function CanvasElement(props: Props) {
   const [local, remote] = splitProps(props, ["x", "y"]);
   return (
