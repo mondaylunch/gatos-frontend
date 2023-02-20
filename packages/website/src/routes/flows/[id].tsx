@@ -6,7 +6,7 @@ import { createStore } from "solid-js/store";
 import { VariableNode } from "~/components/nodes/Node";
 
 import { InteractiveCanvas } from "~/components/editor/InteractiveCanvas";
-import { Graph, SAMPLE_FLOW_DATA } from "~/lib/types";
+import { Graph, NODE_TYPES, SAMPLE_FLOW_DATA } from "~/lib/types";
 import { RenderNodes } from "~/components/nodes/RenderNodes";
 import { RenderConnections } from "~/components/nodes/RenderConnections";
 import { NodeSidebar } from "~/components/nodes/NodeSidebar";
@@ -60,6 +60,40 @@ export default function FlowEditor() {
     const [type, nodeId, inputId] = targetNodeId.split(":");
 
     if (type === "node") {
+      // Get node types of both nodes involved
+      const outputNodeType =
+        NODE_TYPES[
+          graph.nodes.find((node) => node.id === ref.id)
+            ?.type as keyof typeof NODE_TYPES
+        ];
+      const inputNodeType =
+        NODE_TYPES[
+          graph.nodes.find((node) => node.id === nodeId)
+            ?.type as keyof typeof NODE_TYPES
+        ];
+
+      // 1. If the input does not exist, reject.
+      if (!inputNodeType) return;
+
+      // 2. If the variable types differ, reject.
+      const output = outputNodeType.outputs.find(
+        (output) => output.name === ref.name
+      )!;
+      const input = inputNodeType.outputs.find(
+        (input) => input.name === ref.name
+      )!;
+      if (output.type !== input.type) return;
+
+      // 3. If an input connection already exists, reject.
+      if (
+        graph.connections.find(
+          (connection) =>
+            connection.input.nodeId === nodeId &&
+            connection.input.name === inputId
+        )
+      )
+        return;
+
       updateGraph("connections", [
         ...graph.connections,
         {
