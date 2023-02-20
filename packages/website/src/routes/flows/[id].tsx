@@ -66,22 +66,26 @@ export default function FlowEditor() {
    * @param ref Reference object
    * @param targetNodeId Target drop zone
    */
-  function handleDrop(ref: { id: string }, targetNodeId: string) {
-    updateGraph("connections", [
-      ...graph.connections,
-      {
-        output: {
-          nodeId: ref.id,
-          name: "test",
-          type: "integer",
+  function handleDrop(ref: { id: string; name: string }, targetNodeId: string) {
+    const [type, nodeId, inputId] = targetNodeId.split(":");
+
+    if (type === "node") {
+      updateGraph("connections", [
+        ...graph.connections,
+        {
+          output: {
+            nodeId: ref.id,
+            name: ref.name,
+            type: "integer",
+          },
+          input: {
+            nodeId: nodeId,
+            name: inputId,
+            type: "integer",
+          },
         },
-        input: {
-          nodeId: targetNodeId,
-          name: "test",
-          type: "integer",
-        },
-      },
-    ]);
+      ]);
+    }
   }
 
   /**

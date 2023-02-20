@@ -44,15 +44,11 @@ export function InputNode(props: {
   );
 }
 
-export function OutputNode(props: { title: string }) {
+export function OutputNode(props: { title: string; children?: JSX.Element }) {
   return (
     <div class="rounded-b-full h-32 w-64 flex bg-neutral-900 items-center justify-center">
       <p class="font-bold text-white select-none">{props.title}</p>
+      {props.children}
     </div>
   );
 }
-
-<div class="group relative w-72 h-32 rounded-[35px] bg-white flex align-text-top justify-center">
-  <p class="font-bold capitalize select-none">Concatenate</p>
-  <div class="flex-col w-60 h-28 rounded-[35px] bg-neutral-800 flex align-text-top justify-center"></div>
-</div>;
