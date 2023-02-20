@@ -15,16 +15,6 @@ type Props = Omit<
   y: number;
 
   /**
-   * Element width
-   */
-  width: number;
-
-  /**
-   * Element height
-   */
-  height: number;
-
-  /**
    * Child element
    *
    * * Must only have one descendant
@@ -33,16 +23,17 @@ type Props = Omit<
 };
 
 export function CanvasElement(props: Props) {
-  const [local, remote] = splitProps(props, ["x", "y", "width", "height"]);
-
+  const [local, remote] = splitProps(props, ["x", "y"]);
   return (
     <foreignObject
       {...remote}
       x={local.x}
       y={local.y}
-      width={local.width}
-      height={local.height}
-      style={{ "--width": local.width + "px", "--height": local.height + "px" }}
+      style={{
+        width: "1px",
+        height: "1px",
+        overflow: "visible",
+      }}
     />
   );
 }
