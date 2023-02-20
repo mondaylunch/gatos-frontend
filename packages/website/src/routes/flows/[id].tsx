@@ -5,21 +5,11 @@ import { createStore } from "solid-js/store";
 
 import { VariableNode } from "~/components/nodes/Node";
 
-import { movable } from "~/components/editor/directives/movable";
-import { grabSource } from "~/components/editor/directives/grabSource";
-import { dropZone } from "~/components/editor/directives/dropZone";
 import { InteractiveCanvas } from "~/components/editor/InteractiveCanvas";
 import { Graph, SAMPLE_FLOW_DATA } from "~/lib/types";
 import { RenderNodes } from "~/components/nodes/RenderNodes";
 import { RenderConnections } from "~/components/nodes/RenderConnections";
 import { NodeSidebar } from "~/components/nodes/NodeSidebar";
-
-/**
- * typescript will prune these if not referenced
- */
-movable;
-grabSource;
-dropZone;
 
 /**
  * Populate Graph with missing metadata
