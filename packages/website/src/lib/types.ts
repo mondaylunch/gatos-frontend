@@ -6,15 +6,30 @@ export type User = {
   authToken: string;
 };
 
-export type Setting = {
-  type: `option$${"test" | "gfgdf"}`;
-  value: any;
-};
+type DataType = "number" | `optional$${string}` | `list$${string}`;
+
+export type Setting =
+  | {
+      type: `optional$${string}`;
+      value: {
+        present: boolean;
+        value: any;
+      };
+    }
+  | {
+      type: `list$${string}`;
+      value: any[];
+    }
+  | {
+      type: "number";
+      value: number;
+    };
 
 export type Node = {
   id: string;
   type: string;
   settings: Record<string, Setting>;
+  inputTypes: Record<string, DataType>;
 };
 
 export type Connector = {
