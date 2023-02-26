@@ -57,9 +57,12 @@ export default function FlowEditor() {
    * @param targetNodeId Target drop zone
    */
   function handleDrop(ref: { id: string; name: string }, targetNodeId: string) {
-    const [type, nodeId, inputId] = targetNodeId.split(":");
+    const [type, nodeId, inputName] = targetNodeId.split(":");
 
     if (type === "node") {
+      // Get the node we are connecting to
+      const inputNode = graph.nodes.find((node) => node.id === nodeId)!;
+
       // Get node types of both nodes involved
       const outputNodeType =
         NODE_TYPES[
@@ -67,10 +70,7 @@ export default function FlowEditor() {
             ?.type as keyof typeof NODE_TYPES
         ];
       const inputNodeType =
-        NODE_TYPES[
-          graph.nodes.find((node) => node.id === nodeId)
-            ?.type as keyof typeof NODE_TYPES
-        ];
+        NODE_TYPES[inputNode.type as keyof typeof NODE_TYPES];
 
       // 1. If the input does not exist, reject.
       if (!inputNodeType) return;
@@ -79,20 +79,20 @@ export default function FlowEditor() {
       const output = outputNodeType.outputs.find(
         (output) => output.name === ref.name
       )!;
-      const input = inputNodeType.outputs.find(
-        (input) => input.name === ref.name
-      )!;
-      if (output.type !== input.type) return;
+      const inputType = inputNode.inputTypes[inputName];
+      if (!output) throw `Output "${ref.name}" not registered in node types!`;
+      if (!inputType) throw `Input "${inputName}" not defined in the node!`;
+      if (output.type !== inputType) return;
 
       // 3. If an input connection already exists, reject.
       if (
         graph.connections.find(
           (connection) =>
             connection.input.nodeId === nodeId &&
-            connection.input.name === inputId
+            connection.input.name === inputName
         )
       )
-        return;
+        return console.info("Ignoring duplicate connection to input.");
 
       updateGraph("connections", [
         ...graph.connections,
@@ -100,12 +100,12 @@ export default function FlowEditor() {
           output: {
             nodeId: ref.id,
             name: ref.name,
-            type: "integer",
+            type: output.type,
           },
           input: {
             nodeId: nodeId,
-            name: inputId,
-            type: "integer",
+            name: inputName,
+            type: inputType,
           },
         },
       ]);

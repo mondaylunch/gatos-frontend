@@ -35,7 +35,7 @@ export type Node = {
 export type Connector = {
   nodeId: string;
   name: string;
-  type: "number";
+  type: DataType;
 };
 
 export type Connection = {
@@ -65,17 +65,14 @@ export type Flow = {
 export const NODE_TYPES = {
   test_start: {
     name: "Start",
-    inputs: [],
-    outputs: [{ name: "out", type: "integer" }],
+    outputs: [{ name: "start_output", type: "number" }],
   },
   test_process: {
     name: "Process",
-    inputs: [{ name: "in", type: "integer" }],
-    outputs: [{ name: "out", type: "integer" }],
+    outputs: [{ name: "process_output", type: "number" }],
   },
   test_end: {
     name: "End",
-    inputs: [{ name: "in", type: "integer" }],
     outputs: [],
   },
 };

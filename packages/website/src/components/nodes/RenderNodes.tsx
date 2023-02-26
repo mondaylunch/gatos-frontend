@@ -41,20 +41,28 @@ export function RenderNodes(props: { graph: Graph }) {
           <CanvasElement x={metadata.xPos} y={metadata.yPos}>
             <div use:movable={{ id: node.id }}>
               <Component title={nodeType.name}>
-                <For each={nodeType.inputs}>
-                  {(input) => {
+                <For each={Object.keys(node.inputTypes)}>
+                  {(inputName) => {
+                    console.info(
+                      props.graph.connections,
+                      props.graph.connections.filter(
+                        (x) =>
+                          x.input.nodeId === node.id &&
+                          x.input.name === inputName
+                      )
+                    );
                     const connections = () =>
                       props.graph.connections.filter(
                         (x) =>
                           x.input.nodeId === node.id &&
-                          x.input.name === input.name
+                          x.input.name === inputName
                       );
 
                     return (
                       <>
-                        <span>{input.name}</span>
+                        <span>{inputName}</span>
                         <VariableDropZone>
-                          <div use:dropZone={`node:${node.id}:${input.name}`}>
+                          <div use:dropZone={`node:${node.id}:${inputName}`}>
                             <Switch fallback={"drop variables here"}>
                               <Match when={connections().length}>
                                 <For each={connections()}>
