@@ -1,5 +1,8 @@
 import { JSX } from "solid-js";
 
+/**
+ * Node signifying given data is processed
+ */
 export function ProcessNode(props: {
   title: JSX.Element;
   children?: JSX.Element;
@@ -14,6 +17,9 @@ export function ProcessNode(props: {
   );
 }
 
+/**
+ * Node input drop area
+ */
 export function VariableDropZone(props: { children?: JSX.Element }) {
   return (
     <div class="flex-col w-60 h-16 rounded-[35px] bg-neutral-800 flex align-text-top justify-center">
@@ -22,6 +28,9 @@ export function VariableDropZone(props: { children?: JSX.Element }) {
   );
 }
 
+/**
+ * Node variable
+ */
 export function VariableNode(props: { name: JSX.Element }) {
   return (
     <div class="text-white group relative w-28 h-8 rounded-[35px] bg-rose-500 flex items-center justify-center">
@@ -30,6 +39,9 @@ export function VariableNode(props: { name: JSX.Element }) {
   );
 }
 
+/**
+ * Node signifying the start of a flow
+ */
 export function InputNode(props: {
   title: JSX.Element;
   children?: JSX.Element;
@@ -44,6 +56,9 @@ export function InputNode(props: {
   );
 }
 
+/**
+ * Node signifying the end of a flow
+ */
 export function OutputNode(props: { title: string; children?: JSX.Element }) {
   return (
     <div class="rounded-b-full h-32 w-64 flex bg-neutral-900 items-center justify-center">

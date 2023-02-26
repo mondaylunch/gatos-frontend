@@ -33,6 +33,7 @@ export function RenderNodes(props: { graph: Graph }) {
   return (
     <For each={props.graph.nodes}>
       {(node) => {
+        // Find all relevant information to render the node
         const metadata = props.graph.metadata[node.id];
         const nodeType = NODE_TYPES[node.type as keyof typeof NODE_TYPES];
         const Component = COMPONENTS[node.type as keyof typeof NODE_TYPES];
@@ -41,16 +42,10 @@ export function RenderNodes(props: { graph: Graph }) {
           <CanvasElement x={metadata.xPos} y={metadata.yPos}>
             <div use:movable={{ id: node.id }}>
               <Component title={nodeType.name}>
+                {/** Render each input drop zone */}
                 <For each={Object.keys(node.inputTypes)}>
                   {(inputName) => {
-                    console.info(
-                      props.graph.connections,
-                      props.graph.connections.filter(
-                        (x) =>
-                          x.input.nodeId === node.id &&
-                          x.input.name === inputName
-                      )
-                    );
+                    // Find all connections for this node matching this input
                     const connections = () =>
                       props.graph.connections.filter(
                         (x) =>
@@ -63,7 +58,7 @@ export function RenderNodes(props: { graph: Graph }) {
                         <span>{inputName}</span>
                         <VariableDropZone>
                           <div use:dropZone={`node:${node.id}:${inputName}`}>
-                            <Switch fallback={"drop variables here"}>
+                            <Switch fallback={"Drop variables here"}>
                               <Match when={connections().length}>
                                 <For each={connections()}>
                                   {(connection) => (
@@ -80,6 +75,8 @@ export function RenderNodes(props: { graph: Graph }) {
                     );
                   }}
                 </For>
+
+                {/** Render each output grab source */}
                 <For each={nodeType.outputs}>
                   {(output) => (
                     <div use:grabSource={{ id: node.id, name: output.name }}>

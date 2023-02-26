@@ -94,6 +94,7 @@ export default function FlowEditor() {
       )
         return console.info("Ignoring duplicate connection to input.");
 
+      // Connect the two sides
       updateGraph("connections", [
         ...graph.connections,
         {
