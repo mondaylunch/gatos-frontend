@@ -9,10 +9,9 @@ export function ProcessNode(props: {
 }) {
   return (
     <div class="group relative h-32 w-72 rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center">
-      <div class="flex flex-col text-center items-center text-black">
-        <p class="font-bold capitalize select-none">{props.title}</p>
-        {props.children}
-      </div>
+        <div class="flex flex-col items-center justify-center">
+            {props.children}
+        </div>
     </div>
   );
 }
@@ -22,7 +21,7 @@ export function ProcessNode(props: {
  */
 export function VariableDropZone(props: { children?: JSX.Element }) {
   return (
-    <div class="flex-col w-60 h-16 rounded-[35px] bg-neutral-800 flex align-text-top justify-center">
+    <div class="flex-col p-2 min-h-fit rounded-[35px] bg-neutral-800 flex align-text-top justify-center">
       {props.children}
     </div>
   );
@@ -33,7 +32,7 @@ export function VariableDropZone(props: { children?: JSX.Element }) {
  */
 export function VariableNode(props: { name: JSX.Element }) {
   return (
-    <div class="text-white group relative w-28 h-8 rounded-[35px] bg-rose-500 flex items-center justify-center">
+    <div class="text-white group relative w-fit p-4 h-8 rounded-[35px] bg-rose-500 flex items-center justify-center">
       <p class="font-bold select-none">{props.name}</p>
     </div>
   );
@@ -47,11 +46,11 @@ export function InputNode(props: {
   children?: JSX.Element;
 }) {
   return (
-    <div class="rounded-t-full h-32 w-64 flex bg-neutral-900 items-center justify-center">
-      <p class="font-bold text-white select-none">{props.title}</p>
-      <div class="flex-row gap-4 flex align-text-top justify-center">
+    <div class="rounded-t-full h-32 w-64 flex bg-neutral-900 items-center justify-center flex-col">
+      <p class="flex-col font-bold text-white select-none">{props.title}</p>
+        <div class="flex flex-col text-center items-center text-white">
         {props.children}
-      </div>
+        </div>
     </div>
   );
 }
@@ -61,9 +60,12 @@ export function InputNode(props: {
  */
 export function OutputNode(props: { title: string; children?: JSX.Element }) {
   return (
-    <div class="rounded-b-full h-32 w-64 flex bg-neutral-900 items-center justify-center">
-      <p class="font-bold text-white select-none">{props.title}</p>
-      {props.children}
-    </div>
+      <div
+          class="rounded-b-full group relative h-32 w-72 rounded-[35px] bg-neutral-900 flex align-text-top items-center justify-center align-items-center">
+          <div class="flex flex-col text-center items-center text-white">
+              {props.children}
+          </div>
+      </div>
+
   );
 }
