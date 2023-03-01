@@ -23,18 +23,7 @@ export function RenderConnections(props: { graph: Graph }) {
         // TODO: the code below needs to be replaced with line drawing code,
         // the line must be drawn from (output.x,y) to (input.x,y)
         return (
-          <text
-            x={outputMetadata.xPos}
-            y={outputMetadata.yPos + 180 + index() * 20}
-            textContent={`draw line connection from (${outputMetadata.xPos}, ${
-              outputMetadata.yPos
-            }) [${outputRect().width}, ${outputRect().height}] to (${
-              inputMetadata.xPos
-            }, ${inputMetadata.yPos}) [${inputRect().width}, ${
-              inputRect().height
-            }]`}
-            fill="white"
-          />
+            <line x1={outputMetadata.xPos + outputRect().width/2} y1={outputMetadata.yPos+outputRect().height} x2={inputMetadata.xPos+inputRect().width/2} y2={inputMetadata.yPos} stroke="white" />
         );
       }}
     </For>
