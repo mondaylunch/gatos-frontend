@@ -23,7 +23,8 @@ export function RenderConnections(props: { graph: Graph }) {
         // TODO: the code below needs to be replaced with line drawing code,
         // the line must be drawn from (output.x,y) to (input.x,y)
         return (
-            <line x1={outputMetadata.xPos + outputRect().width/2} y1={outputMetadata.yPos+outputRect().height} x2={inputMetadata.xPos+inputRect().width/2} y2={inputMetadata.yPos} class="stroke-white" stroke-width="6" stroke-linecap="round" />
+            //<line x1={outputMetadata.xPos + outputRect().width/2} y1={outputMetadata.yPos+outputRect().height} x2={inputMetadata.xPos+inputRect().width/2} y2={inputMetadata.yPos} class="stroke-white" stroke-width="6" stroke-linecap="round" />
+            <path d={`M ${outputMetadata.xPos + outputRect().width/2} ${outputMetadata.yPos+outputRect().height} C ${outputMetadata.xPos + outputRect().width/2} ${outputMetadata.yPos+outputRect().height+100} ${inputMetadata.xPos+inputRect().width/2} ${inputMetadata.yPos-100} ${inputMetadata.xPos+inputRect().width/2} ${inputMetadata.yPos}`} class="stroke-white" stroke-width="6" stroke-linecap="round" fill="transparent" />
         );
       }}
     </For>
