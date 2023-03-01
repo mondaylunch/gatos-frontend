@@ -39,7 +39,7 @@ export function RenderNodes(props: { graph: Graph }) {
         const Component = COMPONENTS[node.type as keyof typeof NODE_TYPES];
 
         return (
-          <CanvasElement x={metadata.xPos} y={metadata.yPos}>
+          <CanvasElement x={metadata.xPos} y={metadata.yPos} id={node.id}>
             <div use:movable={{ id: node.id }}>
               <Component title={nodeType.name}>
                 {/** Render each input drop zone */}

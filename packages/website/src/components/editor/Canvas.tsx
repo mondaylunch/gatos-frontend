@@ -1,11 +1,14 @@
 import {
   Accessor,
+  createContext,
   createEffect,
   createSignal,
   JSX,
   onCleanup,
   splitProps,
+  useContext,
 } from "solid-js";
+import { createStore, SetStoreFunction, Store } from "solid-js/store";
 
 /**
  * Minimum linear zoom factor
@@ -28,6 +31,22 @@ type Props = JSX.SvgSVGAttributes<SVGSVGElement> & {
    */
   zoomRef?: FuncRef<Accessor<number>>;
 };
+
+/**
+ * Element size cache
+ */
+type ElementSizeStore = Record<string, { width: number; height: number }>;
+
+/**
+ * Provide the element size information
+ */
+export const ElementSizeContext =
+  createContext<[ElementSizeStore, SetStoreFunction<ElementSizeStore>]>();
+
+/**
+ * Zoom factor context
+ */
+export const ZoomFactorContext = createContext<() => number>();
 
 export function Canvas(props: Props) {
   const [local, remote] = splitProps(props, ["zoomRef"]);
@@ -302,18 +321,25 @@ export function Canvas(props: Props) {
     setTrackedTouches(event.touches);
   }
 
+  // Create a cache for element sizes
+  const sizeStore = createStore({});
+
   return (
-    <svg
-      {...remote}
-      ref={svgRef}
-      viewBox={viewBox()}
-      onMouseDown={onMouseDown}
-      onMouseUp={onMouseUp}
-      onMouseMove={onMouseMove}
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
-      onTouchMove={onTouchMove}
-      onWheel={onWheel}
-    />
+    <ElementSizeContext.Provider value={sizeStore}>
+      <ZoomFactorContext.Provider value={zoomFactor}>
+        <svg
+          {...remote}
+          ref={svgRef}
+          viewBox={viewBox()}
+          onMouseDown={onMouseDown}
+          onMouseUp={onMouseUp}
+          onMouseMove={onMouseMove}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+          onTouchMove={onTouchMove}
+          onWheel={onWheel}
+        />
+      </ZoomFactorContext.Provider>
+    </ElementSizeContext.Provider>
   );
 }
