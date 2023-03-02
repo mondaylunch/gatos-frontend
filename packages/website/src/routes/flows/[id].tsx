@@ -1,277 +1,149 @@
 import { Meta } from "solid-start";
-import { CanvasElement } from "~/components/editor/CanvasElement";
-import { Canvas } from "../../components/editor/Canvas";
 import styles from "./editor.module.css";
 
-import { Accessor, createSignal, For, Match, Show, Switch } from "solid-js";
 import { createStore } from "solid-js/store";
-import { Portal } from "solid-js/web";
 
-type DataTypes = "integer" | "boolean" | "string" | "optional" | "list";
+import { VariableNode } from "~/components/nodes/Node";
 
-type DataType<T extends DataTypes> = {
-  type: T;
-};
+import { InteractiveCanvas } from "~/components/editor/InteractiveCanvas";
+import { Graph, NODE_TYPES, SAMPLE_FLOW_DATA } from "~/lib/types";
+import { RenderNodes } from "~/components/nodes/RenderNodes";
+import { RenderConnections } from "~/components/nodes/RenderConnections";
+import { NodeSidebar } from "~/components/nodes/NodeSidebar";
 
-type NodeConnector<T extends DataTypes> = {
-  nodeId: string;
-  name: string;
-  dataType: DataType<T>;
-};
-
-type NodeConnection<T extends DataTypes> = {
-  from: NodeConnector<T>;
-  to: NodeConnector<T>;
-};
-
-type NodeMetadata = {
-  xPos: number;
-  yPos: number;
-};
-
-type Node = {
-  id: string;
-  type: any;
-  settings: Record<string, any>;
-  inputs: Record<string, NodeConnector<DataTypes>>;
-  outputs: Record<string, NodeConnector<DataTypes>>;
-};
-
-type Graph = {
-  nodes: Record<string, Node>;
-  connections: NodeConnection<DataTypes>[];
-  metadataByNode: Record<string, NodeMetadata>;
-};
-
-export default function Home() {
-  const [graph, updateGraph] = createStore<Graph>({
-    nodes: {
-      "001": {
-        id: "001",
-        type: "Input",
-        settings: {},
-        inputs: {},
-        outputs: {},
-      },
-      "002": {
-        id: "002",
-        type: "Process",
-        settings: {},
-        inputs: {},
-        outputs: {},
-      },
-      "003": {
-        id: "003",
-        type: "Process",
-        settings: {},
-        inputs: {},
-        outputs: {},
-      },
-    },
-    connections: [],
-    metadataByNode: {
-      "001": {
-        xPos: 150,
-        yPos: 350,
-      },
-      "002": {
-        xPos: 400,
-        yPos: 350,
-      },
-      "003": {
-        xPos: 650,
-        yPos: 350,
-      },
-    },
-  });
-
-  const [move, setMove] = createSignal<string | undefined>(undefined);
-  const [grabbed, setGrabbed] = createSignal<string | undefined>(undefined);
-
-  const [virtualX, setVX] = createSignal(350);
-  const [virtualY, setVY] = createSignal(100);
-
-  let zoomRef: Accessor<number> | undefined;
-  let transformRef:
-    | ((clientCoords: [number, number]) => [number, number])
-    | undefined;
-
-  function variableSource(el: HTMLElement, variable: Accessor<any>) {
-    function grab(ev: MouseEvent) {
-      ev.stopPropagation();
-
-      setGrabbed(variable());
-      setVX(ev.clientX);
-      setVY(ev.clientY);
+/**
+ * Populate Graph with missing metadata
+ * @param graph Graph
+ * @returns Populated Graph
+ */
+function populate(graph: Graph): Graph {
+  const metadata = { ...graph.metadata };
+  for (const node of graph.nodes) {
+    if (!metadata[node.id]) {
+      metadata[node.id] = {
+        xPos: 0,
+        yPos: 0,
+      };
     }
-
-    el.addEventListener("mousedown", grab);
-    return () => el.removeEventListener("mousedown", grab);
   }
 
-  function variableDropZone(el: HTMLElement, nodeId: Accessor<string>) {
-    el.setAttribute("data-accept-variable", nodeId());
+  return {
+    ...graph,
+    metadata,
+  };
+}
+
+export default function FlowEditor() {
+  const [graph, updateGraph] = createStore<Graph>(
+    populate(SAMPLE_FLOW_DATA.graph)
+  );
+
+  /**
+   * Handle move events from canvas
+   * @param ref Reference object
+   * @param param1 Movement information
+   */
+  function handleMove(
+    ref: { id: string },
+    [movementX, movementY]: [number, number]
+  ) {
+    updateGraph("metadata", ref.id, "xPos", (x) => x + movementX);
+    updateGraph("metadata", ref.id, "yPos", (y) => y + movementY);
+  }
+
+  /**
+   * Handle drop event from canvas
+   * @param ref Reference object
+   * @param targetNodeId Target drop zone
+   */
+  function handleDrop(ref: { id: string; name: string }, targetNodeId: string) {
+    const [type, nodeId, inputName] = targetNodeId.split(":");
+
+    if (type === "node") {
+      // Get the node we are connecting to
+      const inputNode = graph.nodes.find((node) => node.id === nodeId)!;
+
+      // Get node types of both nodes involved
+      const outputNodeType =
+        NODE_TYPES[
+          graph.nodes.find((node) => node.id === ref.id)
+            ?.type as keyof typeof NODE_TYPES
+        ];
+      const inputNodeType =
+        NODE_TYPES[inputNode.type as keyof typeof NODE_TYPES];
+
+      // 1. If the input does not exist, reject.
+      if (!inputNodeType) return;
+
+      // 2. If the variable types differ, reject.
+      const output = outputNodeType.outputs.find(
+        (output) => output.name === ref.name
+      )!;
+      const inputType = inputNode.inputTypes[inputName];
+      if (!output) throw `Output "${ref.name}" not registered in node types!`;
+      if (!inputType) throw `Input "${inputName}" not defined in the node!`;
+      if (output.type !== inputType) return;
+
+      // 3. If an input connection already exists, reject.
+      if (
+        graph.connections.find(
+          (connection) =>
+            connection.input.nodeId === nodeId &&
+            connection.input.name === inputName
+        )
+      )
+        return console.info("Ignoring duplicate connection to input.");
+
+      // Connect the two sides
+      updateGraph("connections", [
+        ...graph.connections,
+        {
+          output: {
+            nodeId: ref.id,
+            name: ref.name,
+            type: output.type,
+          },
+          input: {
+            nodeId: nodeId,
+            name: inputName,
+            type: inputType,
+          },
+        },
+      ]);
+    }
+  }
+
+  /**
+   * Render virtual grabbed element
+   * @param ref Object reference
+   */
+  function renderVirtualElement(ref: { id: string }) {
+    return <VariableNode name={ref.id} />;
   }
 
   return (
-    <main
-      class={styles.container}
-      onMouseMove={(e) => {
-        if (move()) {
-          updateGraph(
-            "metadataByNode",
-            move()!,
-            "xPos",
-            (x) => x + e.movementX / zoomRef!()
-          );
-
-          updateGraph(
-            "metadataByNode",
-            move()!,
-            "yPos",
-            (y) => y + e.movementY / zoomRef!()
-          );
-        }
-
-        if (grabbed()) {
-          setVX(e.clientX);
-          setVY(e.clientY);
-        }
+    <InteractiveCanvas
+      containerProps={{
+        class: styles.container,
       }}
-      onMouseUp={(ev) => {
-        if (move()) {
-          setMove(undefined);
-        }
-
-        if (grabbed()) {
-          setGrabbed(undefined);
-          setVX(350);
-          setVY(100);
-
-          const els = document.querySelectorAll("svg > *");
-          // TODO: optimisation: search at and below top element below cursor "elementsFromPoint"
-          for (const el of els) {
-            const droppable = el.querySelector("[data-accept-variable]");
-            if (droppable) {
-              const pos = droppable.getBoundingClientRect();
-              if (
-                ev.clientX > pos.left &&
-                ev.clientX < pos.right &&
-                ev.clientY > pos.top &&
-                ev.clientY < pos.bottom
-              ) {
-                const id = droppable.getAttribute("data-accept-variable")!;
-                updateGraph("connections", [
-                  ...graph.connections,
-                  {
-                    from: {
-                      nodeId: "001",
-                      name: "test",
-                      dataType: {
-                        type: "string",
-                      },
-                    },
-                    to: {
-                      nodeId: id,
-                      name: "test",
-                      dataType: {
-                        type: "string",
-                      },
-                    },
-                  },
-                ]);
-                // setDropped((x) => [...x, 0]);
-              }
-            }
-          }
-        }
+      canvasProps={{
+        class: styles.canvas,
       }}
+      preCanvas={
+        <>
+          <Meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, user-scalable=no"
+          />
+          <NodeSidebar />
+        </>
+      }
+      handleMove={handleMove}
+      handleDrop={handleDrop}
+      renderVirtualElement={renderVirtualElement}
     >
-      <Meta
-        name="viewport"
-        content="width=device-width, initial-scale=1, user-scalable=no"
-      />
-      <div class={styles.sidebar}>
-        <div
-          use:variableSource="i am some data"
-          style="background: #eb6e6e; border-radius: 16px; padding: 4px"
-        >
-          variable
-        </div>
-      </div>
-      <Canvas
-        class={styles.canvas}
-        zoomRef={(ref) => (zoomRef = ref)}
-        transformRef={(ref) => (transformRef = ref)}
-      >
-        <For each={Object.keys(graph.nodes)}>
-          {(id) => {
-            const node = graph.nodes[id];
-            const metadata = graph.metadataByNode[id];
-            const connections = () =>
-              graph.connections.filter((x) => x.to.nodeId === id);
-
-            return (
-              <CanvasElement
-                x={metadata.xPos}
-                y={metadata.yPos}
-                width={200}
-                height={200}
-                onMouseDown={() => setMove(id)}
-              >
-                <Switch>
-                  <Match when={node.type === "Input"}>
-                    <div style="background: gray">
-                      i am a node
-                      <div
-                        use:variableSource="i am some data"
-                        style="background: #eb6e6e; border-radius: 16px; padding: 4px"
-                      >
-                        variable
-                      </div>
-                    </div>
-                  </Match>
-                  <Match when={node.type === "Process"}>
-                    <div style="background: gray">
-                      i do something with:
-                      <div
-                        use:variableDropZone={id}
-                        style="background: black; color: white; min-height: 50px"
-                      >
-                        <Switch fallback={"drop variables here"}>
-                          <Match when={connections().length}>
-                            <For each={connections()}>
-                              {() => <div style="background: red;">var</div>}
-                            </For>
-                          </Match>
-                        </Switch>
-                      </div>
-                    </div>
-                  </Match>
-                </Switch>
-              </CanvasElement>
-            );
-          }}
-        </For>
-
-        <Show when={grabbed()}>
-          <Portal>
-            <div
-              style={{
-                position: "fixed",
-                left: virtualX() - 50 + "px",
-                top: virtualY() - 50 + "px",
-                width: "100px",
-                height: "100px",
-                background: "red",
-                transform: "rotateZ(-3deg)",
-              }}
-            >
-              {grabbed()}
-            </div>
-          </Portal>
-        </Show>
-      </Canvas>
-    </main>
+      <RenderNodes graph={graph} />
+      <RenderConnections graph={graph} />
+    </InteractiveCanvas>
   );
 }

@@ -5,11 +5,7 @@
     flex-direction: row;
 }
 
-.sidebar {
-    width: 240px;
-    background: #eee;
-}
-
 .canvas {
     flex-grow: 1;
+    @apply bg-neutral-800;
 }
