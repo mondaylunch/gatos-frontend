@@ -3,7 +3,7 @@ export type User = {
   username: string;
   email: string;
   password: string;
-  authToken: string;
+  auth_token: string;
 };
 
 type DataType = "number" | `optional$${string}` | `list$${string}`;
