@@ -1,4 +1,7 @@
 import { useLocation } from "solid-start";
+import useStorage from "solid-start";
+import DiscordOauth2 from "discord-oauth2";
+import { storage } from "~/lib/session";
 
 export default function DiscordAuth() {
   // Use the useLocation hook to get the URL query parameters
@@ -9,38 +12,30 @@ export default function DiscordAuth() {
   const codeInitial = location.search.split("=")[1];
   const code = codeInitial.split("&")[0];
 
-  // Make a POST request to the Discord API to exchange the authorization code for an access token
-  fetch("https://discord.com/api/oauth2/token", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams({
-      client_id: "1076967723352993912",
-      client_secret: client_secret,
-      grant_type: "authorization_code",
-      code: code,
-      redirect_uri: "https://gatos.lutitious.co.uk/discordauth",
-    }),
+  // Create a new DiscordOauth2 object
+  const oauth = new DiscordOauth2({
+    clientId: "1076967723352993912",
+    clientSecret: client_secret,
+    redirectUri: "https://gatos.lutitious.co.uk/discordauth",
+  });
+  
+  // Get the access token from the code and use it to get the user's username
+  oauth.tokenRequest({
+    code: code,
+    scope: "identify",
+    grantType: "authorization_code",
   })
-    .then((response) => response.json())
-    .then((data) => {
-      // Make a GET request to the Discord API's /users/@me endpoint with the access token
-      fetch("https://discord.com/api/users/@me", {
-        headers: {
-          Authorization: `Bearer ${data.access_token}`,
-        },
-      })
-        .then((response) => response.json())
-        .then((user) => {
-          // The user object will contain the username of the user
-          console.log(user.username);
-        })
-        .catch((error) => {
-          console.error("Error getting user:", error);
-        });
-    })
-    .catch((error) => {
-      console.error("Error exchanging authorization code for access token:", error);
+  .then((token) => {
+    // Use the access token to get the user's details
+    oauth.getUser(token.access_token)
+    .then((user) => {
+      console.log(user);
     });
+    }).catch((err) => {
+      // If its a 400 error, the code is invalid, output an error that the code is invalid
+      if (err.statusCode == 400) {
+        console.log("Invalid code");
+      }
+    });
+
 }
