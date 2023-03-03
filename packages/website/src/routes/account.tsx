@@ -3,7 +3,7 @@ import { ENDPOINT } from "~/lib/env";
 import { useRouteData } from "solid-start";
 import { createServerData$ } from "solid-start/server";
 import { resolveUserByRouteEvent } from "~/lib/session";
-import { Square_New, Square_File } from "~/components/dashboard/squares";
+import { SiDiscord } from 'solid-icons/si'
 
 export function routeData() {
   return createServerData$(async (_, event) => {
@@ -32,7 +32,7 @@ export default function Account() {
             <div>
                 <a href="https://discord.com/api/oauth2/authorize?client_id=1076967723352993912&redirect_uri=https%3A%2F%2Fgatos.lutitious.co.uk%2Fdiscordauth&response_type=code&scope=identify%20email%20guilds">
                     <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                        Connect Discord
+                        <SiDiscord class="inline-block w-6 h-6" />  Connect Discord
                     </button>
                 </a>
             </div>
