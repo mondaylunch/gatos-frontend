@@ -22,6 +22,7 @@ const config: PlaywrightTestConfig = {
       name: "chromium",
       use: {
         ...devices["Desktop Chrome"],
+        storageState: '.auth/user.json',
       },
     },
 
@@ -29,6 +30,7 @@ const config: PlaywrightTestConfig = {
       name: "firefox",
       use: {
         ...devices["Desktop Firefox"],
+        storageState: '.auth/user.json',
       },
     },
   ],
@@ -38,3 +40,4 @@ const config: PlaywrightTestConfig = {
 };
 
 export default config;
+

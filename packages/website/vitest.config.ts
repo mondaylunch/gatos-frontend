@@ -15,6 +15,7 @@ export default defineConfig({
       "./setupVitest.js",
     ],
     transformMode: { web: [/\.[jt]sx?$/] },
+    include: ['__tests__/**'],
   },
   resolve: {
     conditions: ["development", "browser"],
