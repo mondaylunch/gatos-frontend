@@ -1,7 +1,7 @@
 /**
  * URL pointing to the Gatos API
  */
-export const ENDPOINT = process.env.API_URL ?? "http://127.0.0.1:4390";
+export const ENDPOINT = process.env.API_URL ?? "http://127.0.0.1:8080";
 
 /**
  * Whether the application is currently running in production

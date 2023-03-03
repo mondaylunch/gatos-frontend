@@ -15,7 +15,7 @@ export default function Login() {
     });
 
     const session = await storage.getSession();
-    session.set("authToken", user.authToken);
+    session.set("authToken", user.auth_token);
 
     return redirect("/dash", {
       headers: {

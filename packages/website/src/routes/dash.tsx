@@ -9,7 +9,7 @@ type Flow = {
   id: string;
   name: string;
   description: string;
-  authorId: string;
+  author_id: string;
 };
 
 export function routeData() {
@@ -21,7 +21,7 @@ export function routeData() {
       flows: await fetch(`${ENDPOINT}/api/v1/flows/list`, {
         method: "GET",
         headers: {
-          "X-Auth-Token": user.authToken,
+          "X-Auth-Token": user.auth_token,
         },
       }).then((res) => (res.ok ? (res.json() as Promise<Flow[]>) : [])),
     };

@@ -1,13 +1,14 @@
 import {
   Accessor,
+  createContext,
   createEffect,
   createSignal,
   JSX,
   onCleanup,
-  Ref,
   splitProps,
+  useContext,
 } from "solid-js";
-import styles from "./Canvas.module.css";
+import { createStore, SetStoreFunction, Store } from "solid-js/store";
 
 /**
  * Minimum linear zoom factor
@@ -29,15 +30,26 @@ type Props = JSX.SvgSVGAttributes<SVGSVGElement> & {
    * Zoom factor ref
    */
   zoomRef?: FuncRef<Accessor<number>>;
-
-  /**
-   * Transform client coords to virtual coords ref
-   */
-  transformRef?: FuncRef<(clientCoords: [number, number]) => [number, number]>;
 };
 
+/**
+ * Element size cache
+ */
+type ElementSizeStore = Record<string, { width: number; height: number }>;
+
+/**
+ * Provide the element size information
+ */
+export const ElementSizeContext =
+  createContext<[ElementSizeStore, SetStoreFunction<ElementSizeStore>]>();
+
+/**
+ * Zoom factor context
+ */
+export const ZoomFactorContext = createContext<() => number>();
+
 export function Canvas(props: Props) {
-  const [local, remote] = splitProps(props, ["zoomRef", "transformRef"]);
+  const [local, remote] = splitProps(props, ["zoomRef"]);
 
   // Keep track of origin and zoom
   const [originX, setOriginX] = createSignal(0);
@@ -96,13 +108,6 @@ export function Canvas(props: Props) {
 
   if (local.zoomRef) {
     local.zoomRef(zoomFactor);
-  }
-
-  if (local.transformRef) {
-    local.transformRef(([x, y]) => [
-      originX() + (x - svgRef!.getBoundingClientRect().left) / zoomFactor(),
-      originY() + (y - svgRef!.getBoundingClientRect().top) / zoomFactor(),
-    ]);
   }
 
   // Keep track of the canvas size
@@ -316,18 +321,25 @@ export function Canvas(props: Props) {
     setTrackedTouches(event.touches);
   }
 
+  // Create a cache for element sizes
+  const sizeStore = createStore({});
+
   return (
-    <svg
-      {...remote}
-      ref={svgRef}
-      viewBox={viewBox()}
-      onMouseDown={onMouseDown}
-      onMouseUp={onMouseUp}
-      onMouseMove={onMouseMove}
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
-      onTouchMove={onTouchMove}
-      onWheel={onWheel}
-    />
+    <ElementSizeContext.Provider value={sizeStore}>
+      <ZoomFactorContext.Provider value={zoomFactor}>
+        <svg
+          {...remote}
+          ref={svgRef}
+          viewBox={viewBox()}
+          onMouseDown={onMouseDown}
+          onMouseUp={onMouseUp}
+          onMouseMove={onMouseMove}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+          onTouchMove={onTouchMove}
+          onWheel={onWheel}
+        />
+      </ZoomFactorContext.Provider>
+    </ElementSizeContext.Provider>
   );
 }
