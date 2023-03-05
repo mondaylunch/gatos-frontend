@@ -8,6 +8,7 @@ import { NodeSidebar } from "./NodeSidebar";
 import { RenderConnections } from "./RenderConnections";
 import { RenderNodes } from "./RenderNodes";
 import { InteractiveCanvas } from "../editor/InteractiveCanvas";
+import { SettingsSidebar } from "./SettingsSidebar";
 
 /**
  * Populate Graph with missing metadata
@@ -142,6 +143,7 @@ export function FlowEditor(props: { flow: Flow }) {
           <NodeSidebar />
         </>
       }
+      postCanvas={<SettingsSidebar />}
       handleMove={handleMove}
       handleDrop={handleDrop}
       handleSelect={() => void 0}
