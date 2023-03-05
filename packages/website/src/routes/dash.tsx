@@ -19,6 +19,7 @@ export function routeData() {
 
     return {
       user,
+      isLoggedIn: !!user,
       flows: await fetch(`${ENDPOINT}/api/v1/flows/list`, {
         method: "GET",
         headers: {
@@ -34,11 +35,11 @@ export default function Dash() {
 
   return (
     <div>
-      <Navbar />
+      <Navbar
+        username={data()?.user.username}
+        isLoggedIn={data()?.isLoggedIn}
+      />
       <div class="flex flex-col items-center justify-center w-screen h-screen bg-neutral-800">
-        {/* <div class="absolute top-0 right-0 mr-5 mt-5">
-          <p class="text-neutral-200 font-medium">Hi {data()?.user.username}</p>
-        </div> */}
         <div class="grid grid-cols-4 gap-5">
           <Square_New />
           <For each={data()?.flows ?? []}>
