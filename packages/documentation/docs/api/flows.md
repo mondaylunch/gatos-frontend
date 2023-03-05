@@ -11,9 +11,10 @@ Response Body:
 ```json
 [
   {
-    "id": "048f7d91-f6cc-4afc-9210-00878f188a84",
+    "_id": "048f7d91-f6cc-4afc-9210-00878f188a84",
     "name": "Flow Name",
-    "authorId": "048f7d91-f6cc-4afc-9210-00878f188a84"
+    "authorId": "048f7d91-f6cc-4afc-9210-00878f188a84",
+    "graph": [..]
   }
 ]
 ```
@@ -34,9 +35,10 @@ Response Body:
 
 ```json
 {
-  "id": "048f7d91-f6cc-4afc-9210-00878f188a84",
+  "_id": "048f7d91-f6cc-4afc-9210-00878f188a84",
   "name": "Flow Name",
-  "authorId": "048f7d91-f6cc-4afc-9210-00878f188a84"
+  "author_id": "048f7d91-f6cc-4afc-9210-00878f188a84",
+  "graph": [..]
 }
 ```
 
@@ -56,9 +58,10 @@ Response Body:
 
 ```json
 {
-  "id": "048f7d91-f6cc-4afc-9210-00878f188a84",
+  "_id": "048f7d91-f6cc-4afc-9210-00878f188a84",
   "name": "Flow Name",
-  "authorId": "048f7d91-f6cc-4afc-9210-00878f188a84"
+  "author_id": "048f7d91-f6cc-4afc-9210-00878f188a84",
+  "graph": [..]
 }
 ```
 

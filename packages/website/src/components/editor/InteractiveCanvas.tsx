@@ -1,17 +1,20 @@
 import {
   Accessor,
   ComponentProps,
-  createEffect,
+  createContext,
   createSignal,
   JSX,
   onCleanup,
+  Setter,
   Show,
+  Signal,
+  useContext,
 } from "solid-js";
 import { Portal } from "solid-js/web";
 import { Canvas } from "./Canvas";
 import { CanvasContext } from "./context";
 
-type Props<MoveRef, GrabRef> = {
+type Props<MoveRef, GrabRef, SelectRef> = {
   /**
    * Content rendered in the canvas
    */
@@ -28,6 +31,12 @@ type Props<MoveRef, GrabRef> = {
   postCanvas?: JSX.Element;
 
   /**
+   * Handle selecting an element on the canvas (single-click / single-tap)
+   * @param ref Unique identified of element being selected
+   */
+  handleSelect(ref?: SelectRef): void;
+
+  /**
    * Handle moving an element
    * @param ref Unique identifier of element being moved
    * @param param1 Change in (X, Y) coordinates
@@ -36,10 +45,15 @@ type Props<MoveRef, GrabRef> = {
 
   /**
    * Handle dropping an element
+   * @param param1 Position of dropped element
    * @param ref Unique identifier of element that was grabbed
    * @param targetNodeId Unique identifier of element that it was dropped into
    */
-  handleDrop(ref: GrabRef, targetNodeId: string): void;
+  handleDrop(
+    [posX, posY]: [number, number],
+    ref: GrabRef,
+    targetNodeId?: string
+  ): void;
 
   /**
    * Render a grabbed element
@@ -92,14 +106,45 @@ function searchForDropZone(clientX: number, clientY: number) {
 }
 
 /**
+ * Provide the currently selected element information
+ */
+export const SelectedElementContext = createContext<Signal<string>>();
+
+/**
+ * Signal children elements whether this element is currently selected
+ */
+export const SelectionSignalContext = createContext<Accessor<boolean>>();
+
+/**
+ * Create an accessor for whether the given element ID is selected
+ * @param id Element reference
+ * @returns Accessor
+ */
+export function useSelected<SelectRef>(id: SelectRef) {
+  // TODO: for complex types, this needs equalsDeep
+  return () => useContext(SelectedElementContext)![0]() === id;
+}
+
+/**
+ * Retrieve whether the current element is selected
+ */
+export function useSelfSelected() {
+  return useContext(SelectionSignalContext);
+}
+
+/**
  * Canvas with additional interactivity tools built-in
  */
-export function InteractiveCanvas<M, G>(props: Props<M, G>) {
+export function InteractiveCanvas<M, G, S>(props: Props<M, G, S>) {
   const [moving, setMoving] = createSignal<M | undefined>();
   const [grabbed, setGrabbed] = createSignal<G | undefined>();
+  const selected = createSignal<S | undefined>();
   const [virtualCoords, setVirtualCoords] = createSignal([0, 0]);
 
   let zoomRef: Accessor<number> | undefined;
+  let transformRef:
+    | ((coords: [number, number]) => [number, number])
+    | undefined;
 
   /**
    * Handle items being dropped in canvas
@@ -115,9 +160,16 @@ export function InteractiveCanvas<M, G>(props: Props<M, G>) {
       setGrabbed(undefined);
 
       const nodeId = searchForDropZone(ev.clientX, ev.clientY);
-      if (nodeId) {
-        props.handleDrop(grabRef, nodeId);
-      }
+      console.info(
+        ev.clientX,
+        ev.clientY,
+        transformRef!([ev.clientX, ev.clientY])
+      );
+      props.handleDrop(
+        transformRef!([ev.clientX, ev.clientY]),
+        grabRef,
+        nodeId
+      );
     }
   }
 
@@ -156,42 +208,49 @@ export function InteractiveCanvas<M, G>(props: Props<M, G>) {
         },
       }}
     >
-      <div
-        {...props.containerProps}
-        onMouseMove={(e) => {
-          // Check if we are moving an element,
-          // if so transform mouse movement and apply.
-          const movingRef = moving();
-          if (movingRef) {
-            props.handleMove(movingRef, [
-              e.movementX / zoomRef!(),
-              e.movementY / zoomRef!(),
-            ]);
-          }
-        }}
-        onMouseLeave={() => setMoving(undefined)}
-      >
-        {props.preCanvas}
-        <Canvas {...props.canvasProps} zoomRef={(ref) => (zoomRef = ref)}>
-          {props.children}
-        </Canvas>
-        {props.postCanvas}
-      </div>
-
-      <Show when={grabbed()}>
-        <Portal>
-          <div
-            style={{
-              position: "fixed",
-              left: virtualCoords()[0] + "px",
-              top: virtualCoords()[1] + "px",
-              transform: "translate(-50%, -50%) rotateZ(-3deg)",
-            }}
+      <SelectedElementContext.Provider value={selected as Signal<any>}>
+        <div
+          {...props.containerProps}
+          onMouseMove={(e) => {
+            // Check if we are moving an element,
+            // if so transform mouse movement and apply.
+            const movingRef = moving();
+            if (movingRef) {
+              props.handleMove(movingRef, [
+                e.movementX / zoomRef!(),
+                e.movementY / zoomRef!(),
+              ]);
+            }
+          }}
+          onMouseLeave={() => setMoving(undefined)}
+        >
+          {props.preCanvas}
+          <Canvas
+            {...props.canvasProps}
+            zoomRef={(ref) => (zoomRef = ref)}
+            transformRef={(ref) => (transformRef = ref)}
+            onMouseDown={() => selected[1](undefined)}
           >
-            {props.renderVirtualElement(grabbed()!)}
-          </div>
-        </Portal>
-      </Show>
+            {props.children}
+          </Canvas>
+          {props.postCanvas}
+        </div>
+
+        <Show when={grabbed()}>
+          <Portal>
+            <div
+              style={{
+                position: "fixed",
+                left: virtualCoords()[0] + "px",
+                top: virtualCoords()[1] + "px",
+                transform: "translate(-50%, -50%) rotateZ(-3deg)",
+              }}
+            >
+              {props.renderVirtualElement(grabbed()!)}
+            </div>
+          </Portal>
+        </Show>
+      </SelectedElementContext.Provider>
     </CanvasContext.Provider>
   );
 }
