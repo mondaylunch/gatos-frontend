@@ -9,13 +9,16 @@ export function ProcessNode(props: {
   children?: JSX.Element;
 }) {
   const isSelected = useSelfSelected();
+  // TODO: indicate the node is selected
 
   return (
-    <div class="group relative h-32 w-72 rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center">
+    <div
+      class={`group relative h-32 w-72 rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center`}
+    >
       <div class="flex-1 p-4 flex-col items-center justify-center text-left">
         {props.children}
       </div>
-      <Show when={isSelected?.()}>i am selected</Show>
+      {/*<Show when={isSelected?.()}>i am selected</Show>*/}
     </div>
   );
 }

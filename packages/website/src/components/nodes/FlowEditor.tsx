@@ -144,6 +144,7 @@ export function FlowEditor(props: { flow: Flow }) {
       }
       handleMove={handleMove}
       handleDrop={handleDrop}
+      handleSelect={() => void 0}
       renderVirtualElement={renderVirtualElement}
     >
       <RenderConnections graph={graph} />
