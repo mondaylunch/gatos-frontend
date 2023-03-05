@@ -109,7 +109,7 @@ export function register(
   );
 }
 
-export async function logout(request: Request) {
+export async function logout() {
   const session = await storage.getSession();
   return redirect("/", {
     headers: {

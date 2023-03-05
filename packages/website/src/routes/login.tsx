@@ -3,6 +3,7 @@ import { createServerAction$, redirect } from "solid-start/server";
 import { FormInput } from "~/components/forms/FormInput";
 import { Button } from "~/components/inputs/Buttons";
 import { login, storage } from "~/lib/session";
+import { Navbar } from "~/components/shared/Navbar";
 
 export default function Login() {
   const [form, { Form }] = createServerAction$(async (form: FormData) => {
@@ -15,6 +16,7 @@ export default function Login() {
     });
 
     const session = await storage.getSession();
+
     session.set("authToken", user.auth_token);
 
     return redirect("/dash", {

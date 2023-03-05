@@ -1,5 +1,5 @@
 import { logout } from "~/lib/session";
 
-export function GET(request: Request) {
-  return logout(request);
+export function GET() {
+  return logout();
 }
