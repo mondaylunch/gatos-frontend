@@ -1,4 +1,4 @@
-import { For, Show, createSignal, createEffect, onCleanup } from "solid-js";
+import { Show, createSignal, createEffect, onCleanup } from "solid-js";
 import { FaSolidCat } from "solid-icons/fa";
 import { useNavigate } from "solid-start";
 
@@ -14,10 +14,13 @@ export function Navbar(props: Props) {
   const [page, setPage] = createSignal("Dash");
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    navigate("/login", { replace: true });
-  };
+  function handleLogout() {
+    fetch("/logout", {
+      method: "GET",
+    }).then(() => {
+      navigate("/login", { replace: true });
+    });
+  }
 
   function toggleDropdown() {
     setDropdownVisible(!dropdownVisible());
