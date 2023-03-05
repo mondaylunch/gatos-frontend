@@ -14,6 +14,11 @@ export function Navbar(props: Props) {
   const [page, setPage] = createSignal("Dash");
   const navigate = useNavigate();
 
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    navigate("/login", { replace: true });
+  };
+
   function toggleDropdown() {
     setDropdownVisible(!dropdownVisible());
   }
@@ -124,8 +129,9 @@ export function Navbar(props: Props) {
                           role="menuitem"
                           tabindex="-1"
                           id="user-menu-item-2"
+                          onClick={handleLogout}
                         >
-                          Sign out
+                          Logout
                         </a>
                       </div>
                     </Show>
