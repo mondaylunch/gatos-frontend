@@ -142,6 +142,9 @@ export function InteractiveCanvas<M, G, S>(props: Props<M, G, S>) {
   const [virtualCoords, setVirtualCoords] = createSignal([0, 0]);
 
   let zoomRef: Accessor<number> | undefined;
+  let transformRef:
+    | ((coords: [number, number]) => [number, number])
+    | undefined;
 
   /**
    * Handle items being dropped in canvas
@@ -157,7 +160,16 @@ export function InteractiveCanvas<M, G, S>(props: Props<M, G, S>) {
       setGrabbed(undefined);
 
       const nodeId = searchForDropZone(ev.clientX, ev.clientY);
-      props.handleDrop([ev.clientX, ev.clientY], grabRef, nodeId);
+      console.info(
+        ev.clientX,
+        ev.clientY,
+        transformRef!([ev.clientX, ev.clientY])
+      );
+      props.handleDrop(
+        transformRef!([ev.clientX, ev.clientY]),
+        grabRef,
+        nodeId
+      );
     }
   }
 
@@ -216,6 +228,7 @@ export function InteractiveCanvas<M, G, S>(props: Props<M, G, S>) {
           <Canvas
             {...props.canvasProps}
             zoomRef={(ref) => (zoomRef = ref)}
+            transformRef={(ref) => (transformRef = ref)}
             onMouseDown={() => selected[1](undefined)}
           >
             {props.children}
