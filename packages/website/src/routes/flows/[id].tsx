@@ -10,6 +10,10 @@ import { FlowEditor } from "~/components/nodes/FlowEditor";
 export function routeData() {
   return createServerData$(async (_, event) => {
     const user = await resolveUserByRouteEvent(event);
+
+    // Route data doesn't provide params because Router is
+    // inaccessible, so we just read the URL instead, which
+    // is good enough for our purposes.
     const flowId = event.request.url.split("/").pop()!;
 
     return {
@@ -20,6 +24,9 @@ export function routeData() {
           "X-Auth-Token": user.auth_token,
         },
       }).then((res) => res.json() as Promise<Flow>),
+      nodeTypes: await fetch(`${ENDPOINT}/api/v1/node-types`).then((res) =>
+        res.json()
+      ),
     };
   });
 }
@@ -29,6 +36,7 @@ export default function FlowPage() {
 
   return (
     <Show when={data()}>
+      {/*JSON.stringify(data()?.nodeTypes)*/}
       <FlowEditor flow={data()!.flow} />
     </Show>
   );

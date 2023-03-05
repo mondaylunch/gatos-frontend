@@ -210,7 +210,11 @@ export function InteractiveCanvas<M, G, S>(props: Props<M, G, S>) {
           onMouseLeave={() => setMoving(undefined)}
         >
           {props.preCanvas}
-          <Canvas {...props.canvasProps} zoomRef={(ref) => (zoomRef = ref)}>
+          <Canvas
+            {...props.canvasProps}
+            zoomRef={(ref) => (zoomRef = ref)}
+            onMouseDown={() => selected[1](undefined)}
+          >
             {props.children}
           </Canvas>
           {props.postCanvas}

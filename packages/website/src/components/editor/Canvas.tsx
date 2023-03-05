@@ -6,9 +6,8 @@ import {
   JSX,
   onCleanup,
   splitProps,
-  useContext,
 } from "solid-js";
-import { createStore, SetStoreFunction, Store } from "solid-js/store";
+import { createStore, SetStoreFunction } from "solid-js/store";
 
 /**
  * Minimum linear zoom factor
@@ -70,6 +69,7 @@ export function Canvas(props: Props) {
    */
   const onMouseDown = (event: MouseEvent) => {
     if (event.target instanceof SVGSVGElement) {
+      (remote.onMouseDown as any)?.(event);
       event.preventDefault();
       setPan(true);
     }
