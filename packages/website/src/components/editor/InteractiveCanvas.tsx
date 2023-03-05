@@ -45,10 +45,15 @@ type Props<MoveRef, GrabRef, SelectRef> = {
 
   /**
    * Handle dropping an element
+   * @param param1 Position of dropped element
    * @param ref Unique identifier of element that was grabbed
    * @param targetNodeId Unique identifier of element that it was dropped into
    */
-  handleDrop(ref: GrabRef, targetNodeId: string): void;
+  handleDrop(
+    [posX, posY]: [number, number],
+    ref: GrabRef,
+    targetNodeId?: string
+  ): void;
 
   /**
    * Render a grabbed element
@@ -152,9 +157,7 @@ export function InteractiveCanvas<M, G, S>(props: Props<M, G, S>) {
       setGrabbed(undefined);
 
       const nodeId = searchForDropZone(ev.clientX, ev.clientY);
-      if (nodeId) {
-        props.handleDrop(grabRef, nodeId);
-      }
+      props.handleDrop([ev.clientX, ev.clientY], grabRef, nodeId);
     }
   }
 

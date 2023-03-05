@@ -1,6 +1,6 @@
 import { useRouteData } from "solid-start";
 
-import { Flow } from "~/lib/types";
+import { Flow, NodeType } from "~/lib/types";
 import { createServerData$ } from "solid-start/server";
 import { resolveUserByRouteEvent } from "~/lib/session";
 import { ENDPOINT } from "~/lib/env";
@@ -24,8 +24,8 @@ export function routeData() {
           "X-Auth-Token": user.auth_token,
         },
       }).then((res) => res.json() as Promise<Flow>),
-      nodeTypes: await fetch(`${ENDPOINT}/api/v1/node-types`).then((res) =>
-        res.json()
+      nodeTypes: await fetch(`${ENDPOINT}/api/v1/node-types`).then(
+        (res) => res.json() as Promise<NodeType[]>
       ),
     };
   });
@@ -36,8 +36,7 @@ export default function FlowPage() {
 
   return (
     <Show when={data()}>
-      {/*JSON.stringify(data()?.nodeTypes)*/}
-      <FlowEditor flow={data()!.flow} />
+      <FlowEditor flow={data()!.flow} nodeTypes={data()!.nodeTypes} />
     </Show>
   );
 }

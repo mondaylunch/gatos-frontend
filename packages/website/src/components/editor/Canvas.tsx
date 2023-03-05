@@ -177,6 +177,7 @@ export function Canvas(props: Props) {
    * @param event Wheel Event
    */
   function onWheel(event: WheelEvent) {
+    event.preventDefault();
     clampScale(-event.deltaY * 0.001, [mouseX(), mouseY()]);
   }
   /**

@@ -1,5 +1,5 @@
 import { Component, For, JSX, Match, Switch } from "solid-js";
-import { Graph, NODE_TYPES } from "~/lib/types";
+import { Graph, NodeType, NODE_TYPE_REGISTRY } from "~/lib/types";
 
 import { movable } from "../editor/directives/movable";
 import { dropZone } from "../editor/directives/dropZone";
@@ -18,12 +18,12 @@ dropZone;
 grabSource;
 
 const COMPONENTS: Record<
-  keyof typeof NODE_TYPES,
+  NodeType["category"],
   Component<{ title: string; children?: JSX.Element }>
 > = {
-  test_start: InputNode,
-  test_process: ProcessNode,
-  test_end: OutputNode,
+  input: InputNode,
+  process: ProcessNode,
+  output: OutputNode,
 };
 
 /**
@@ -35,11 +35,13 @@ export function RenderNodes(props: { graph: Graph }) {
       {(node) => {
         // Find all relevant information to render the node
         const metadata = props.graph.metadata[node.id];
-        const nodeType = NODE_TYPES[node.type as keyof typeof NODE_TYPES];
-        const Component = COMPONENTS[node.type as keyof typeof NODE_TYPES];
+        const nodeType =
+          NODE_TYPE_REGISTRY[node.type as keyof typeof NODE_TYPE_REGISTRY];
+        const Component = COMPONENTS[nodeType.category];
 
         return (
           <CanvasElement x={metadata.xPos} y={metadata.yPos} id={node.id}>
+            {/** @ts-expect-error directives are not supported */}
             <div use:movable={{ id: node.id }}>
               <Component title={nodeType.name}>
                 {/** Render each input drop zone */}
@@ -57,6 +59,7 @@ export function RenderNodes(props: { graph: Graph }) {
                       <>
                         <span>{inputName}</span>
                         <VariableDropZone>
+                          {/** @ts-expect-error directives are not supported */}
                           <div use:dropZone={`node:${node.id}:${inputName}`}>
                             <Switch fallback={"Drop variables here"}>
                               <Match when={connections().length}>
@@ -79,7 +82,14 @@ export function RenderNodes(props: { graph: Graph }) {
                 {/** Render each output grab source */}
                 <For each={nodeType.outputs}>
                   {(output) => (
-                    <div use:grabSource={{ id: node.id, name: output.name }}>
+                    <div
+                      // @ts-expect-error directives are not supported
+                      use:grabSource={{
+                        type: "Variable",
+                        id: node.id,
+                        name: output.name,
+                      }}
+                    >
                       <VariableNode name={output.name} />
                     </div>
                   )}
