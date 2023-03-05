@@ -15,11 +15,7 @@ export function Navbar(props: Props) {
   const navigate = useNavigate();
 
   function handleLogout() {
-    fetch("/logout", {
-      method: "GET",
-    }).then(() => {
-      navigate("/login", { replace: true });
-    });
+    navigate("/logout", { replace: true });
   }
 
   function toggleDropdown() {
@@ -127,7 +123,6 @@ export function Navbar(props: Props) {
                           Settings
                         </a>
                         <a
-                          href="#"
                           class="block px-4 py-2 text-sm text-gray-700 text-right hover:bg-gray-300 transition ease-in-out duration-150"
                           role="menuitem"
                           tabindex="-1"
