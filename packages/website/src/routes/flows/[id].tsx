@@ -142,8 +142,8 @@ export default function FlowEditor() {
       handleDrop={handleDrop}
       renderVirtualElement={renderVirtualElement}
     >
-      <RenderNodes graph={graph} />
       <RenderConnections graph={graph} />
+      <RenderNodes graph={graph} />
     </InteractiveCanvas>
   );
 }
