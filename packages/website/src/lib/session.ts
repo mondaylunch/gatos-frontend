@@ -110,10 +110,9 @@ export function register(
 }
 
 export async function logout(request: Request) {
-  const session = await storage.getSession(request.headers.get("Cookie"));
-  return redirect("/login", {
+  return redirect("/", {
     headers: {
-      "Set-Cookie": await storage.destroySession(session)
+      "Set-Cookie": "session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
     }
   });
 }
