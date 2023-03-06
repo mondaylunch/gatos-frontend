@@ -2,7 +2,7 @@
 
 This API provides CRUD for flows.
 
-## GET `/api/v1/flows/list`
+## GET `/api/v1/flows`
 
 > [Requires authentication.](/api/#authentication)
 
