@@ -13,8 +13,7 @@ Response Body:
   {
     "_id": "048f7d91-f6cc-4afc-9210-00878f188a84",
     "name": "Flow Name",
-    "authorId": "048f7d91-f6cc-4afc-9210-00878f188a84",
-    "graph": [..]
+    "authorId": "048f7d91-f6cc-4afc-9210-00878f188a84"
   }
 ]
 ```
@@ -37,8 +36,7 @@ Response Body:
 {
   "_id": "048f7d91-f6cc-4afc-9210-00878f188a84",
   "name": "Flow Name",
-  "author_id": "048f7d91-f6cc-4afc-9210-00878f188a84",
-  "graph": [..]
+  "author_id": "048f7d91-f6cc-4afc-9210-00878f188a84"
 }
 ```
 
@@ -60,8 +58,7 @@ Response Body:
 {
   "_id": "048f7d91-f6cc-4afc-9210-00878f188a84",
   "name": "Flow Name",
-  "author_id": "048f7d91-f6cc-4afc-9210-00878f188a84",
-  "graph": [..]
+  "author_id": "048f7d91-f6cc-4afc-9210-00878f188a84"
 }
 ```
 
