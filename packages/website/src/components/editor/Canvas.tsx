@@ -6,9 +6,8 @@ import {
   JSX,
   onCleanup,
   splitProps,
-  useContext,
 } from "solid-js";
-import { createStore, SetStoreFunction, Store } from "solid-js/store";
+import { createStore, SetStoreFunction } from "solid-js/store";
 
 /**
  * Minimum linear zoom factor
@@ -30,6 +29,11 @@ type Props = JSX.SvgSVGAttributes<SVGSVGElement> & {
    * Zoom factor ref
    */
   zoomRef?: FuncRef<Accessor<number>>;
+
+  /**
+   * Coordinate transform ref
+   */
+  transformRef?: FuncRef<(coords: [number, number]) => [number, number]>;
 };
 
 /**
@@ -49,7 +53,7 @@ export const ElementSizeContext =
 export const ZoomFactorContext = createContext<() => number>();
 
 export function Canvas(props: Props) {
-  const [local, remote] = splitProps(props, ["zoomRef"]);
+  const [local, remote] = splitProps(props, ["zoomRef", "transformRef"]);
 
   // Keep track of origin and zoom
   const [originX, setOriginX] = createSignal(0);
@@ -70,6 +74,7 @@ export function Canvas(props: Props) {
    */
   const onMouseDown = (event: MouseEvent) => {
     if (event.target instanceof SVGSVGElement) {
+      (remote.onMouseDown as any)?.(event);
       event.preventDefault();
       setPan(true);
     }
@@ -108,6 +113,20 @@ export function Canvas(props: Props) {
 
   if (local.zoomRef) {
     local.zoomRef(zoomFactor);
+  }
+
+  // Provide client to canvas transformation function
+  function transform([clientX, clientY]: [number, number]): [number, number] {
+    const bounds = svgRef!.getBoundingClientRect();
+
+    return [
+      (clientX - bounds.left) * zoomFactor() + originX(),
+      (clientY - bounds.top) * zoomFactor() + originY(),
+    ];
+  }
+
+  if (local.transformRef) {
+    local.transformRef(transform);
   }
 
   // Keep track of the canvas size
@@ -177,6 +196,7 @@ export function Canvas(props: Props) {
    * @param event Wheel Event
    */
   function onWheel(event: WheelEvent) {
+    event.preventDefault();
     clampScale(-event.deltaY * 0.001, [mouseX(), mouseY()]);
   }
   /**

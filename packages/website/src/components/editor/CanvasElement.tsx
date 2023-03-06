@@ -1,5 +1,9 @@
 import { createEffect, JSX, on, splitProps, useContext } from "solid-js";
 import { ElementSizeContext, ZoomFactorContext } from "./Canvas";
+import {
+  SelectedElementContext,
+  SelectionSignalContext,
+} from "./InteractiveCanvas";
 
 type Props = Omit<
   JSX.ForeignObjectSVGAttributes<SVGForeignObjectElement>,
@@ -74,17 +78,24 @@ export function CanvasElement(props: Props) {
     );
   }
 
+  // Pull in selection context
+  const [selection, setSelected] = useContext(SelectedElementContext)!;
+  const isSelected = () => (props.id ? selection() === props.id : false);
+
   return (
-    <foreignObject
-      {...remote}
-      ref={ref}
-      x={local.x}
-      y={local.y}
-      style={{
-        width: "1px",
-        height: "1px",
-        overflow: "visible",
-      }}
-    />
+    <SelectionSignalContext.Provider value={isSelected}>
+      <foreignObject
+        {...remote}
+        ref={ref}
+        x={local.x}
+        y={local.y}
+        style={{
+          width: "1px",
+          height: "1px",
+          overflow: "visible",
+        }}
+        onClick={() => local.id && setSelected(local.id)}
+      />
+    </SelectionSignalContext.Provider>
   );
 }
