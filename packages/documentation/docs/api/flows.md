@@ -4,6 +4,8 @@ This API provides CRUD for flows.
 
 ## GET `/api/v1/flows`
 
+Gets a user's flows. Graph information is not included.
+
 > [Requires authentication.](/api/#authentication)
 
 Response Body:
@@ -20,6 +22,8 @@ Response Body:
 ```
 
 ## GET `/api/v1/flows/{flowId}`
+
+Gets a flow.
 
 > [Requires authentication.](/api/#authentication)
 
@@ -115,6 +119,8 @@ Response Body:
 
 ## POST `/api/v1/flows`
 
+Creates a new flow. Returns the created flow. Graph information is not included.
+
 > [Requires authentication.](/api/#authentication)
 
 Request Body:
@@ -140,6 +146,8 @@ Response Body:
 ```
 
 ## PATCH `/api/v1/flows/{flowId}`
+
+Edits flow information. Returns the edited flow. Graph information is not included.
 
 > [Requires authentication.](/api/#authentication)
 
@@ -167,11 +175,45 @@ Response Body:
 
 ## DELETE `/api/v1/flows/{flowId}`
 
+Deletes a flow.
+
 > [Requires authentication.](/api/#authentication)
 
 No response body.
 
+## GET `/api/v1/flows/{flowId}/graph/nodes/{nodeId}`
+
+Gets a flow graph node.
+
+> [Requires authentication.](/api/#authentication)
+
+Response Body:
+
+```json
+{
+    "id": "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
+    "type": "string_length",
+    "settings": {},
+    "inputs": {
+        "input": {
+            "node_id": "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
+            "name": "input",
+            "type": "string"
+        }
+    },
+    "outputs": {
+        "output": {
+            "node_id": "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
+            "name": "output",
+            "type": "number"
+        }
+    }
+}
+```
+
 ## POST `/api/v1/flows/{flowId}/graph/nodes`
+
+Creates a new flow graph node. Returns the created node.
 
 > [Requires authentication.](/api/#authentication)
 
@@ -208,6 +250,8 @@ Response Body:
 ```
 
 ## PATCH `/api/v1/flows/{flowId}/graph/nodes/{node_id}/settings`
+
+Edits a flow graph node's settings. Returns the updated node.
 
 > [Requires authentication.](/api/#authentication)
 
@@ -256,5 +300,132 @@ Response Body:
             "type": "number"
         }
     }
+}
+```
+
+## DELETE `/api/v1/flows/{flowId}/graph/nodes/{nodeId}`
+
+Deletes a flow graph node.
+
+> [Requires authentication.](/api/#authentication)
+
+No response body.
+
+## GET `/api/v1/flows/{flowId}/graph/connections/{nodeId}`
+
+Gets a flow graph node's connections.
+
+> [Requires authentication.](/api/#authentication)
+
+Response Body:
+
+```json
+[
+    {
+        "output": {
+            "node_id": "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
+            "name": "start_node_output",
+            "type": "number"
+        },
+        "input": {
+            "node_id": "6f8de627-706d-4817-8921-73bff23006a8",
+            "name": "process_node_input",
+            "type": "number"
+        }
+    }
+]
+```
+
+## POST `/api/v1/flows/{flowId}/graph/connections`
+
+Creates a new flow graph node connection. Returns the created connection.
+
+> [Requires authentication.](/api/#authentication)
+
+Request Body:
+
+```json
+{
+    "from_node_id": "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
+    "from_name": "start_node_output",
+    "to_node_id": "6f8de627-706d-4817-8921-73bff23006a8",
+    "to_name": "process_node_input",
+    "type": "number"
+}
+```
+
+Response Body:
+
+```json
+{
+    "output": {
+        "node_id": "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
+        "name": "start_node_output",
+        "type": "number"
+    },
+    "input": {
+        "node_id": "6f8de627-706d-4817-8921-73bff23006a8",
+        "name": "process_node_input",
+        "type": "number"
+    }
+}
+```
+
+## DELETE `/api/v1/flows/{flowId}/graph/connections`
+
+Deletes a flow graph node connection.
+
+> [Requires authentication.](/api/#authentication)
+
+Request Body:
+
+```json
+{
+    "from_node_id": "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
+    "from_name": "start_node_output",
+    "to_node_id": "6f8de627-706d-4817-8921-73bff23006a8",
+    "to_name": "process_node_input",
+    "type": "number"
+}
+```
+
+No response body.
+
+## GET `/api/v1/flows/{flowId}/graph/nodes/{nodeId}/metadata`
+
+Gets a flow graph node's metadata.
+
+> [Requires authentication.](/api/#authentication)
+
+Response Body:
+
+```json
+{
+    "x_pos": 1.0,
+    "y_pos": 0.0
+}
+```
+
+## PATCH `/api/v1/flows/{flowId}/graph/nodes/{nodeId}/metadata`
+
+Edits a flow graph node's metadata. Returns the updated metadata.
+
+> [Requires authentication.](/api/#authentication)
+
+Request Body:
+
+```json
+{
+    "x_pos": 2.0,
+    "y_pos": 2.0
+}
+```
+
+Response Body:
+
+```json
+{
+    "x_pos": 2.0,
+    "y_pos": 2.0
 }
 ```
