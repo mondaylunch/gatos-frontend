@@ -23,7 +23,9 @@ import { Match, Switch } from "solid-js";
  * @param graph Graph
  * @returns Populated Graph
  */
-function populate(graph: Graph): Graph {
+function populate(
+  graph: Graph = { connections: [], metadata: {}, nodes: [] }
+): Graph {
   const metadata = { ...graph.metadata };
   for (const node of graph.nodes) {
     if (!metadata[node.id]) {

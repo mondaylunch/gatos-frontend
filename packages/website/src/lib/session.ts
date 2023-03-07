@@ -1,3 +1,4 @@
+import { createSignal, onMount } from "solid-js";
 import {
   createCookieSessionStorage,
   redirect,
@@ -5,6 +6,19 @@ import {
 } from "solid-start";
 import { ENDPOINT, PRODUCTION, SESSION_SECRET } from "./env";
 import { User } from "./types";
+
+/**
+ * Global user state information
+ */
+export const [user, setUser] = createSignal<User>();
+
+/**
+ * Mount the user data
+ */
+export function MountUser(props: { user: User }) {
+  onMount(() => setUser(props.user));
+  return null;
+}
 
 /**
  * Fetch a user by their given token
@@ -29,11 +43,22 @@ export async function resolveUserByRequest(request: Request): Promise<User> {
   const cookie = request.headers.get("Cookie") ?? "";
   const session = await storage.getSession(cookie);
   const token = session.get("authToken");
-  if (!token) throw redirect("/login");
+  if (!token)
+    throw redirect("/login", {
+      headers: {
+        "Set-Cookie": await storage.destroySession(session),
+      },
+    });
 
   // Fetch using token
   const user = await resolveUserByToken(token);
-  if (!user) throw redirect("/login");
+  if (!user)
+    throw redirect("/login", {
+      headers: {
+        "Set-Cookie": await storage.destroySession(session),
+      },
+    });
+
   return user;
 }
 

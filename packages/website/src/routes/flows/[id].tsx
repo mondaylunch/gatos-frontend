@@ -2,7 +2,7 @@ import { useRouteData } from "solid-start";
 
 import { Flow, NodeType } from "~/lib/types";
 import { createServerData$ } from "solid-start/server";
-import { resolveUserByRouteEvent } from "~/lib/session";
+import { MountUser, resolveUserByRouteEvent, setUser } from "~/lib/session";
 import { ENDPOINT } from "~/lib/env";
 import { Show } from "solid-js";
 import { FlowEditor } from "~/components/nodes/FlowEditor";
@@ -36,6 +36,7 @@ export default function FlowPage() {
 
   return (
     <Show when={data()}>
+      <MountUser user={data()!.user} />
       <FlowEditor flow={data()!.flow} nodeTypes={data()!.nodeTypes} />
     </Show>
   );
