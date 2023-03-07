@@ -42,7 +42,7 @@ Response Body:
                         "value": 0.0
                     }
                 },
-                "inputTypes": {}
+                "input_types": {}
             },
             {
                 "id": "6f8de627-706d-4817-8921-73bff23006a8",
@@ -56,7 +56,7 @@ Response Body:
                         ]
                     }
                 },
-                "inputTypes": {
+                "input_types": {
                     "process_input": "number"
                 }
             },
@@ -72,7 +72,7 @@ Response Body:
                         }
                     }
                 },
-                "inputTypes": {
+                "input_types": {
                     "end_input": "number"
                 }
             }
@@ -80,24 +80,24 @@ Response Body:
         "connections": [
             {
                 "output": {
-                    "nodeId": "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
+                    "node_id": "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
                     "name": "start_output",
                     "type": "number"
                 },
                 "input": {
-                    "nodeId": "6f8de627-706d-4817-8921-73bff23006a8",
+                    "node_id": "6f8de627-706d-4817-8921-73bff23006a8",
                     "name": "process_input",
                     "type": "number"
                 }
             },
             {
                 "output": {
-                    "nodeId": "6f8de627-706d-4817-8921-73bff23006a8",
+                    "node_id": "6f8de627-706d-4817-8921-73bff23006a8",
                     "name": "process_output",
                     "type": "number"
                 },
                 "input": {
-                    "nodeId": "b15f484f-4345-4f30-9162-5210b4ff1433",
+                    "node_id": "b15f484f-4345-4f30-9162-5210b4ff1433",
                     "name": "end_input",
                     "type": "number"
                 }
@@ -105,8 +105,8 @@ Response Body:
         ],
         "metadata": {
             "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd": {
-                "xPos": 1.0,
-                "yPos": 0.0
+                "x_pos": 1.0,
+                "y_pos": 0.0
             }
         }
     }
@@ -190,13 +190,13 @@ Response Body:
     "id": "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
     "type": "string_length",
     "settings": {},
-    "inputTypes": {
+    "input_types": {
         "input": "string"
     }
 }
 ```
 
-## PATCH `/api/v1/flows/{flowId}/graph/nodes/{nodeId}/settings`
+## PATCH `/api/v1/flows/{flowId}/graph/nodes/{node_id}/settings`
 
 > [Requires authentication.](/api/#authentication)
 
@@ -231,7 +231,7 @@ Response Body:
             "value": "GET"
         }
     },
-    "inputTypes": {
+    "input_types": {
         "body": "string"
     }
 }
