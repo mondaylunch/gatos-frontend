@@ -13,6 +13,7 @@ Response Body:
   {
     "_id": "048f7d91-f6cc-4afc-9210-00878f188a84",
     "name": "Flow Name",
+    "description": "Flow Description",
     "authorId": "048f7d91-f6cc-4afc-9210-00878f188a84"
   }
 ]
@@ -26,7 +27,8 @@ Request Body:
 
 ```json
 {
-  "name": "Flow Name"
+  "name": "Flow Name",
+  "description": "Flow Description"
 }
 ```
 
@@ -36,6 +38,7 @@ Response Body:
 {
   "_id": "048f7d91-f6cc-4afc-9210-00878f188a84",
   "name": "Flow Name",
+  "description": "Flow Description",
   "author_id": "048f7d91-f6cc-4afc-9210-00878f188a84"
 }
 ```
@@ -48,7 +51,8 @@ Request Body:
 
 ```json
 {
-  "name": "Flow Name"
+  "name": "Flow Name",
+  "description": "Flow Description"
 }
 ```
 
@@ -58,6 +62,7 @@ Response Body:
 {
   "_id": "048f7d91-f6cc-4afc-9210-00878f188a84",
   "name": "Flow Name",
+  "description": "Flow Description",
   "author_id": "048f7d91-f6cc-4afc-9210-00878f188a84"
 }
 ```
