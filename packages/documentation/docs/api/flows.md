@@ -170,3 +170,28 @@ Response Body:
 > [Requires authentication.](/api/#authentication)
 
 No response body.
+
+## POST `/api/v1/flows/{flowId}/graph/nodes`
+
+> [Requires authentication.](/api/#authentication)
+
+Request Body:
+
+```json
+{
+    "type": "string_length"
+}
+```
+
+Response Body:
+
+```json
+{
+    "id": "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
+    "type": "string_length",
+    "settings": {},
+    "inputTypes": {
+        "input": "string"
+    }
+}
+```
