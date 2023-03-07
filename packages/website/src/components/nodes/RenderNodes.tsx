@@ -45,7 +45,7 @@ export function RenderNodes(props: { graph: Graph }) {
             <div use:movable={{ id: node.id }}>
               <Component title={nodeType.name}>
                 {/** Render each input drop zone */}
-                <For each={Object.keys(node.inputTypes)}>
+                <For each={Object.keys(node.inputs)}>
                   {(inputName) => {
                     // Find all connections for this node matching this input
                     const connections = () =>
@@ -80,17 +80,17 @@ export function RenderNodes(props: { graph: Graph }) {
                 </For>
 
                 {/** Render each output grab source */}
-                <For each={nodeType.outputs}>
+                <For each={Object.keys(node.outputs)}>
                   {(output) => (
                     <div
                       // @ts-expect-error directives are not supported
                       use:grabSource={{
                         type: "Variable",
                         id: node.id,
-                        name: output.name,
+                        name: output,
                       }}
                     >
-                      <VariableNode name={output.name} />
+                      <VariableNode name={output} />
                     </div>
                   )}
                 </For>

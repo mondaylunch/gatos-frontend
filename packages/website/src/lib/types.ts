@@ -30,11 +30,18 @@ export type Setting =
       value: number;
     };
 
+export type IO = {
+  node_id: string;
+  name: string;
+  type: DataType;
+};
+
 export type Node = {
   id: string;
   type: string;
   settings: Record<string, Setting>;
-  inputTypes: Record<string, DataType>;
+  inputs: Record<string, IO>;
+  outputs: Record<string, IO>;
 };
 
 export type Connector = {
@@ -91,7 +98,14 @@ export const SAMPLE_FLOW_DATA: Flow = {
             value: 0.0,
           },
         },
-        inputTypes: {},
+        inputs: {},
+        outputs: {
+          start_output: {
+            node_id: "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
+            name: "start_output",
+            type: "number",
+          },
+        },
       },
       {
         id: "6f8de627-706d-4817-8921-73bff23006a8",
@@ -102,8 +116,19 @@ export const SAMPLE_FLOW_DATA: Flow = {
             value: [20.0, 3.0],
           },
         },
-        inputTypes: {
-          process_input: "number",
+        inputs: {
+          process_input: {
+            node_id: "6f8de627-706d-4817-8921-73bff23006a8",
+            name: "process_input",
+            type: "number",
+          },
+        },
+        outputs: {
+          process_output: {
+            node_id: "6f8de627-706d-4817-8921-73bff23006a8",
+            name: "process_output",
+            type: "number",
+          },
         },
       },
       {
@@ -118,9 +143,14 @@ export const SAMPLE_FLOW_DATA: Flow = {
             },
           },
         },
-        inputTypes: {
-          end_input: "number",
+        inputs: {
+          end_input: {
+            node_id: "b15f484f-4345-4f30-9162-5210b4ff1433",
+            name: "end_input",
+            type: "number",
+          },
         },
+        outputs: {},
       },
     ],
     connections: [
