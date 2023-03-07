@@ -32,6 +32,8 @@ Request Body:
 }
 ```
 
+Description is optional.
+
 Response Body:
 
 ```json
@@ -55,6 +57,8 @@ Request Body:
   "description": "Flow Description"
 }
 ```
+
+Either name or description can be omitted.
 
 Response Body:
 
