@@ -190,8 +190,19 @@ Response Body:
     "id": "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
     "type": "string_length",
     "settings": {},
-    "input_types": {
-        "input": "string"
+    "inputs": {
+        "input": {
+            "node_id": "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
+            "name": "input",
+            "type": "string"
+        }
+    },
+    "outputs": {
+        "output": {
+            "node_id": "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
+            "name": "output",
+            "type": "number"
+        }
     }
 }
 ```
@@ -231,8 +242,19 @@ Response Body:
             "value": "GET"
         }
     },
-    "input_types": {
-        "body": "string"
+    "inputs": {
+        "input": {
+            "node_id": "b15f484f-4345-4f30-9162-5210b4ff1433",
+            "name": "input",
+            "type": "string"
+        }
+    },
+    "outputs": {
+        "output": {
+            "node_id": "b15f484f-4345-4f30-9162-5210b4ff1433",
+            "name": "output",
+            "type": "number"
+        }
     }
 }
 ```
