@@ -195,3 +195,44 @@ Response Body:
     }
 }
 ```
+
+## PATCH `/api/v1/flows/{flowId}/graph/nodes/{nodeId}/settings`
+
+> [Requires authentication.](/api/#authentication)
+
+Request Body:
+
+```json
+{
+    "url": {
+        "type": "string",
+        "value": "https://api.github.com/users/mondaylunch/repos"
+    },
+    "method": {
+        "type": "string",
+        "value": "GET"
+    }
+}
+```
+
+Response Body:
+
+```json
+{
+    "id": "b15f484f-4345-4f30-9162-5210b4ff1433",
+    "type": "http_request",
+    "settings": {
+        "url": {
+            "type": "string",
+            "value": "https://api.github.com/users/mondaylunch/repos"
+        },
+        "method": {
+            "type": "string",
+            "value": "GET"
+        }
+    },
+    "inputTypes": {
+        "body": "string"
+    }
+}
+```
