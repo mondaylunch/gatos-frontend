@@ -1,3 +1,12 @@
+import { createServerData$ } from "solid-start/server";
+import { redirectIfLoggedIn } from "~/lib/session";
+
+export async function routeData() {
+  return createServerData$(async (_, event) => redirectIfLoggedIn(event), {
+    deferStream: true,
+  });
+}
+
 export default function Home() {
   return (
     <div class="bg-gradient-to-br from-indigo-600 to-teal-500 min-h-screen flex flex-col justify-center items-center">

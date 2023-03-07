@@ -4,6 +4,7 @@ import {
   redirect,
   ServerFunctionEvent,
 } from "solid-start";
+import { createServerData$ } from "solid-start/server";
 import { ENDPOINT, PRODUCTION, SESSION_SECRET } from "./env";
 import { User } from "./types";
 
@@ -71,6 +72,29 @@ export function resolveUserByRouteEvent(
   data: ServerFunctionEvent
 ): Promise<User> {
   return resolveUserByRequest(data.request);
+}
+
+/**
+ * Redirect a user to dashboard if they are logged in
+ * @param event Server function event
+ */
+export async function redirectIfLoggedIn(event: ServerFunctionEvent) {
+  const cookie = event.request.headers.get("Cookie") ?? "";
+  const session = await storage.getSession(cookie);
+  const token = session.get("authToken");
+
+  if (token) {
+    throw redirect("/dash");
+  }
+}
+
+/**
+ * Route data preset for redirecting to dashboard if logged in
+ */
+export async function createAuthenticatedRedirect() {
+  return createServerData$(async (_, event) => redirectIfLoggedIn(event), {
+    deferStream: true,
+  });
 }
 
 /**

@@ -1,8 +1,18 @@
 import { Show } from "solid-js";
-import { createServerAction$, redirect } from "solid-start/server";
+import {
+  createServerAction$,
+  createServerData$,
+  redirect,
+} from "solid-start/server";
 import { FormInput } from "~/components/forms/FormInput";
 import { Button } from "~/components/inputs/Buttons";
-import { register } from "~/lib/session";
+import { redirectIfLoggedIn, register } from "~/lib/session";
+
+export async function routeData() {
+  return createServerData$(async (_, event) => redirectIfLoggedIn(event), {
+    deferStream: true,
+  });
+}
 
 export default function SignUp() {
   const [form, { Form }] = createServerAction$(async (form: FormData) => {

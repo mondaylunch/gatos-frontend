@@ -2,12 +2,7 @@ import { For } from "solid-js";
 import { ENDPOINT } from "~/lib/env";
 import { A, useNavigate, useRouteData } from "solid-start";
 import { createServerData$ } from "solid-start/server";
-import {
-  MountUser,
-  resolveUserByRouteEvent,
-  setUser,
-  user,
-} from "~/lib/session";
+import { MountUser, resolveUserByRouteEvent, user } from "~/lib/session";
 import { Square_New, Square_File } from "~/components/dashboard/squares";
 
 type Flow = {
