@@ -7,7 +7,6 @@ import {
   Graph,
   loadNodeTypes,
   NodeType,
-  NODE_TYPE_REGISTRY,
   SAMPLE_FLOW_DATA,
 } from "~/lib/types";
 import { VariableNode } from "./Node";
@@ -100,27 +99,17 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
       if (type === "node") {
         // Get the node we are connecting to
         const inputNode = graph.nodes.find((node) => node.id === nodeId)!;
+        const outputNode = graph.nodes.find((node) => node.id === ref.id)!;
 
-        // Get node types of both nodes involved
-        const outputNodeType =
-          NODE_TYPE_REGISTRY[
-            graph.nodes.find((node) => node.id === ref.id)
-              ?.type as keyof typeof NODE_TYPE_REGISTRY
-          ];
-        const inputNodeType =
-          NODE_TYPE_REGISTRY[inputNode.type as keyof typeof NODE_TYPE_REGISTRY];
-
-        // 1. If the input does not exist, reject.
-        if (!inputNodeType) return;
+        // 1. If the input or output does not exist, reject.
+        if (!inputNode || !outputNode) return;
 
         // 2. If the variable types differ, reject.
-        const output = outputNodeType.outputs.find(
-          (output) => output.name === ref.name
-        )!;
-        const inputType = inputNode.inputTypes[inputName];
-        if (!output) throw `Output "${ref.name}" not registered in node types!`;
-        if (!inputType) throw `Input "${inputName}" not defined in the node!`;
-        if (output.type !== inputType) return;
+        const output = outputNode.outputs[ref.name];
+        const input = inputNode.inputs[inputName];
+        if (!output) throw `Output "${ref.name}" not defined in the node!`;
+        if (!input) throw `Input "${inputName}" not defined in the node!`;
+        if (output.type !== input.type) return;
 
         // 3. If an input connection already exists, reject.
         if (
@@ -144,7 +133,7 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
             input: {
               nodeId: nodeId,
               name: inputName,
-              type: inputType,
+              type: input.type,
             },
           },
         ]);
@@ -164,7 +153,8 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
           id,
           type: ref.node.name,
           settings: {},
-          inputTypes: {},
+          inputs: {},
+          outputs: {},
         },
       ]);
     }
