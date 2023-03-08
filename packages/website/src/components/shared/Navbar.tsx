@@ -133,15 +133,6 @@ export function Navbar() {
                             Hi {user().username}!
                           </a>
                           <a
-                            href="#"
-                            class="block px-4 py-2 text-sm text-gray-700 text-right hover:bg-gray-300 transition ease-in-out duration-150"
-                            role="menuitem"
-                            tabindex="-1"
-                            id="user-menu-item-1"
-                          >
-                            Settings
-                          </a>
-                          <a
                             href="/api/logout"
                             class="block px-4 py-2 text-sm text-gray-700 text-right hover:bg-gray-300 transition ease-in-out duration-150"
                             role="menuitem"
