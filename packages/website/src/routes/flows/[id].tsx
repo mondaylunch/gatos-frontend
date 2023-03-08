@@ -7,6 +7,7 @@ import {Show} from "solid-js";
 import {FlowEditor} from "~/components/nodes/FlowEditor";
 import {getSession} from "@auth/solid-start";
 import {authOpts} from "~/routes/api/auth/[...solidauth]";
+import {Navbar} from "~/components/shared/Navbar"
 
 export function routeData() {
   return createServerData$(async (_, event) => {
@@ -38,8 +39,11 @@ export default function FlowPage() {
   const data = useRouteData<typeof routeData>();
 
   return (
-    <Show when={data()}>
-      <FlowEditor flow={data()!.flow} nodeTypes={data()!.nodeTypes}/>
-    </Show>
+    <div class="flex flex-col h-screen max-h-screen min-h-0">
+      <Navbar/>
+      <Show when={data()}>
+        <FlowEditor flow={data()!.flow} nodeTypes={data()!.nodeTypes}/>
+      </Show>
+    </div>
   );
 }

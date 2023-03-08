@@ -349,8 +349,7 @@ Request Body:
     "from_node_id": "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
     "from_name": "start_node_output",
     "to_node_id": "6f8de627-706d-4817-8921-73bff23006a8",
-    "to_name": "process_node_input",
-    "type": "number"
+    "to_name": "process_node_input"
 }
 ```
 
@@ -384,8 +383,7 @@ Request Body:
     "from_node_id": "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
     "from_name": "start_node_output",
     "to_node_id": "6f8de627-706d-4817-8921-73bff23006a8",
-    "to_name": "process_node_input",
-    "type": "number"
+    "to_name": "process_node_input"
 }
 ```
 

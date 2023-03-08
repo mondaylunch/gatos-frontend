@@ -1,11 +1,17 @@
-import {Component, For, JSX, Match, Switch} from "solid-js";
-import {Graph, NODE_TYPE_REGISTRY, NodeType} from "~/lib/types";
+import { Component, For, JSX, Match, Switch } from "solid-js";
+import { Graph, NodeType, NODE_TYPE_REGISTRY } from "~/lib/types";
 
-import {movable} from "../editor/directives/movable";
-import {dropZone} from "../editor/directives/dropZone";
-import {grabSource} from "../editor/directives/grabSource";
-import {CanvasElement} from "../editor/CanvasElement";
-import {InputNode, OutputNode, ProcessNode, VariableDropZone, VariableNode,} from "./Node";
+import { movable } from "../editor/directives/movable";
+import { dropZone } from "../editor/directives/dropZone";
+import { grabSource } from "../editor/directives/grabSource";
+import { CanvasElement } from "../editor/CanvasElement";
+import {
+  InputNode,
+  OutputNode,
+  ProcessNode,
+  VariableDropZone,
+  VariableNode,
+} from "./Node";
 
 movable;
 dropZone;
@@ -34,24 +40,26 @@ export function RenderNodes(props: { graph: Graph }) {
         const Component = COMPONENTS[nodeType.category];
 
         return (
-          <CanvasElement x={metadata.xPos} y={metadata.yPos} id={node.id}>
+          <CanvasElement x={metadata.x_pos} y={metadata.y_pos} id={node.id}>
             {/** @ts-expect-error directives are not supported */}
-            <div use:movable={{id: node.id}}>
+            <div use:movable={{ id: node.id }}>
               <Component title={nodeType.name}>
                 {/** Render each input drop zone */}
-                <For each={Object.keys(node.inputTypes)}>
+                <For each={Object.keys(node.inputs)}>
                   {(inputName) => {
                     // Find all connections for this node matching this input
                     const connections = () =>
                       props.graph.connections.filter(
                         (x) =>
-                          x.input.nodeId === node.id &&
+                          x.input.node_id === node.id &&
                           x.input.name === inputName
                       );
 
                     return (
                       <>
-                        <span>{inputName}</span>
+                        <span>
+                          {inputName}: {node.inputs[inputName].type}
+                        </span>
                         <VariableDropZone>
                           {/** @ts-expect-error directives are not supported */}
                           <div use:dropZone={`node:${node.id}:${inputName}`}>
@@ -74,17 +82,19 @@ export function RenderNodes(props: { graph: Graph }) {
                 </For>
 
                 {/** Render each output grab source */}
-                <For each={nodeType.outputs}>
+                <For each={Object.keys(node.outputs)}>
                   {(output) => (
                     <div
                       // @ts-expect-error directives are not supported
                       use:grabSource={{
                         type: "Variable",
                         id: node.id,
-                        name: output.name,
+                        name: output,
                       }}
                     >
-                      <VariableNode name={output.name}/>
+                      <VariableNode
+                        name={`${output}: ${node.outputs[output].type}`}
+                      />
                     </div>
                   )}
                 </For>
