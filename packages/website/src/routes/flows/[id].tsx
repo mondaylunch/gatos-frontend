@@ -36,7 +36,7 @@ export default function FlowPage() {
     const data = useRouteData<typeof routeData>();
 
     return (
-        <div>
+        <div class="flex flex-col h-screen max-h-screen min-h-0">
             <Navbar/>
             <Show when={data()}>
                 <MountUser user={data()!.user}/>

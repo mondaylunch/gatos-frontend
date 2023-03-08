@@ -8,17 +8,12 @@ import {
     FaSolidBox,
     FaSolidCalculator, FaSolidEquals,
     FaSolidGreaterThanEqual,
-    FaSolidMagnifyingGlass, FaSolidSkullCrossbones
+    FaSolidMagnifyingGlass, FaSolidSkullCrossbones, FaSolidToggleOn,
+    FaSolidUpRightFromSquare, FaSolidCircleExclamation, FaSolidArrowRight,
+    FaSolidArrowLeft, FaSolidQuoteLeft, FaSolidDownLeftAndUpRightToCenter,
+    FaSolidSignsPost, FaSolidRuler, FaSolidCircleCheck, FaSolidTriangleExclamation,
+    FaSolidGlobe, FaSolidCircleQuestion
 } from "solid-icons/fa";
-import {CgToggleOn} from 'solid-icons/cg';
-import {BsBoxArrowUpLeft, BsExclamationCircle} from "solid-icons/bs";
-import {BiRegularArrowToLeft, BiRegularArrowToRight, BiRegularCodeCurly} from "solid-icons/bi";
-import {TbArrowsJoin2, TbMapSearch} from "solid-icons/tb";
-import {RiEditorTextSpacing} from "solid-icons/ri";
-import {TiTickOutline} from "solid-icons/ti";
-import {SiZeromq} from "solid-icons/si";
-import {FiGlobe} from "solid-icons/fi";
-import {AiOutlineQuestionCircle} from 'solid-icons/ai';
 
 grabSource;
 
@@ -31,23 +26,23 @@ type NodeType = {
 
 const Icons_Dict = {
     "list_length": FaSolidArrowsLeftRight,
-    'variable_extraction': BsBoxArrowUpLeft,
-    "string_interpolation": BiRegularCodeCurly,
-    "http_request": FiGlobe,
-    "is_nan": SiZeromq,
-    "truthiness": TiTickOutline,
-    "variable_remapping": TbMapSearch,
-    "string_length": RiEditorTextSpacing,
-    "string_concat": TbArrowsJoin2,
-    "list_head_separation": BiRegularArrowToLeft,
+    'variable_extraction': FaSolidUpRightFromSquare,
+    "string_interpolation": FaSolidQuoteLeft,
+    "http_request": FaSolidGlobe,
+    "is_nan": FaSolidTriangleExclamation,
+    "truthiness": FaSolidCircleCheck,
+    "variable_remapping": FaSolidSignsPost,
+    "string_length": FaSolidRuler,
+    "string_concat": FaSolidDownLeftAndUpRightToCenter,
+    "list_head_separation": FaSolidArrowLeft,
     "is_finite": FaSolidSkullCrossbones,
-    "list_tail_separation": BiRegularArrowToRight,
-    "negation": BsExclamationCircle,
+    "list_tail_separation": FaSolidArrowRight,
+    "negation": FaSolidCircleExclamation,
     "equals": FaSolidEquals,
     "string_contains": FaSolidMagnifyingGlass,
     "number_comparison": FaSolidGreaterThanEqual,
     "math": FaSolidCalculator,
-    "boolean_operation": CgToggleOn,
+    "boolean_operation": FaSolidToggleOn,
     "optional_or_else": FaSolidBox,
 }
 
@@ -76,21 +71,30 @@ function loadNodeTypes() {
 export function NodeSidebar() {
     loadNodeTypes();
     return (
-        <div class="w-[240px] bg-neutral-700">
-            <div class="flex flex-row flex-wrap">
+        <div class="w-[240px] bg-neutral-700 min-h-0 ">
+            <div class="flex flex-col gap-2 pl-2 pr-2">
                 <For each={nodeTypes()}>
                     {(nodeType) => {
                         const Icon = Icons_Dict[nodeType.name as keyof typeof Icons_Dict];
                         // @ts-expect-error directives are not supported
                         return <div use:grabSource={{type: "NodeType", node: nodeType}}>
-                            <div class="flex flex-row flex-wrap items-center">
-                                <div class="flex-1 w-1/2 max-w-xs rounded-xl border-4 1">
-                                    <Switch fallback={<AiOutlineQuestionCircle fill="red-700"/>}>
-                                        <Match when={nodeType.name in Icons_Dict}>
-                                            <Icon size={64}/>
-                                        </Match>
-                                    </Switch>
-                                </div>
+                            <div
+                                class="flex text-w-full rounded-[30px] border-4 place-content-center bg-white justify-items-center items-center gap-2 pl-1">
+                                <Switch fallback={
+                                    <div>
+                                        <FaSolidCircleQuestion size={20} fill="red-700"/>
+                                        <p class="font-bold flex-grow">
+                                            {nodeType.name}
+                                        </p>
+                                    </div>
+                                }>
+                                    <Match when={nodeType.name in Icons_Dict}>
+                                        <Icon size={20}/>
+                                        <p class="font-bold flex-grow">
+                                            {nodeType.name}
+                                        </p>
+                                    </Match>
+                                </Switch>
                             </div>
                         </div>
                     }}
