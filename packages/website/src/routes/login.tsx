@@ -3,6 +3,7 @@ import { createServerAction$, redirect } from "solid-start/server";
 import { FormInput } from "~/components/forms/FormInput";
 import { Button } from "~/components/inputs/Buttons";
 import { login, storage } from "~/lib/session";
+import { Navbar } from "~/components/shared/Navbar";
 
 export default function Login() {
   const [form, { Form }] = createServerAction$(async (form: FormData) => {
@@ -15,6 +16,7 @@ export default function Login() {
     });
 
     const session = await storage.getSession();
+
     session.set("authToken", user.auth_token);
 
     return redirect("/dash", {
@@ -25,52 +27,55 @@ export default function Login() {
   });
 
   return (
-    <div class="flex h-screen w-screen items-center justify-center bg-neutral-900">
-      <Form>
-        <div class="block pt-6 pr-6 pl-6 pb-4 rounded-[35px] shadow-lg max-w-sm bg-neutral-800">
-          <div class="pb-2">
-            <FormInput
-              type="email"
-              name="email"
-              minLength={2}
-              label="Email Address"
-            />
-          </div>
-          <div class="py-2">
-            <FormInput
-              minLength={8}
-              type="password"
-              name="password"
-              label="Password"
-            />
-          </div>
-          <Show when={form.error}>{form.error}</Show>
-          <div class="py-2">
-            <div class="flex space-x-2 justify-center">
-              <Button
-                type="submit"
-                variant="primary"
-                class="form-submit submit"
-              >
-                Log in
-              </Button>
-              <a href="/signup">
-                <Button type="button" variant="option">
-                  Sign up
+    <div>
+      <Navbar />
+      <div class="flex h-screen w-screen items-center justify-center bg-neutral-900">
+        <Form>
+          <div class="block pt-6 pr-6 pl-6 pb-4 rounded-[35px] shadow-lg max-w-sm bg-neutral-800">
+            <div class="pb-2">
+              <FormInput
+                type="email"
+                name="email"
+                minLength={2}
+                label="Email Address"
+              />
+            </div>
+            <div class="py-2">
+              <FormInput
+                minLength={8}
+                type="password"
+                name="password"
+                label="Password"
+              />
+            </div>
+            <Show when={form.error}>{form.error}</Show>
+            <div class="py-2">
+              <div class="flex space-x-2 justify-center">
+                <Button
+                  type="submit"
+                  variant="primary"
+                  class="form-submit submit"
+                >
+                  Log in
                 </Button>
-              </a>
-            </div>
-            <div class="pt-2">
-              <a
-                class="text-gray-500 text-sm hover:underline transition duration-150 ease-in-out"
-                href="#!"
-              >
-                Forgot password?
-              </a>
+                <a href="/signup">
+                  <Button type="button" variant="option">
+                    Sign up
+                  </Button>
+                </a>
+              </div>
+              <div class="pt-2">
+                <a
+                  class="text-gray-500 text-sm hover:underline transition duration-150 ease-in-out"
+                  href="#!"
+                >
+                  Forgot password?
+                </a>
+              </div>
             </div>
           </div>
-        </div>
-      </Form>
+        </Form>
+      </div>
     </div>
   );
 }
