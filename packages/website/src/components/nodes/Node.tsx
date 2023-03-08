@@ -9,8 +9,6 @@ export function ProcessNode(props: {
     children?: JSX.Element;
 }) {
     const isSelected = useSelfSelected();
-    // TODO: indicate the node is selected
-    // "flex-1 p-4 flex-col items-center justify-center text-left
     return (
         <Switch fallback={
             <div
