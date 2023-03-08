@@ -2,7 +2,12 @@ import { For } from "solid-js";
 import { ENDPOINT } from "~/lib/env";
 import { A, useNavigate, useRouteData } from "solid-start";
 import { createServerData$ } from "solid-start/server";
-import { resolveUserByRouteEvent } from "~/lib/session";
+import {
+  MountUser,
+  resolveUserByRouteEvent,
+  setUser,
+  user,
+} from "~/lib/session";
 import { Square_New, Square_File } from "~/components/dashboard/squares";
 
 type Flow = {
@@ -42,7 +47,7 @@ export default function Dash() {
         }),
         headers: {
           "Content-Type": "application/json",
-          "X-Auth-Token": data()!.user.auth_token,
+          "X-Auth-Token": user()!.auth_token,
         },
       })
         .then((res) => res.json())
@@ -52,9 +57,12 @@ export default function Dash() {
 
   return (
     <div class="flex flex-col items-center justify-center w-screen h-screen bg-neutral-800">
+      <MountUser user={data()!.user} />
+
       <div class="absolute top-0 right-0 mr-5 mt-5">
-        <p class="text-neutral-200 font-medium">Hi {data()?.user.username}</p>
+        <p class="text-neutral-200 font-medium">Hi {user()?.username}</p>
       </div>
+
       <div class="grid grid-cols-4 gap-5">
         <a class="cursor-pointer" onClick={createFlow}>
           <Square_New />
