@@ -25,7 +25,7 @@ export function routeData() {
     return {
       user,
       isLoggedIn: !!user,
-      flows: await fetch(`${ENDPOINT}/api/v1/flows/list`, {
+      flows: await fetch(`${ENDPOINT}/api/v1/flows`, {
         method: "GET",
         headers: {
           "X-Auth-Token": user.auth_token,

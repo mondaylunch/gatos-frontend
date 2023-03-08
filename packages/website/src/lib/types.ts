@@ -11,7 +11,11 @@ export type NodeType = {
   category: "input" | "process" | "output";
 };
 
-type DataType = "number" | `optional$${string}` | `list$${string}`;
+export type DataType =
+  | "any"
+  | "number"
+  | `optional$${string}`
+  | `list$${string}`;
 
 export type Setting =
   | {
@@ -45,7 +49,7 @@ export type Node = {
 };
 
 export type Connector = {
-  nodeId: string;
+  node_id: string;
   name: string;
   type: DataType;
 };
@@ -56,8 +60,8 @@ export type Connection = {
 };
 
 export type Metadata = {
-  xPos: number;
-  yPos: number;
+  x_pos: number;
+  y_pos: number;
 };
 
 export type Graph = {
@@ -156,24 +160,24 @@ export const SAMPLE_FLOW_DATA: Flow = {
     connections: [
       {
         output: {
-          nodeId: "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
+          node_id: "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
           name: "start_output",
           type: "number",
         },
         input: {
-          nodeId: "6f8de627-706d-4817-8921-73bff23006a8",
+          node_id: "6f8de627-706d-4817-8921-73bff23006a8",
           name: "process_input",
           type: "number",
         },
       },
       {
         output: {
-          nodeId: "6f8de627-706d-4817-8921-73bff23006a8",
+          node_id: "6f8de627-706d-4817-8921-73bff23006a8",
           name: "process_output",
           type: "number",
         },
         input: {
-          nodeId: "b15f484f-4345-4f30-9162-5210b4ff1433",
+          node_id: "b15f484f-4345-4f30-9162-5210b4ff1433",
           name: "end_input",
           type: "number",
         },
@@ -181,8 +185,8 @@ export const SAMPLE_FLOW_DATA: Flow = {
     ],
     metadata: {
       "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd": {
-        xPos: 1.0,
-        yPos: 0.0,
+        x_pos: 1.0,
+        y_pos: 0.0,
       },
     },
   },
