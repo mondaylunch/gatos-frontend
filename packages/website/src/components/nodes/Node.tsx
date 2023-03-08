@@ -16,6 +16,7 @@ export function ProcessNode(props: {
       class={`group relative h-32 w-72 rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center`}
     >
       <div class="flex-1 p-4 flex-col items-center justify-center text-left">
+        <p class="flex-col font-bold text-black select-none">{props.title}</p>
         {props.children}
       </div>
       {/*<Show when={isSelected?.()}>i am selected</Show>*/}

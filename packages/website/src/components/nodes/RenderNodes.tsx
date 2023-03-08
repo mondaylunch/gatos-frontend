@@ -40,7 +40,7 @@ export function RenderNodes(props: { graph: Graph }) {
         const Component = COMPONENTS[nodeType.category];
 
         return (
-          <CanvasElement x={metadata.xPos} y={metadata.yPos} id={node.id}>
+          <CanvasElement x={metadata.x_pos} y={metadata.y_pos} id={node.id}>
             {/** @ts-expect-error directives are not supported */}
             <div use:movable={{ id: node.id }}>
               <Component title={nodeType.name}>
@@ -57,7 +57,9 @@ export function RenderNodes(props: { graph: Graph }) {
 
                     return (
                       <>
-                        <span>{inputName}</span>
+                        <span>
+                          {inputName}: {node.inputs[inputName].type}
+                        </span>
                         <VariableDropZone>
                           {/** @ts-expect-error directives are not supported */}
                           <div use:dropZone={`node:${node.id}:${inputName}`}>
@@ -90,7 +92,9 @@ export function RenderNodes(props: { graph: Graph }) {
                         name: output,
                       }}
                     >
-                      <VariableNode name={output} />
+                      <VariableNode
+                        name={`${output}: ${node.outputs[output].type}`}
+                      />
                     </div>
                   )}
                 </For>

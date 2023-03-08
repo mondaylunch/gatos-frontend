@@ -11,7 +11,11 @@ export type NodeType = {
   category: "input" | "process" | "output";
 };
 
-type DataType = "number" | `optional$${string}` | `list$${string}`;
+export type DataType =
+  | "any"
+  | "number"
+  | `optional$${string}`
+  | `list$${string}`;
 
 export type Setting =
   | {
@@ -56,8 +60,8 @@ export type Connection = {
 };
 
 export type Metadata = {
-  xPos: number;
-  yPos: number;
+  x_pos: number;
+  y_pos: number;
 };
 
 export type Graph = {
@@ -181,8 +185,8 @@ export const SAMPLE_FLOW_DATA: Flow = {
     ],
     metadata: {
       "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd": {
-        xPos: 1.0,
-        yPos: 0.0,
+        x_pos: 1.0,
+        y_pos: 0.0,
       },
     },
   },

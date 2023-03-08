@@ -3,9 +3,12 @@ import styles from "./editor.module.css";
 import { createStore } from "solid-js/store";
 import { Meta } from "solid-start";
 import {
+  DataType,
   Flow,
   Graph,
   loadNodeTypes,
+  Metadata,
+  Node,
   NodeType,
   SAMPLE_FLOW_DATA,
 } from "~/lib/types";
@@ -16,6 +19,8 @@ import { RenderNodes } from "./RenderNodes";
 import { InteractiveCanvas } from "../editor/InteractiveCanvas";
 import { SettingsSidebar } from "./SettingsSidebar";
 import { Match, Switch } from "solid-js";
+import { ENDPOINT } from "~/lib/env";
+import { user } from "~/lib/session";
 
 /**
  * Populate Graph with missing metadata
@@ -29,8 +34,8 @@ function populate(
   for (const node of graph.nodes) {
     if (!metadata[node.id]) {
       metadata[node.id] = {
-        xPos: 0,
-        yPos: 0,
+        x_pos: 0,
+        y_pos: 0,
       };
     }
   }
@@ -52,6 +57,46 @@ type Grabbable =
       name: string;
     };
 
+type GraphAction =
+  | {
+      type: "CreateNode";
+      nodeType: string;
+      metadata: Metadata;
+    }
+  | {
+      type: "MoveNode";
+      id: string;
+      metadata: Metadata;
+    }
+  | {
+      type: "ConnectNode";
+      input: {
+        id: string;
+        name: string;
+      };
+      output: {
+        id: string;
+        name: string;
+      };
+      dataType: DataType;
+    };
+
+/**
+ * Debounce requests to the server
+ */
+const __requestQueue: Record<string, number> = {};
+
+/**
+ * Debounce an action to the server
+ * @param id Node ID
+ * @param ns Namespace
+ * @param fn Function
+ */
+function debounceRequest(id: string, ns: string, fn: () => void) {
+  clearTimeout(__requestQueue[ns + id]);
+  __requestQueue[ns + id] = setTimeout(fn, 1200) as never as number;
+}
+
 export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
   loadNodeTypes(props.nodeTypes);
   const [graph, updateGraph] = createStore<Graph>(populate(props.flow.graph));
@@ -71,6 +116,86 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
   }
 
   /**
+   * Send a request
+   * @param method Method request
+   * @param url Request URL
+   * @param body Request body stringified as JSON
+   * @returns T
+   */
+  function sendRequest<T>(method: string, url: string, body: any): Promise<T> {
+    return fetch(`${ENDPOINT}/api/v1/flows/${props.flow._id}/${url}`, {
+      method,
+      body: JSON.stringify(body),
+      headers: {
+        "X-Auth-Token": user()!.auth_token,
+        "Content-Type": "application/json",
+      },
+    }).then((res) => res.json());
+  }
+
+  /**
+   * Execute an action against the graph
+   * @param action Action
+   */
+  async function executeAction(action: GraphAction) {
+    switch (action.type) {
+      case "CreateNode": {
+        const node: Node = await sendRequest("POST", `graph/nodes`, {
+          type: action.nodeType,
+        });
+
+        executeAction({
+          type: "MoveNode",
+          id: node.id,
+          metadata: action.metadata,
+        });
+
+        updateGraph("nodes", (nodes) => [...nodes, node]);
+        break;
+      }
+      case "MoveNode": {
+        debounceRequest(action.id, "metadata", () =>
+          sendRequest(
+            "PATCH",
+            `graph/nodes/${action.id}/metadata`,
+            action.metadata
+          )
+        );
+
+        updateGraph("metadata", action.id, action.metadata);
+        break;
+      }
+      case "ConnectNode": {
+        updateGraph("connections", [
+          ...graph.connections,
+          {
+            output: {
+              nodeId: action.output.id,
+              name: action.output.name,
+              type: action.dataType,
+            },
+            input: {
+              nodeId: action.input.id,
+              name: action.input.name,
+              type: action.dataType,
+            },
+          },
+        ]);
+
+        await sendRequest("POST", `graph/connections`, {
+          from_node_id: action.output.id,
+          from_name: action.output.name,
+          to_node_id: action.input.id,
+          to_name: action.input.name,
+          type: action.dataType,
+        });
+
+        break;
+      }
+    }
+  }
+
+  /**
    * Handle move events from canvas
    * @param ref Reference object
    * @param param1 Movement information
@@ -79,8 +204,15 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
     ref: { id: string },
     [movementX, movementY]: [number, number]
   ) {
-    updateGraph("metadata", ref.id, "xPos", (x) => x + movementX);
-    updateGraph("metadata", ref.id, "yPos", (y) => y + movementY);
+    const metadata = graph.metadata[ref.id];
+    executeAction({
+      type: "MoveNode",
+      id: ref.id,
+      metadata: {
+        x_pos: metadata.x_pos + movementX,
+        y_pos: metadata.y_pos + movementY,
+      },
+    });
   }
 
   /**
@@ -90,7 +222,7 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
    * @param targetNodeId Target drop zone
    */
   function handleDrop(
-    [xPos, yPos]: [number, number],
+    [x_pos, y_pos]: [number, number],
     ref: Grabbable,
     targetNodeId?: string
   ) {
@@ -109,7 +241,7 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
         const input = inputNode.inputs[inputName];
         if (!output) throw `Output "${ref.name}" not defined in the node!`;
         if (!input) throw `Input "${inputName}" not defined in the node!`;
-        if (output.type !== input.type) return;
+        if (output.type !== input.type && input.type !== "any") return;
 
         // 3. If an input connection already exists, reject.
         if (
@@ -122,41 +254,30 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
           return console.info("Ignoring duplicate connection to input.");
 
         // Connect the two sides
-        updateGraph("connections", [
-          ...graph.connections,
-          {
-            output: {
-              nodeId: ref.id,
-              name: ref.name,
-              type: output.type,
-            },
-            input: {
-              nodeId: nodeId,
-              name: inputName,
-              type: input.type,
-            },
+        executeAction({
+          type: "ConnectNode",
+          output: {
+            id: ref.id,
+            name: ref.name,
           },
-        ]);
+          input: {
+            id: nodeId,
+            name: inputName,
+          },
+          dataType: output.type,
+        });
       }
     }
 
     if (ref.type === "NodeType") {
-      // Create a new node
-      const id = crypto.randomUUID();
-      updateGraph("metadata", id, {
-        xPos,
-        yPos,
-      });
-      updateGraph("nodes", (nodes) => [
-        ...nodes,
-        {
-          id,
-          type: ref.node.name,
-          settings: {},
-          inputs: {},
-          outputs: {},
+      executeAction({
+        type: "CreateNode",
+        nodeType: ref.node.name,
+        metadata: {
+          x_pos,
+          y_pos,
         },
-      ]);
+      });
     }
   }
 
