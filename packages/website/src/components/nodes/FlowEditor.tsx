@@ -21,6 +21,7 @@ import { SettingsSidebar } from "./SettingsSidebar";
 import { createSignal, Match, onCleanup, Switch } from "solid-js";
 import { ENDPOINT } from "~/lib/env";
 import { user } from "~/lib/session";
+import { NodeTypeDrag } from "~/components/editor/NodeTypeDrag";
 
 /**
  * Populate Graph with missing metadata
@@ -339,7 +340,11 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
         <Match when={ref.type === "Variable"}>
           <VariableNode name={(ref as Grabbable & { type: "Variable" }).id} />
         </Match>
-        <Match when={ref.type === "NodeType"}>node</Match>
+        <Match when={ref.type === "NodeType"}>
+          <NodeTypeDrag
+            name={(ref as Grabbable & { type: "NodeType" }).node.name}
+          />
+        </Match>
       </Switch>
     );
   }
