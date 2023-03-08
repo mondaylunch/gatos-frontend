@@ -6,7 +6,7 @@ import {
 } from "solid-start/entry-server";
 import { storage } from "./lib/session";
 
-const anonymousPaths = ["/", "/login", "/signup"];
+const anonymousPaths = ["/login", "/signup"];
 
 export default createHandler(
   ({ forward }) => {

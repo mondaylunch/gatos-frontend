@@ -58,24 +58,24 @@ export default function Dash() {
   }
 
   return (
-    <div class="flex flex-col items-center justify-center w-screen h-screen bg-neutral-800">
-      <MountUser user={data()!.user} />
+    <div>
+      <Navbar />
+      <div class="flex flex-col items-center justify-center w-screen h-screen bg-neutral-800">
+        <MountUser user={data()!.user} />
+        <div class="absolute top-0 right-0 mr-5 mt-5"></div>
 
-      <div class="absolute top-0 right-0 mr-5 mt-5">
-        <p class="text-neutral-200 font-medium">Hi {user()?.username}</p>
-      </div>
-
-      <div class="grid grid-cols-4 gap-5">
-        <a class="cursor-pointer" onClick={createFlow}>
-          <Square_New />
-        </a>
-        <For each={data()?.flows ?? []}>
-          {(flow) => (
-            <A href={`/flows/${flow._id}`}>
-              <Square_File title={flow.name} description={flow.description} />
-            </A>
-          )}
-        </For>
+        <div class="grid grid-cols-4 gap-5">
+          <a class="cursor-pointer" onClick={createFlow}>
+            <Square_New />
+          </a>
+          <For each={data()?.flows ?? []}>
+            {(flow) => (
+              <A href={`/flows/${flow._id}`}>
+                <Square_File title={flow.name} description={flow.description} />
+              </A>
+            )}
+          </For>
+        </div>
       </div>
     </div>
   );
