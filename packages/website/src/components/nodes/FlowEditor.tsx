@@ -18,7 +18,7 @@ import { RenderConnections } from "./RenderConnections";
 import { RenderNodes } from "./RenderNodes";
 import { InteractiveCanvas } from "../editor/InteractiveCanvas";
 import { SettingsSidebar } from "./SettingsSidebar";
-import { Match, Switch } from "solid-js";
+import { createSignal, Match, onCleanup, Switch } from "solid-js";
 import { ENDPOINT } from "~/lib/env";
 import { user } from "~/lib/session";
 
@@ -78,6 +78,10 @@ type GraphAction =
         name: string;
       };
       dataType: DataType;
+    }
+  | {
+      type: "DeleteNode";
+      id: string;
     };
 
 /**
@@ -99,6 +103,7 @@ function debounceRequest(id: string, ns: string, fn: () => void) {
 export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
   loadNodeTypes(props.nodeTypes);
   const [graph, updateGraph] = createStore<Graph>(populate(props.flow.graph));
+  const [selectedNode, setSelected] = createSignal<string>();
 
   /**
    * Debugging
@@ -121,15 +126,21 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
    * @param body Request body stringified as JSON
    * @returns T
    */
-  function sendRequest<T>(method: string, url: string, body: any): Promise<T> {
-    return fetch(`${ENDPOINT}/api/v1/flows/${props.flow._id}/${url}`, {
+  async function sendRequest<T>(
+    method: string,
+    url: string,
+    body?: any
+  ): Promise<T> {
+    const res = fetch(`${ENDPOINT}/api/v1/flows/${props.flow._id}/${url}`, {
       method,
       body: JSON.stringify(body),
       headers: {
         "X-Auth-Token": user()!.auth_token,
         "Content-Type": "application/json",
       },
-    }).then((res) => res.json());
+    });
+
+    return body ? await res.then((res) => res.json()) : undefined;
   }
 
   /**
@@ -189,6 +200,21 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
         });
 
         break;
+      }
+      case "DeleteNode": {
+        updateGraph("connections", (connections) =>
+          connections.filter(
+            (connection) =>
+              connection.input.node_id !== action.id &&
+              connection.output.node_id !== action.id
+          )
+        );
+
+        updateGraph("nodes", (nodes) =>
+          nodes.filter((node) => node.id !== action.id)
+        );
+
+        await sendRequest("DELETE", `graph/nodes/${action.id}`);
       }
     }
   }
@@ -280,6 +306,30 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
   }
 
   /**
+   * Handle key press for deleting selected node
+   * @param event Keyboard Event
+   */
+  function onKeyDown(event: KeyboardEvent) {
+    if (event.key === "Delete") {
+      event.preventDefault();
+
+      const id = selectedNode();
+      console.info("selected:", id);
+      if (id) {
+        executeAction({
+          type: "DeleteNode",
+          id,
+        });
+      }
+    }
+  }
+
+  if (typeof window !== "undefined") {
+    document.addEventListener("keydown", onKeyDown);
+    onCleanup(() => document.removeEventListener("keydown", onKeyDown));
+  }
+
+  /**
    * Render virtual grabbed element
    * @param ref Object reference
    */
@@ -314,7 +364,7 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
       postCanvas={<SettingsSidebar />}
       handleMove={handleMove}
       handleDrop={handleDrop}
-      handleSelect={() => void 0}
+      handleSelect={setSelected}
       renderVirtualElement={renderVirtualElement}
     >
       <RenderConnections graph={graph} />
