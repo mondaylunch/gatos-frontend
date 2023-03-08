@@ -1,14 +1,13 @@
 import { For } from "solid-js";
 import { ENDPOINT } from "~/lib/env";
 import { A, useNavigate, useRouteData } from "solid-start";
-import { createServerData$ } from "solid-start/server";
+import {createServerData$, redirect} from "solid-start/server";
 import {
-  MountUser,
-  resolveUserByRouteEvent,
-  setUser,
-  user,
 } from "~/lib/session";
 import { Square_New, Square_File } from "~/components/dashboard/squares";
+import {getSession} from "@auth/solid-start";
+import {authOpts} from "~/routes/api/auth/[...solidauth]";
+import { getToken } from "@auth/core/jwt";
 
 type Flow = {
   _id: string;
@@ -19,14 +18,21 @@ type Flow = {
 
 export function routeData() {
   return createServerData$(async (_, event) => {
-    const user = await resolveUserByRouteEvent(event);
+    const session = (await getSession(event.request, authOpts));
+
+    if (!session || !session.user) {
+      throw redirect("/");
+    }
+
+    const token = await getToken({ req: event.request, secret: authOpts.secret, raw: true })
 
     return {
-      user,
+      user: session.user,
+      token: token,
       flows: await fetch(`${ENDPOINT}/api/v1/flows/list`, {
         method: "GET",
         headers: {
-          "X-Auth-Token": user.auth_token,
+          "Authorization": "Bearer "+token
         },
       }).then((res) => (res.ok ? (res.json() as Promise<Flow[]>) : [])),
     };
@@ -47,7 +53,7 @@ export default function Dash() {
         }),
         headers: {
           "Content-Type": "application/json",
-          "X-Auth-Token": user()!.auth_token,
+          "Authorization": "Bearer " + data()!.token,
         },
       })
         .then((res) => res.json())
@@ -57,10 +63,8 @@ export default function Dash() {
 
   return (
     <div class="flex flex-col items-center justify-center w-screen h-screen bg-neutral-800">
-      <MountUser user={data()!.user} />
-
       <div class="absolute top-0 right-0 mr-5 mt-5">
-        <p class="text-neutral-200 font-medium">Hi {user()?.username}</p>
+        <p class="text-neutral-200 font-medium">Hi {data()?.user?.name}</p>
       </div>
 
       <div class="grid grid-cols-4 gap-5">

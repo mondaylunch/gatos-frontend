@@ -1,15 +1,20 @@
 import { useRouteData } from "solid-start";
 
 import { Flow, NodeType } from "~/lib/types";
-import { createServerData$ } from "solid-start/server";
-import { MountUser, resolveUserByRouteEvent, setUser } from "~/lib/session";
+import {createServerData$, redirect} from "solid-start/server";
 import { ENDPOINT } from "~/lib/env";
 import { Show } from "solid-js";
 import { FlowEditor } from "~/components/nodes/FlowEditor";
+import {getSession} from "@auth/solid-start";
+import {authOpts} from "~/routes/api/auth/[...solidauth]";
 
 export function routeData() {
   return createServerData$(async (_, event) => {
-    const user = await resolveUserByRouteEvent(event);
+    const session = (await getSession(event.request, authOpts));
+
+    if (!session || !session.user) {
+      throw redirect("/");
+    }
 
     // Route data doesn't provide params because Router is
     // inaccessible, so we just read the URL instead, which
@@ -17,11 +22,10 @@ export function routeData() {
     const flowId = event.request.url.split("/").pop()!;
 
     return {
-      user,
+      user: session.user,
       flow: await fetch(`${ENDPOINT}/api/v1/flows/${flowId}`, {
         method: "GET",
         headers: {
-          "X-Auth-Token": user.auth_token,
         },
       }).then((res) => res.json() as Promise<Flow>),
       nodeTypes: await fetch(`${ENDPOINT}/api/v1/node-types`).then(
@@ -36,7 +40,6 @@ export default function FlowPage() {
 
   return (
     <Show when={data()}>
-      <MountUser user={data()!.user} />
       <FlowEditor flow={data()!.flow} nodeTypes={data()!.nodeTypes} />
     </Show>
   );
