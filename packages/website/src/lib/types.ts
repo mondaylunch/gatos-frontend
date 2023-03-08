@@ -15,20 +15,20 @@ type DataType = "number" | `optional$${string}` | `list$${string}`;
 
 export type Setting =
   | {
-      type: `optional$${string}`;
-      value: {
-        present: boolean;
-        value: any;
-      };
-    }
+  type: `optional$${string}`;
+  value: {
+    present: boolean;
+    value: any;
+  };
+}
   | {
-      type: `list$${string}`;
-      value: any[];
-    }
+  type: `list$${string}`;
+  value: any[];
+}
   | {
-      type: "number";
-      value: number;
-    };
+  type: "number";
+  value: number;
+};
 
 export type Node = {
   id: string;

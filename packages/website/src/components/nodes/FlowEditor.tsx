@@ -1,22 +1,15 @@
 import styles from "./editor.module.css";
 
-import { createStore } from "solid-js/store";
-import { Meta } from "solid-start";
-import {
-  Flow,
-  Graph,
-  loadNodeTypes,
-  NodeType,
-  NODE_TYPE_REGISTRY,
-  SAMPLE_FLOW_DATA,
-} from "~/lib/types";
-import { VariableNode } from "./Node";
-import { NodeSidebar } from "./NodeSidebar";
-import { RenderConnections } from "./RenderConnections";
-import { RenderNodes } from "./RenderNodes";
-import { InteractiveCanvas } from "../editor/InteractiveCanvas";
-import { SettingsSidebar } from "./SettingsSidebar";
-import { Match, Switch } from "solid-js";
+import {createStore} from "solid-js/store";
+import {Meta} from "solid-start";
+import {Flow, Graph, loadNodeTypes, NODE_TYPE_REGISTRY, NodeType, SAMPLE_FLOW_DATA,} from "~/lib/types";
+import {VariableNode} from "./Node";
+import {NodeSidebar} from "./NodeSidebar";
+import {RenderConnections} from "./RenderConnections";
+import {RenderNodes} from "./RenderNodes";
+import {InteractiveCanvas} from "../editor/InteractiveCanvas";
+import {SettingsSidebar} from "./SettingsSidebar";
+import {Match, Switch} from "solid-js";
 
 /**
  * Populate Graph with missing metadata
@@ -24,9 +17,9 @@ import { Match, Switch } from "solid-js";
  * @returns Populated Graph
  */
 function populate(
-  graph: Graph = { connections: [], metadata: {}, nodes: [] }
+  graph: Graph = {connections: [], metadata: {}, nodes: []}
 ): Graph {
-  const metadata = { ...graph.metadata };
+  const metadata = {...graph.metadata};
   for (const node of graph.nodes) {
     if (!metadata[node.id]) {
       metadata[node.id] = {
@@ -44,14 +37,14 @@ function populate(
 
 type Grabbable =
   | {
-      type: "NodeType";
-      node: NodeType;
-    }
+  type: "NodeType";
+  node: NodeType;
+}
   | {
-      type: "Variable";
-      id: string;
-      name: string;
-    };
+  type: "Variable";
+  id: string;
+  name: string;
+};
 
 export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
   loadNodeTypes(props.nodeTypes);
@@ -62,9 +55,9 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
    */
   if (typeof window !== "undefined") {
     loadNodeTypes([
-      { name: "test_start", category: "input" },
-      { name: "test_process", category: "process" },
-      { name: "test_end", category: "output" },
+      {name: "test_start", category: "input"},
+      {name: "test_process", category: "process"},
+      {name: "test_end", category: "output"},
     ]);
 
     (window as any).__setDebugGraph = () =>
@@ -106,7 +99,7 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
           NODE_TYPE_REGISTRY[
             graph.nodes.find((node) => node.id === ref.id)
               ?.type as keyof typeof NODE_TYPE_REGISTRY
-          ];
+            ];
         const inputNodeType =
           NODE_TYPE_REGISTRY[inputNode.type as keyof typeof NODE_TYPE_REGISTRY];
 
@@ -178,7 +171,7 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
     return (
       <Switch>
         <Match when={ref.type === "Variable"}>
-          <VariableNode name={(ref as Grabbable & { type: "Variable" }).id} />
+          <VariableNode name={(ref as Grabbable & { type: "Variable" }).id}/>
         </Match>
         <Match when={ref.type === "NodeType"}>node</Match>
       </Switch>
@@ -199,17 +192,17 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
             name="viewport"
             content="width=device-width, initial-scale=1, user-scalable=no"
           />
-          <NodeSidebar />
+          <NodeSidebar/>
         </>
       }
-      postCanvas={<SettingsSidebar />}
+      postCanvas={<SettingsSidebar/>}
       handleMove={handleMove}
       handleDrop={handleDrop}
       handleSelect={() => void 0}
       renderVirtualElement={renderVirtualElement}
     >
-      <RenderConnections graph={graph} />
-      <RenderNodes graph={graph} />
+      <RenderConnections graph={graph}/>
+      <RenderNodes graph={graph}/>
     </InteractiveCanvas>
   );
 }

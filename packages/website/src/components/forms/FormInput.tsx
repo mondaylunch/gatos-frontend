@@ -1,4 +1,4 @@
-import { JSX, splitProps } from "solid-js";
+import {JSX, splitProps} from "solid-js";
 
 type Props = JSX.InputHTMLAttributes<HTMLInputElement> & {
   label: string;

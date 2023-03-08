@@ -1,6 +1,6 @@
-import { Match, Switch, useContext } from "solid-js";
-import { grabSource } from "../editor/directives/grabSource";
-import { SelectedElementContext } from "../editor/InteractiveCanvas";
+import {Match, Switch, useContext} from "solid-js";
+import {grabSource} from "../editor/directives/grabSource";
+import {SelectedElementContext} from "../editor/InteractiveCanvas";
 
 grabSource;
 

@@ -1,10 +1,10 @@
-import { useRouteData } from "solid-start";
+import {useRouteData} from "solid-start";
 
-import { Flow, NodeType } from "~/lib/types";
+import {Flow, NodeType} from "~/lib/types";
 import {createServerData$, redirect} from "solid-start/server";
-import { ENDPOINT } from "~/lib/env";
-import { Show } from "solid-js";
-import { FlowEditor } from "~/components/nodes/FlowEditor";
+import {ENDPOINT} from "~/lib/env";
+import {Show} from "solid-js";
+import {FlowEditor} from "~/components/nodes/FlowEditor";
 import {getSession} from "@auth/solid-start";
 import {authOpts} from "~/routes/api/auth/[...solidauth]";
 
@@ -25,8 +25,7 @@ export function routeData() {
       user: session.user,
       flow: await fetch(`${ENDPOINT}/api/v1/flows/${flowId}`, {
         method: "GET",
-        headers: {
-        },
+        headers: {},
       }).then((res) => res.json() as Promise<Flow>),
       nodeTypes: await fetch(`${ENDPOINT}/api/v1/node-types`).then(
         (res) => res.json() as Promise<NodeType[]>
@@ -40,7 +39,7 @@ export default function FlowPage() {
 
   return (
     <Show when={data()}>
-      <FlowEditor flow={data()!.flow} nodeTypes={data()!.nodeTypes} />
+      <FlowEditor flow={data()!.flow} nodeTypes={data()!.nodeTypes}/>
     </Show>
   );
 }

@@ -1,4 +1,4 @@
-import { createContext } from "solid-js";
+import {createContext} from "solid-js";
 
 type Context<MoveRef, GrabRef> = {
   /**
@@ -19,7 +19,8 @@ type Context<MoveRef, GrabRef> = {
 /**
  * No operation
  */
-const noop = () => {};
+const noop = () => {
+};
 
 export const CanvasContext = createContext<Context<any, any>>({
   setMoving: noop,

@@ -1,4 +1,4 @@
-import type { JSX } from "solid-js";
+import type {JSX} from "solid-js";
 
 type Props = JSX.InputHTMLAttributes<HTMLInputElement>;
 
@@ -6,11 +6,11 @@ type Props = JSX.InputHTMLAttributes<HTMLInputElement>;
  * Common textbox element
  */
 export function Textbox(props: Props) {
-  return <input {...props} class="bg-gray-200 p-4" />;
+  return <input {...props} class="bg-gray-200 p-4"/>;
 }
 
 export function Hidden_Textbox(props: Props) {
-  return <input {...props} class="hidden" />;
+  return <input {...props} class="hidden"/>;
 }
 
 /**

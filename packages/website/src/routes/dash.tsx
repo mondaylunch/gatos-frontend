@@ -1,13 +1,11 @@
-import { For } from "solid-js";
-import { ENDPOINT } from "~/lib/env";
-import { A, useNavigate, useRouteData } from "solid-start";
+import {For} from "solid-js";
+import {ENDPOINT} from "~/lib/env";
+import {A, useNavigate, useRouteData} from "solid-start";
 import {createServerData$, redirect} from "solid-start/server";
-import {
-} from "~/lib/session";
-import { Square_New, Square_File } from "~/components/dashboard/squares";
+import {Square_File, Square_New} from "~/components/dashboard/squares";
 import {getSession} from "@auth/solid-start";
 import {authOpts} from "~/routes/api/auth/[...solidauth]";
-import { getToken } from "@auth/core/jwt";
+import {getToken} from "@auth/core/jwt";
 
 type Flow = {
   _id: string;
@@ -24,7 +22,7 @@ export function routeData() {
       throw redirect("/");
     }
 
-    const token = await getToken({ req: event.request, secret: authOpts.secret, raw: true })
+    const token = await getToken({req: event.request, secret: authOpts.secret, raw: true})
 
     return {
       user: session.user,
@@ -32,7 +30,7 @@ export function routeData() {
       flows: await fetch(`${ENDPOINT}/api/v1/flows/list`, {
         method: "GET",
         headers: {
-          "Authorization": "Bearer "+token
+          "Authorization": "Bearer " + token
         },
       }).then((res) => (res.ok ? (res.json() as Promise<Flow[]>) : [])),
     };
@@ -69,12 +67,12 @@ export default function Dash() {
 
       <div class="grid grid-cols-4 gap-5">
         <a class="cursor-pointer" onClick={createFlow}>
-          <Square_New />
+          <Square_New/>
         </a>
         <For each={data()?.flows ?? []}>
           {(flow) => (
             <A href={`/flows/${flow._id}`}>
-              <Square_File title={flow.name} description={flow.description} />
+              <Square_File title={flow.name} description={flow.description}/>
             </A>
           )}
         </For>

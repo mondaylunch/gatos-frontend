@@ -1,17 +1,11 @@
-import { Component, For, JSX, Match, Switch } from "solid-js";
-import { Graph, NodeType, NODE_TYPE_REGISTRY } from "~/lib/types";
+import {Component, For, JSX, Match, Switch} from "solid-js";
+import {Graph, NODE_TYPE_REGISTRY, NodeType} from "~/lib/types";
 
-import { movable } from "../editor/directives/movable";
-import { dropZone } from "../editor/directives/dropZone";
-import { grabSource } from "../editor/directives/grabSource";
-import { CanvasElement } from "../editor/CanvasElement";
-import {
-  InputNode,
-  OutputNode,
-  ProcessNode,
-  VariableDropZone,
-  VariableNode,
-} from "./Node";
+import {movable} from "../editor/directives/movable";
+import {dropZone} from "../editor/directives/dropZone";
+import {grabSource} from "../editor/directives/grabSource";
+import {CanvasElement} from "../editor/CanvasElement";
+import {InputNode, OutputNode, ProcessNode, VariableDropZone, VariableNode,} from "./Node";
 
 movable;
 dropZone;
@@ -42,7 +36,7 @@ export function RenderNodes(props: { graph: Graph }) {
         return (
           <CanvasElement x={metadata.xPos} y={metadata.yPos} id={node.id}>
             {/** @ts-expect-error directives are not supported */}
-            <div use:movable={{ id: node.id }}>
+            <div use:movable={{id: node.id}}>
               <Component title={nodeType.name}>
                 {/** Render each input drop zone */}
                 <For each={Object.keys(node.inputTypes)}>
@@ -90,7 +84,7 @@ export function RenderNodes(props: { graph: Graph }) {
                         name: output.name,
                       }}
                     >
-                      <VariableNode name={output.name} />
+                      <VariableNode name={output.name}/>
                     </div>
                   )}
                 </For>

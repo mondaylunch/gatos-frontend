@@ -1,5 +1,5 @@
-import { JSX, Show } from "solid-js";
-import { useSelfSelected } from "../editor/InteractiveCanvas";
+import {JSX} from "solid-js";
+import {useSelfSelected} from "../editor/InteractiveCanvas";
 
 /**
  * Node signifying given data is processed
@@ -28,7 +28,8 @@ export function ProcessNode(props: {
  */
 export function VariableDropZone(props: { children?: JSX.Element }) {
   return (
-    <div class="flex-col flex-1 p-2 min-h-fit w-full rounded-[35px] bg-neutral-800 flex align-text-top justify-center place-content-stretch">
+    <div
+      class="flex-col flex-1 p-2 min-h-fit w-full rounded-[35px] bg-neutral-800 flex align-text-top justify-center place-content-stretch">
       {props.children}
     </div>
   );
@@ -67,7 +68,8 @@ export function InputNode(props: {
  */
 export function OutputNode(props: { title: string; children?: JSX.Element }) {
   return (
-    <div class="rounded-b-full group relative h-32 w-72 rounded-[35px] bg-neutral-900 flex align-text-top items-center justify-center align-items-center">
+    <div
+      class="rounded-b-full group relative h-32 w-72 rounded-[35px] bg-neutral-900 flex align-text-top items-center justify-center align-items-center">
       <div class="flex flex-col text-center items-center text-white">
         {props.children}
       </div>

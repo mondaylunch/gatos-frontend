@@ -1,8 +1,8 @@
-import { grabSource } from "../editor/directives/grabSource";
-import { ProcessNode } from "./Node";
-import { createServerData$ } from "solid-start/server";
-import { ENDPOINT } from "~/lib/env";
-import { createSignal, For } from "solid-js";
+import {grabSource} from "../editor/directives/grabSource";
+import {ProcessNode} from "./Node";
+import {createServerData$} from "solid-start/server";
+import {ENDPOINT} from "~/lib/env";
+import {createSignal, For} from "solid-js";
 
 grabSource;
 
@@ -43,8 +43,8 @@ export function NodeSidebar() {
         <For each={nodeTypes()}>
           {(nodeType) => (
             // @ts-expect-error directives are not supported
-            <div use:grabSource={{ type: "NodeType", node: nodeType }}>
-              <ProcessNode title={nodeType.name} />
+            <div use:grabSource={{type: "NodeType", node: nodeType}}>
+              <ProcessNode title={nodeType.name}/>
             </div>
           )}
         </For>

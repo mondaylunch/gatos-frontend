@@ -1,9 +1,6 @@
-import { createEffect, JSX, on, splitProps, useContext } from "solid-js";
-import { ElementSizeContext, ZoomFactorContext } from "./Canvas";
-import {
-  SelectedElementContext,
-  SelectionSignalContext,
-} from "./InteractiveCanvas";
+import {createEffect, JSX, on, splitProps, useContext} from "solid-js";
+import {ElementSizeContext, ZoomFactorContext} from "./Canvas";
+import {SelectedElementContext, SelectionSignalContext,} from "./InteractiveCanvas";
 
 type Props = Omit<
   JSX.ForeignObjectSVGAttributes<SVGForeignObjectElement>,
@@ -63,7 +60,7 @@ export function CanvasElement(props: Props) {
                 const width = rect.width / zoomFactor();
                 const height = rect.height / zoomFactor();
 
-                setSize(local.id!, { width, height });
+                setSize(local.id!, {width, height});
               }
 
               commit();

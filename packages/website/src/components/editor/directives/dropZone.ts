@@ -1,4 +1,4 @@
-import { Accessor } from "solid-js";
+import {Accessor} from "solid-js";
 
 /**
  * Mark an element in the canvas as an area to drop into.

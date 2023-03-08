@@ -1,4 +1,4 @@
-import { getSession } from "@auth/solid-start";
+import {getSession} from "@auth/solid-start";
 import {redirect} from "solid-start";
 import {createHandler, renderAsync, StartServer,} from "solid-start/entry-server";
 import {authOpts} from "~/routes/api/auth/[...solidauth]";
@@ -7,7 +7,7 @@ const anonymousPaths = ["/"];
 const protectedPaths = ["/dash"];
 
 export default createHandler(
-  ({ forward }) => {
+  ({forward}) => {
     return async (event) => {
       const session = await getSession(event.request, authOpts);
       if (anonymousPaths.includes(new URL(event.request.url).pathname)) {
@@ -23,5 +23,5 @@ export default createHandler(
       return forward(event);
     };
   },
-  renderAsync((event) => <StartServer event={event} />)
+  renderAsync((event) => <StartServer event={event}/>)
 );
