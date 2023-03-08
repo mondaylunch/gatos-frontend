@@ -99,7 +99,7 @@ export function Navbar() {
                           ? "bg-gray-900 text-white"
                           : "text-gray-300 hover:bg-gray-700 hover:text-white"
                       } px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out`}
-                      href="/help"
+                      href="https://docs.mondaylunch.club/"
                     >
                       Help
                     </A>
