@@ -51,7 +51,7 @@ export function RenderNodes(props: { graph: Graph }) {
                     const connections = () =>
                       props.graph.connections.filter(
                         (x) =>
-                          x.input.nodeId === node.id &&
+                          x.input.node_id === node.id &&
                           x.input.name === inputName
                       );
 

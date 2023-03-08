@@ -12,13 +12,14 @@ export function RenderConnections(props: { graph: Graph }) {
     <For each={props.graph.connections}>
       {(connection, index) => {
         // Find the relevant metadata for output and input sides
-        const outputMetadata = props.graph.metadata[connection.output.nodeId];
-        const inputMetadata = props.graph.metadata[connection.input.nodeId];
+        const outputMetadata = props.graph.metadata[connection.output.node_id];
+        const inputMetadata = props.graph.metadata[connection.input.node_id];
 
         // Get size of output and input nodes.
         const outputRect = () =>
-          elementSizeCache[connection.output.nodeId] ?? {};
-        const inputRect = () => elementSizeCache[connection.input.nodeId] ?? {};
+          elementSizeCache[connection.output.node_id] ?? {};
+        const inputRect = () =>
+          elementSizeCache[connection.input.node_id] ?? {};
 
         return (
           <path

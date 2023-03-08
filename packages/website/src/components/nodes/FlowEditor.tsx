@@ -32,12 +32,11 @@ function populate(
 ): Graph {
   const metadata = { ...graph.metadata };
   for (const node of graph.nodes) {
-    if (!metadata[node.id]) {
-      metadata[node.id] = {
-        x_pos: 0,
-        y_pos: 0,
-      };
-    }
+    metadata[node.id] = {
+      x_pos: 0,
+      y_pos: 0,
+      ...(metadata[node.id] as any),
+    };
   }
 
   return {
@@ -170,12 +169,12 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
           ...graph.connections,
           {
             output: {
-              nodeId: action.output.id,
+              node_id: action.output.id,
               name: action.output.name,
               type: action.dataType,
             },
             input: {
-              nodeId: action.input.id,
+              node_id: action.input.id,
               name: action.input.name,
               type: action.dataType,
             },
@@ -187,7 +186,6 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
           from_name: action.output.name,
           to_node_id: action.input.id,
           to_name: action.input.name,
-          type: action.dataType,
         });
 
         break;
@@ -247,7 +245,7 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
         if (
           graph.connections.find(
             (connection) =>
-              connection.input.nodeId === nodeId &&
+              connection.input.node_id === nodeId &&
               connection.input.name === inputName
           )
         )
