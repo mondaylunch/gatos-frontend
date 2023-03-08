@@ -6,6 +6,11 @@ export type User = {
   auth_token: string;
 };
 
+export type NodeType = {
+  name: string;
+  category: "input" | "process" | "output";
+};
+
 type DataType = "number" | `optional$${string}` | `list$${string}`;
 
 export type Setting =
@@ -62,20 +67,13 @@ export type Flow = {
   graph: Graph;
 };
 
-export const NODE_TYPES = {
-  test_start: {
-    name: "Start",
-    outputs: [{ name: "start_output", type: "number" }],
-  },
-  test_process: {
-    name: "Process",
-    outputs: [{ name: "process_output", type: "number" }],
-  },
-  test_end: {
-    name: "End",
-    outputs: [],
-  },
-};
+export const NODE_TYPE_REGISTRY: Record<string, NodeType> = {};
+
+export function loadNodeTypes(types: NodeType[]) {
+  for (const type of types) {
+    NODE_TYPE_REGISTRY[type.name] = type;
+  }
+}
 
 export const SAMPLE_FLOW_DATA: Flow = {
   _id: "269e8442-05b9-4981-a9cb-c780a42cba30",
