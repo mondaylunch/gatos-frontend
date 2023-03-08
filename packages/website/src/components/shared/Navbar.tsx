@@ -39,9 +39,36 @@ export function Navbar() {
         <div class="relative flex h-16 items-center justify-between">
           <div class="flex flex-1 items-stretch justify-start">
             <div class="flex items-center pr-2">
-              <FaSolidCat class="h-8 w-8" fill="white" />
+              <A href="/">
+                <FaSolidCat class="h-8 w-8" fill="white" />
+              </A>
             </div>
-            <Switch fallback={<div>Loading...</div>}>
+            <Switch
+              fallback={
+                <div class="flex space-x-4">
+                  <A
+                    class={`${
+                      location.pathname === "/login"
+                        ? "bg-gray-900 text-white"
+                        : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                    } px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out`}
+                    href="/login"
+                  >
+                    Login
+                  </A>
+                  <A
+                    class={`${
+                      location.pathname === "/signup"
+                        ? "bg-gray-900 text-white"
+                        : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                    } px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out`}
+                    href="/signup"
+                  >
+                    Sign up
+                  </A>
+                </div>
+              }
+            >
               <Match when={user()}>
                 <div>
                   <div class="flex space-x-4">
