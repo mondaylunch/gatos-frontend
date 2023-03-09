@@ -1,4 +1,4 @@
-import {useRouteData} from "solid-start";
+import {useLocation, useRouteData} from "solid-start";
 
 import {Flow, NodeType} from "~/lib/types";
 import {createServerData$, redirect} from "solid-start/server";
@@ -11,30 +11,28 @@ import {Navbar} from "~/components/shared/Navbar"
 import {backendServersideFetch} from "~/lib/backend";
 import {RouteDataFuncArgs} from "@solidjs/router";
 
-export function routeData() {
-  return createServerData$(async (_, event) => {
+export function routeData({ location }: RouteDataFuncArgs) {
+  return createServerData$(async ([loc], event) => {
     const session = (await getSession(event.request, authOpts));
 
     if (!session || !session.user) {
       throw redirect("/");
     }
 
-    // Route data doesn't provide params because Router is
-    // inaccessible, so we just read the URL instead, which
-    // is good enough for our purposes.
-    const flowId = event.request.url.split("/").pop()!;
+    const flowId = loc.split("/").pop()!;
+    const flow = await backendServersideFetch(`/api/v1/flows/${flowId}`, {
+      method: "GET",
+      headers: {},
+    }, session).then((res) => res.json() as Promise<Flow>)
 
     return {
       user: session.user,
-      flow: await fetch(`${ENDPOINT}/api/v1/flows/${flowId}`, {
-        method: "GET",
-        headers: {},
-      }).then((res) => res.json() as Promise<Flow>),
-      nodeTypes: await fetch(`${ENDPOINT}/api/v1/node-types`).then(
+      flow,
+      nodeTypes: await backendServersideFetch('/api/v1/node-types', {}, session).then(
         (res) => res.json() as Promise<NodeType[]>
       ),
     };
-  });
+  }, { key: () => [location.pathname] });
 }
 
 export default function FlowPage() {
