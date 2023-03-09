@@ -22,7 +22,6 @@ import { createSignal, Match, onCleanup, Switch } from "solid-js";
 import { ENDPOINT } from "~/lib/env";
 import { user } from "~/lib/session";
 import { NodeTypeDrag } from "~/components/editor/NodeTypeDrag";
-import { createBackendFetchAction } from "~/lib/backend";
 
 /**
  * Populate Graph with missing metadata
@@ -106,7 +105,6 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
   loadNodeTypes(props.nodeTypes);
   const [graph, updateGraph] = createStore<Graph>(populate(props.flow.graph));
   const [selectedNode, setSelected] = createSignal<string>();
-  const [_, sendBackendRequest] = createBackendFetchAction();
 
   /**
    * Debugging
@@ -134,14 +132,12 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
     url: string,
     body?: any
   ): Promise<T> {
-    const res = sendBackendRequest({
-      route: `/api/v1/flows/${props.flow._id}/${url}`,
-      init: {
-        method,
-        body: JSON.stringify(body),
-        headers: {
-          "Content-Type": "application/json",
-        },
+    const res = fetch(`${ENDPOINT}/api/v1/flows/${props.flow._id}/${url}`, {
+      method,
+      body: JSON.stringify(body),
+      headers: {
+        "X-Auth-Token": user()!.auth_token,
+        "Content-Type": "application/json",
       },
     });
 

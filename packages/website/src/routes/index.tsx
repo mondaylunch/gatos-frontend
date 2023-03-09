@@ -1,10 +1,6 @@
-import { signIn } from "@auth/solid-start/client";
-
 import { Navbar } from "~/components/shared/Navbar";
 
 export default function Home() {
-  const login = () => signIn("auth0");
-
   return (
     <div>
       <Navbar />
@@ -14,13 +10,16 @@ export default function Home() {
         </h1>
         <div class="w-full max-w-md">
           <div class="bg-white p-6 rounded-[35px] shadow-md flex justify-center">
-            <button
-              type="button"
-              onClick={login}
-              class="w-full mr-2 bg-indigo-500 text-white p-3 rounded-[20px] hover:bg-indigo-600"
-            >
-              Log in or Sign Up
-            </button>
+            <a class="w-full mr-2" href="/login">
+              <button class="w-full mr-2 bg-indigo-500 text-white p-3 rounded-[20px] hover:bg-indigo-600">
+                Log in
+              </button>
+            </a>
+            <a class="w-full" href="/signup">
+              <button class="w-full bg-indigo-500 text-white p-3 rounded-[20px] hover:bg-indigo-600">
+                Sign Up
+              </button>
+            </a>
           </div>
         </div>
       </div>

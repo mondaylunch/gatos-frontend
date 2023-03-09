@@ -1,26 +1,23 @@
-import { getSession } from "@auth/solid-start";
 import { redirect } from "solid-start";
 import {
+  StartServer,
   createHandler,
   renderAsync,
-  StartServer,
 } from "solid-start/entry-server";
-import { authOpts } from "~/routes/api/auth/[...solidauth]";
+import { storage } from "./lib/session";
 
-const anonymousPaths = ["/"];
-const protectedPaths = ["/dash"];
+const anonymousPaths = ["/login", "/signup"];
 
 export default createHandler(
   ({ forward }) => {
     return async (event) => {
-      const session = await getSession(event.request, authOpts);
       if (anonymousPaths.includes(new URL(event.request.url).pathname)) {
-        if (session && session.user) {
+        const cookie = event.request.headers.get("Cookie") ?? "";
+        const session = await storage.getSession(cookie);
+        const token = session.get("authToken");
+
+        if (token) {
           return redirect("/dash");
-        }
-      } else if (protectedPaths.includes(new URL(event.request.url).pathname)) {
-        if (!session || !session.user) {
-          return redirect("/");
         }
       }
 

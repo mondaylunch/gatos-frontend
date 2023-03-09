@@ -1,7 +1,9 @@
 export type User = {
-  avatar: string | undefined;
+  _id: string;
   username: string;
   email: string;
+  password: string;
+  auth_token: string;
 };
 
 export type NodeType = {
