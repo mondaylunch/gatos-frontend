@@ -7,6 +7,7 @@ import {
   JSX,
   on,
   onCleanup,
+  Setter,
   Show,
   Signal,
   useContext,

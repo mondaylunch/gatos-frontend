@@ -21,7 +21,7 @@
     "@vitest/ui": "^0.26.2",
     "jsdom": "^20.0.2",
     "solid-js": "^1.6.2",
-    "solid-start": "^0.2.23",
+    "solid-start": "^0.2.5",
     "solid-start-node": "^0.2.5",
     "typescript": "^4.9.3",
     "undici": "^5.12.0",
@@ -29,8 +29,6 @@
     "vitest": "^0.26.2"
   },
   "dependencies": {
-    "@auth/core": "^0.5.1",
-    "@auth/solid-start": "^0.1.1",
     "@thisbeyond/solid-dnd": "^0.7.3",
     "@types/node": "^18.11.11",
     "autoprefixer": "^10.4.13",

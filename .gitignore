@@ -1,7 +1,7 @@
 node_modules
 dist
 
-packages/website/.env
+.env*
 !.env.example
 
 ### IntelliJ IDEA ###
