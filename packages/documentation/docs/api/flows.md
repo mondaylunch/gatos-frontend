@@ -427,3 +427,29 @@ Response Body:
     "y_pos": 2.0
 }
 ```
+
+## POST `/api/v1/flows/{flowId}/run/{startNodeId}`
+
+Runs a flow from the specified start node. The start node should be a webhook start node. Returns the flow output.
+
+> [Requires authentication.](/api/#authentication)
+
+Request Body:
+
+```json
+{
+    "input_field_name": "input_field_value"
+}
+```
+
+The request body can be any JSON object, or empty.
+
+Response Body:
+
+```json
+{
+    "output_field_name": "output_field_value"
+}
+```
+
+The response body can be any JSON object.
