@@ -4,6 +4,9 @@ import {createServerData$} from "solid-start/server";
 import {ENDPOINT} from "~/lib/env";
 import {createSignal, For, Match, Switch} from "solid-js";
 import {NodeTypeDrag} from "~/components/editor/NodeTypeDrag";
+import {backendServersideFetch, createBackendFetchAction} from "~/lib/backend";
+import {authOpts} from "~/routes/api/auth/[...solidauth]";
+import { getSession } from "@auth/solid-start";
 
 
 grabSource;
@@ -19,17 +22,18 @@ type NodeType = {
 export function routeData() {
     return createServerData$(async (_, event) => {
         return {
-            NodeTypes: await fetch(`${ENDPOINT}/api/v1/node-types`, {
+            NodeTypes: await backendServersideFetch('/api/v1/node-types', {
                 method: "GET",
-            }).then((res) => (res.ok ? (res.json() as Promise<NodeType[]>) : [])),
+            }, await getSession(event.request, authOpts)).then((res) => (res.ok ? (res.json() as Promise<NodeType[]>) : [])),
         };
     });
 }
 
 function loadNodeTypes() {
-    fetch(`${ENDPOINT}/api/v1/node-types`, {
+    const [_, sendBackendRequest] = createBackendFetchAction();
+    sendBackendRequest({ route: '/api/v1/node-types', init: {
         method: "GET",
-    })
+    }})
         .then((res) => res.json() as Promise<NodeType[]>)
         .then((data) => {
             if (!isNaN(data.length)) {

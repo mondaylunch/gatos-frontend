@@ -5,8 +5,9 @@ import {createServerData$, redirect} from "solid-start/server";
 import {Square_File, Square_New} from "~/components/dashboard/squares";
 import {getSession} from "@auth/solid-start";
 import {authOpts} from "~/routes/api/auth/[...solidauth]";
-import {getToken} from "@auth/core/jwt";
 import {Navbar} from "~/components/shared/Navbar";
+import {constructUser, MountUser} from "~/lib/session";
+import {backendServersideFetch, createBackendFetchAction} from "~/lib/backend";
 
 type Flow = {
   _id: string;
@@ -23,18 +24,13 @@ export function routeData() {
       throw redirect("/");
     }
 
-    const token = await getToken({req: event.request, secret: authOpts.secret, raw: true})
+    const flows = await backendServersideFetch('/api/v1/flows', {
+        method: "GET",
+    }, session).then((res) => (res.ok ? (res.json() as Promise<Flow[]>) : []));
 
     return {
-      user,
-      isLoggedIn: !!user: session.user,
-      token: token,
-      flows: await fetch(`${ENDPOINT}/api/v1/flows`, {
-      method: "GET",
-      headers: {
-        "Authorization": "Bearer " + token
-      },
-    }).then((res) => (res.ok ? (res.json() as Promise<Flow[]>) : [])),
+      user: constructUser(session),
+      flows
   };
   });
 }
@@ -42,28 +38,30 @@ export function routeData() {
 export default function Dash() {
   const data = useRouteData<typeof routeData>();
   const navigate = useNavigate();
+  const [_, sendBackendRequest] = createBackendFetchAction();
 
   async function createFlow() {
     const name = prompt("Enter flow name:");
     if (name) {
-      await fetch(`${ENDPOINT}/api/v1/flows`, {
+      await sendBackendRequest({ route: '/api/v1/flows', init: {
         method: "POST",
         body: JSON.stringify({
           name,
         }),
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer " + data()!.token,
         },
-      })
+      }})
         .then((res) => res.json())
         .then((flow) => navigate(`/flows/${flow._id}`));
     }
   }
 
   return (
-    <div class="flex flex-col items-center justify-center w-screen h-screen bg-neutral-800">
+    <div>
       <Navbar />
+    <div class="flex flex-col items-center justify-center w-screen h-screen bg-neutral-800">
+      <MountUser user={data()!.user} />
       <div class="absolute top-0 right-0 mr-5 mt-5"></div>
       <div class="grid grid-cols-4 gap-5">
         <a class="cursor-pointer" onClick={createFlow}>
@@ -77,6 +75,7 @@ export default function Dash() {
           )}
         </For>
       </div>
+    </div>
     </div>
   );
 }

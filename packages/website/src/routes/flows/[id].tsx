@@ -8,6 +8,8 @@ import {FlowEditor} from "~/components/nodes/FlowEditor";
 import {getSession} from "@auth/solid-start";
 import {authOpts} from "~/routes/api/auth/[...solidauth]";
 import {Navbar} from "~/components/shared/Navbar"
+import {backendServersideFetch} from "~/lib/backend";
+import {RouteDataFuncArgs} from "@solidjs/router";
 
 export function routeData() {
   return createServerData$(async (_, event) => {
