@@ -151,7 +151,7 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
   async function executeAction(action: GraphAction) {
     switch (action.type) {
       case "CreateNode": {
-        const node: Node = await sendRequest("POST", `graph/nodes`, {
+        const node: Node = await sendRequest("POST", `nodes`, {
           type: action.nodeType,
         });
 
@@ -168,7 +168,7 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
         debounceRequest(action.id, "metadata", () =>
           sendRequest(
             "PATCH",
-            `graph/nodes/${action.id}/metadata`,
+            `nodes/${action.id}/metadata`,
             action.metadata
           )
         );
@@ -193,7 +193,7 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
           },
         ]);
 
-        await sendRequest("POST", `graph/connections`, {
+        await sendRequest("POST", `connections`, {
           from_node_id: action.output.id,
           from_name: action.output.name,
           to_node_id: action.input.id,
@@ -215,7 +215,7 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
           nodes.filter((node) => node.id !== action.id)
         );
 
-        await sendRequest("DELETE", `graph/nodes/${action.id}`);
+        await sendRequest("DELETE", `nodes/${action.id}`);
       }
     }
   }
