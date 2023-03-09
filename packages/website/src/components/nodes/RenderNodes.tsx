@@ -37,6 +37,9 @@ export function RenderNodes(props: { graph: Graph }) {
         const metadata = props.graph.metadata[node.id];
         const nodeType =
           NODE_TYPE_REGISTRY[node.type as keyof typeof NODE_TYPE_REGISTRY];
+        if (!metadata || !nodeType) {
+          return null;
+        }
         const Component = COMPONENTS[nodeType.category];
 
         return (

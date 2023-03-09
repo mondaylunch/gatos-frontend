@@ -7,8 +7,9 @@ import {
     Match,
 } from "solid-js";
 import {FaSolidCat} from "solid-icons/fa";
-import {user} from "~/lib/session";
 import {A, useLocation} from "solid-start";
+import {signIn, signOut} from "@auth/solid-start/client";
+import {user} from "~/lib/session";
 
 export function Navbar() {
     const [dropdownVisible, setDropdownVisible] = createSignal(false);
@@ -47,26 +48,16 @@ export function Navbar() {
                         <Switch
                             fallback={
                                 <div class="flex space-x-4">
-                                    <A
+                                    <button
                                         class={`${
                                             location.pathname === "/login"
                                                 ? "bg-gray-900 text-white"
                                                 : "text-gray-300 hover:bg-gray-700 hover:text-white"
                                         } px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out`}
-                                        href="/login"
+                                        onClick={() => signIn("auth0")}
                                     >
-                                        Login
-                                    </A>
-                                    <A
-                                        class={`${
-                                            location.pathname === "/signup"
-                                                ? "bg-gray-900 text-white"
-                                                : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                                        } px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out`}
-                                        href="/signup"
-                                    >
-                                        Sign up
-                                    </A>
+                                        Login or Sign Up
+                                    </button>
                                 </div>
                             }
                         >
@@ -113,7 +104,7 @@ export function Navbar() {
                                                 <span class="sr-only">Open user menu</span>
                                                 <img
                                                     class="h-12 w-12 rounded-full"
-                                                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                                                    src={user()!.avatar ?? "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"}
                                                     alt=""
                                                 />
                                             </button>
@@ -132,17 +123,17 @@ export function Navbar() {
                                                         tabindex="-1"
                                                         id="user-menu-item-0"
                                                     >
-                                                        Hi {user().username}!
+                                                        Hi {user()!.username}!
                                                     </a>
-                                                    <a
-                                                        href="/api/logout"
+                                                    <button
+                                                        onClick={() => signOut()}
                                                         class="block px-4 py-2 text-sm text-gray-700 text-right hover:bg-gray-300 transition ease-in-out duration-150"
                                                         role="menuitem"
                                                         tabindex="-1"
                                                         id="user-menu-item-2"
                                                     >
                                                         Logout
-                                                    </a>
+                                                    </button>
                                                 </div>
                                             </Show>
                                         </div>
