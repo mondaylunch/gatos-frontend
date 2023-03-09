@@ -22,7 +22,7 @@ import { createSignal, Match, onCleanup, Switch } from "solid-js";
 import { ENDPOINT } from "~/lib/env";
 import { user } from "~/lib/session";
 import { NodeTypeDrag } from "~/components/editor/NodeTypeDrag";
-import {createBackendFetchAction} from "~/lib/backend";
+import { createBackendFetchAction } from "~/lib/backend";
 
 /**
  * Populate Graph with missing metadata
@@ -134,13 +134,16 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
     url: string,
     body?: any
   ): Promise<T> {
-    const res = sendBackendRequest({ route: `/api/v1/flows/${props.flow._id}/${url}`, init: {
-      method,
-      body: JSON.stringify(body),
-      headers: {
-        "Content-Type": "application/json",
+    const res = sendBackendRequest({
+      route: `/api/v1/flows/${props.flow._id}/${url}`,
+      init: {
+        method,
+        body: JSON.stringify(body),
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    }});
+    });
 
     return body ? await res.then((res) => res.json()) : undefined;
   }

@@ -1,5 +1,5 @@
-import {Accessor, useContext} from "solid-js";
-import {CanvasContext} from "../context";
+import { Accessor, useContext } from "solid-js";
+import { CanvasContext } from "../context";
 
 /**
  * Mark an element in the canvas as moveable.

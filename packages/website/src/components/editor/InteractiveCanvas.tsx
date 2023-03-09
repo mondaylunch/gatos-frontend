@@ -11,9 +11,9 @@ import {
   Signal,
   useContext,
 } from "solid-js";
-import {Portal} from "solid-js/web";
-import {Canvas} from "./Canvas";
-import {CanvasContext} from "./context";
+import { Portal } from "solid-js/web";
+import { Canvas } from "./Canvas";
+import { CanvasContext } from "./context";
 
 type Props<MoveRef, GrabRef, SelectRef> = {
   /**

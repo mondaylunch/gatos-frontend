@@ -1,5 +1,13 @@
-import {Accessor, createContext, createEffect, createSignal, JSX, onCleanup, splitProps,} from "solid-js";
-import {createStore, SetStoreFunction} from "solid-js/store";
+import {
+  Accessor,
+  createContext,
+  createEffect,
+  createSignal,
+  JSX,
+  onCleanup,
+  splitProps,
+} from "solid-js";
+import { createStore, SetStoreFunction } from "solid-js/store";
 
 /**
  * Minimum linear zoom factor
