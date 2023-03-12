@@ -13,7 +13,7 @@ export function ProcessNode(props: {
     <Switch
       fallback={
         <div
-          class={`group relative h-32 w-72 rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center`}
+          class={`group relative w-72 rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center`}
         >
           <div class="group flex-1 p-4 flex-col items-center justify-center text-left">
             <p class="flex-col font-bold text-black select-none">
@@ -26,7 +26,7 @@ export function ProcessNode(props: {
     >
       <Match when={isSelected?.()}>
         <div
-          class={`group relative h-32 w-72 rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center outline outline-4 outline-indigo-500`}
+          class={`group relative w-72 rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center outline outline-4 outline-indigo-500`}
         >
           <div class="group flex-1 p-4 flex-col items-center justify-center text-left">
             <p class="flex-col font-bold text-black select-none">

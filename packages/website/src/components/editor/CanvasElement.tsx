@@ -63,7 +63,9 @@ export function CanvasElement(props: Props) {
                 const width = rect.width / zoomFactor();
                 const height = rect.height / zoomFactor();
 
-                setSize(local.id!, { width, height });
+                if (width && height) {
+                  setSize(local.id!, { width, height });
+                }
               }
 
               commit();

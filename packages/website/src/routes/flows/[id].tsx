@@ -1,58 +1,83 @@
-import { useLocation, useRouteData } from "solid-start";
+import { useParams, useRouteData } from "solid-start";
 
-import { Flow, NodeType } from "~/lib/types";
+import { Flow, NodeType, User } from "~/lib/types";
 import { createServerData$, redirect } from "solid-start/server";
+import { constructUser, MountUser } from "~/lib/session";
 import { ENDPOINT } from "~/lib/env";
-import { Show } from "solid-js";
-import { FlowEditor } from "~/components/nodes/FlowEditor";
 import { getSession } from "@auth/solid-start";
-import { authOpts } from "~/routes/api/auth/[...solidauth]";
+import { onMount, Show } from "solid-js";
+import { FlowEditor } from "~/components/nodes/FlowEditor";
 import { Navbar } from "~/components/shared/Navbar";
-import { backendServersideFetch } from "~/lib/backend";
-import { RouteDataFuncArgs } from "@solidjs/router";
+import { createSignal } from "solid-js";
+import { authOpts } from "../api/auth/[...solidauth]";
+import {
+  backendServersideFetch,
+  createBackendFetchAction,
+} from "~/lib/backend";
 
-export function routeData({ location }: RouteDataFuncArgs) {
-  return createServerData$(
-    async ([loc], event) => {
-      const session = await getSession(event.request, authOpts);
+export function routeData() {
+  return createServerData$(async (_, event) => {
+    const session = await getSession(event.request, authOpts);
 
-      if (!session || !session.user) {
-        throw redirect("/");
-      }
+    if (!session || !session.user) {
+      throw redirect("/");
+    }
 
-      const flowId = loc.split("/").pop()!;
-      const flow = await backendServersideFetch(
-        `/api/v1/flows/${flowId}`,
-        {
-          method: "GET",
-          headers: {},
-        },
+    return {
+      user: constructUser(session),
+      nodeTypes: await backendServersideFetch(
+        "/api/v1/node-types",
+        {},
         session
-      ).then((res) => res.json() as Promise<Flow>);
-
-      return {
-        user: session.user,
-        flow,
-        nodeTypes: await backendServersideFetch(
-          "/api/v1/node-types",
-          {},
-          session
-        ).then((res) => res.json() as Promise<NodeType[]>),
-      };
-    },
-    { key: () => [location.pathname] }
-  );
+      ).then((res) => res.json() as Promise<NodeType[]>),
+    };
+  });
 }
 
 export default function FlowPage() {
+  const params = useParams<{ id: string }>();
   const data = useRouteData<typeof routeData>();
 
   return (
     <div class="flex flex-col h-screen max-h-screen min-h-0">
       <Navbar />
       <Show when={data()}>
-        <FlowEditor flow={data()!.flow} nodeTypes={data()!.nodeTypes} />
+        <MountUser user={data()!.user} />
+        <LoadFlow
+          id={params.id}
+          user={data()!.user}
+          nodeTypes={data()!.nodeTypes}
+        />
       </Show>
     </div>
+  );
+}
+
+/**
+ * Route data is funky so data fetching is off-loaded to this sub-component
+ */
+function LoadFlow(props: { id: string; user: User; nodeTypes: NodeType[] }) {
+  const [flow, setFlow] = createSignal<Flow>();
+  const [_, sendBackendRequest] = createBackendFetchAction();
+
+  // Fetch the flow once client has loaded
+  onMount(() =>
+    sendBackendRequest({
+      route: `/api/v1/flows/${props.id}`,
+      init: {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    })
+      .then((res) => res.json() as Promise<Flow>)
+      .then(setFlow)
+  );
+
+  return (
+    <Show when={flow()}>
+      <FlowEditor flow={flow()!} nodeTypes={props.nodeTypes} />
+    </Show>
   );
 }

@@ -11,6 +11,7 @@ import {
   Node,
   NodeType,
   SAMPLE_FLOW_DATA,
+  Setting,
 } from "~/lib/types";
 import { VariableNode } from "./Node";
 import { NodeSidebar } from "./NodeSidebar";
@@ -58,7 +59,7 @@ type Grabbable =
       name: string;
     };
 
-type GraphAction =
+export type GraphAction =
   | {
       type: "CreateNode";
       nodeType: string;
@@ -84,6 +85,12 @@ type GraphAction =
   | {
       type: "DeleteNode";
       id: string;
+    }
+  | {
+      type: "UpdateSettingsKey";
+      id: string;
+      key: string;
+      value: any;
     };
 
 /**
@@ -107,20 +114,6 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
   const [graph, updateGraph] = createStore<Graph>(populate(props.flow.graph));
   const [selectedNode, setSelected] = createSignal<string>();
   const [_, sendBackendRequest] = createBackendFetchAction();
-
-  /**
-   * Debugging
-   */
-  if (typeof window !== "undefined") {
-    loadNodeTypes([
-      { name: "test_start", category: "input" },
-      { name: "test_process", category: "process" },
-      { name: "test_end", category: "output" },
-    ]);
-
-    (window as any).__setDebugGraph = () =>
-      updateGraph(populate(SAMPLE_FLOW_DATA.graph));
-  }
 
   /**
    * Send a request
@@ -166,18 +159,16 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
         });
 
         updateGraph("nodes", (nodes) => [...nodes, node]);
+
         break;
       }
       case "MoveNode": {
         debounceRequest(action.id, "metadata", () =>
-          sendRequest(
-            "PATCH",
-            `nodes/${action.id}/metadata`,
-            action.metadata
-          )
+          sendRequest("PATCH", `nodes/${action.id}/metadata`, action.metadata)
         );
 
         updateGraph("metadata", action.id, action.metadata);
+
         break;
       }
       case "ConnectNode": {
@@ -220,6 +211,28 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
         );
 
         await sendRequest("DELETE", `nodes/${action.id}`);
+
+        break;
+      }
+      case "UpdateSettingsKey": {
+        const existingNode = graph.nodes.find((node) => node.id === action.id)!;
+        const node: Node = await sendRequest(
+          "PATCH",
+          `nodes/${action.id}/settings`,
+          {
+            [action.key]: {
+              ...existingNode.settings[action.key],
+              value: action.value,
+            },
+          }
+        );
+
+        updateGraph("nodes", (nodes) => [
+          ...nodes.filter((node) => node.id !== action.id),
+          node,
+        ]);
+
+        break;
       }
     }
   }
@@ -270,7 +283,13 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
         const input = inputNode.inputs[inputName];
         if (!output) throw `Output "${ref.name}" not defined in the node!`;
         if (!input) throw `Input "${inputName}" not defined in the node!`;
-        if (output.type !== input.type && input.type !== "any") return;
+        if (
+          output.type !== input.type &&
+          input.type !== "any" &&
+          output.type !== "any" &&
+          !(input.type === "optional" && output.type.startsWith("optional"))
+        )
+          return;
 
         // 3. If an input connection already exists, reject.
         if (
@@ -370,7 +389,7 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
           <NodeSidebar />
         </>
       }
-      postCanvas={<SettingsSidebar />}
+      postCanvas={<SettingsSidebar graph={graph} updateGraph={executeAction} />}
       handleMove={handleMove}
       handleDrop={handleDrop}
       handleSelect={setSelected}
