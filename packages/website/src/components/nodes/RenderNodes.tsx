@@ -21,9 +21,9 @@ const COMPONENTS: Record<
   NodeType["category"],
   Component<{ title: string; children?: JSX.Element }>
 > = {
-  input: InputNode,
+  start: InputNode,
   process: ProcessNode,
-  output: OutputNode,
+  end: OutputNode,
 };
 
 /**

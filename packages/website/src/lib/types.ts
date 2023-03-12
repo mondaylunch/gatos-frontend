@@ -8,12 +8,13 @@ export type User = {
 
 export type NodeType = {
   name: string;
-  category: "input" | "process" | "output";
+  category: "start" | "process" | "end";
 };
 
 export type DataType =
   | "any"
   | "number"
+  | "optional"
   | `optional$${string}`
   | `list$${string}`;
 
