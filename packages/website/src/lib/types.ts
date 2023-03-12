@@ -33,6 +33,14 @@ export type Setting =
   | {
       type: "number";
       value: number;
+    }
+  | {
+      type: "boolean";
+      value: boolean;
+    }
+  | {
+      type: "string";
+      value: string;
     };
 
 export type IO = {

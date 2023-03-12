@@ -11,6 +11,7 @@ import {
   Node,
   NodeType,
   SAMPLE_FLOW_DATA,
+  Setting,
 } from "~/lib/types";
 import { VariableNode } from "./Node";
 import { NodeSidebar } from "./NodeSidebar";
@@ -57,7 +58,7 @@ type Grabbable =
       name: string;
     };
 
-type GraphAction =
+export type GraphAction =
   | {
       type: "CreateNode";
       nodeType: string;
@@ -83,6 +84,12 @@ type GraphAction =
   | {
       type: "DeleteNode";
       id: string;
+    }
+  | {
+      type: "UpdateSettingsKey";
+      id: string;
+      key: string;
+      value: any;
     };
 
 /**
@@ -148,6 +155,7 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
         });
 
         updateGraph("nodes", (nodes) => [...nodes, node]);
+
         break;
       }
       case "MoveNode": {
@@ -156,6 +164,7 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
         );
 
         updateGraph("metadata", action.id, action.metadata);
+
         break;
       }
       case "ConnectNode": {
@@ -198,6 +207,28 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
         );
 
         await sendRequest("DELETE", `nodes/${action.id}`);
+
+        break;
+      }
+      case "UpdateSettingsKey": {
+        const existingNode = graph.nodes.find((node) => node.id === action.id)!;
+        const node: Node = await sendRequest(
+          "PATCH",
+          `nodes/${action.id}/settings`,
+          {
+            [action.key]: {
+              ...existingNode.settings[action.key],
+              value: action.value,
+            },
+          }
+        );
+
+        updateGraph("nodes", (nodes) => [
+          ...nodes.filter((node) => node.id !== action.id),
+          node,
+        ]);
+
+        break;
       }
     }
   }
@@ -354,7 +385,7 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
           <NodeSidebar />
         </>
       }
-      postCanvas={<SettingsSidebar />}
+      postCanvas={<SettingsSidebar graph={graph} updateGraph={executeAction} />}
       handleMove={handleMove}
       handleDrop={handleDrop}
       handleSelect={setSelected}
