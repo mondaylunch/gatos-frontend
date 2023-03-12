@@ -107,20 +107,6 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
   const [selectedNode, setSelected] = createSignal<string>();
 
   /**
-   * Debugging
-   */
-  if (typeof window !== "undefined") {
-    loadNodeTypes([
-      { name: "test_start", category: "input" },
-      { name: "test_process", category: "process" },
-      { name: "test_end", category: "output" },
-    ]);
-
-    (window as any).__setDebugGraph = () =>
-      updateGraph(populate(SAMPLE_FLOW_DATA.graph));
-  }
-
-  /**
    * Send a request
    * @param method Method request
    * @param url Request URL
@@ -166,11 +152,7 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
       }
       case "MoveNode": {
         debounceRequest(action.id, "metadata", () =>
-          sendRequest(
-            "PATCH",
-            `nodes/${action.id}/metadata`,
-            action.metadata
-          )
+          sendRequest("PATCH", `nodes/${action.id}/metadata`, action.metadata)
         );
 
         updateGraph("metadata", action.id, action.metadata);
@@ -266,7 +248,13 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
         const input = inputNode.inputs[inputName];
         if (!output) throw `Output "${ref.name}" not defined in the node!`;
         if (!input) throw `Input "${inputName}" not defined in the node!`;
-        if (output.type !== input.type && input.type !== "any") return;
+        if (
+          output.type !== input.type &&
+          input.type !== "any" &&
+          output.type !== "any" &&
+          !(input.type === "optional" && output.type.startsWith("optional"))
+        )
+          return;
 
         // 3. If an input connection already exists, reject.
         if (
