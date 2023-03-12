@@ -27,6 +27,7 @@ export function SettingsSidebar(props: SidebarProps) {
       <Match when={node()}>
         <div class="w-[360px] bg-neutral-700 text-white flex flex-col gap-4 p-4">
           <span class="text-xl">{node()!.type}</span>
+          <span class="text-xs select-all">{selected()}</span>
           <For each={Object.keys(node()!.settings)}>
             {(key) => {
               const entry = () => node()!.settings[key];
