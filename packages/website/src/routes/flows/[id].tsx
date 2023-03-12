@@ -63,7 +63,7 @@ function LoadFlow(props: { id: string; user: User; nodeTypes: NodeType[] }) {
   // Fetch the flow once client has loaded
   onMount(() =>
     sendBackendRequest({
-      route: `${ENDPOINT}/api/v1/flows/${props.id}`,
+      route: `/api/v1/flows/${props.id}`,
       init: {
         method: "GET",
         headers: {
