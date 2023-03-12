@@ -1,23 +1,35 @@
 import { useParams, useRouteData } from "solid-start";
 
 import { Flow, NodeType, User } from "~/lib/types";
-import { createServerData$ } from "solid-start/server";
-import { MountUser, resolveUserByRouteEvent, setUser } from "~/lib/session";
+import { createServerData$, redirect } from "solid-start/server";
+import { constructUser, MountUser } from "~/lib/session";
 import { ENDPOINT } from "~/lib/env";
-import { createEffect, on, onMount, Show } from "solid-js";
+import { getSession } from "@auth/solid-start";
+import { onMount, Show } from "solid-js";
 import { FlowEditor } from "~/components/nodes/FlowEditor";
 import { Navbar } from "~/components/shared/Navbar";
 import { createSignal } from "solid-js";
+import { authOpts } from "../api/auth/[...solidauth]";
+import {
+  backendServersideFetch,
+  createBackendFetchAction,
+} from "~/lib/backend";
 
 export function routeData() {
   return createServerData$(async (_, event) => {
-    const user = await resolveUserByRouteEvent(event);
+    const session = await getSession(event.request, authOpts);
+
+    if (!session || !session.user) {
+      throw redirect("/");
+    }
 
     return {
-      user,
-      nodeTypes: await fetch(`${ENDPOINT}/api/v1/node-types`).then(
-        (res) => res.json() as Promise<NodeType[]>
-      ),
+      user: constructUser(session),
+      nodeTypes: await backendServersideFetch(
+        "/api/v1/node-types",
+        {},
+        session
+      ).then((res) => res.json() as Promise<NodeType[]>),
     };
   });
 }
@@ -46,13 +58,17 @@ export default function FlowPage() {
  */
 function LoadFlow(props: { id: string; user: User; nodeTypes: NodeType[] }) {
   const [flow, setFlow] = createSignal<Flow>();
+  const [_, sendBackendRequest] = createBackendFetchAction();
 
   // Fetch the flow once client has loaded
   onMount(() =>
-    fetch(`${ENDPOINT}/api/v1/flows/${props.id}`, {
-      method: "GET",
-      headers: {
-        "X-Auth-Token": props.user.auth_token,
+    sendBackendRequest({
+      route: `${ENDPOINT}/api/v1/flows/${props.id}`,
+      init: {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
     })
       .then((res) => res.json() as Promise<Flow>)
