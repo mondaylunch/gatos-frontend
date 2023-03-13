@@ -2,11 +2,15 @@ import { A } from "solid-start";
 import { BsPlus } from "solid-icons/bs";
 import { FaSolidXmark } from "solid-icons/fa";
 import { createBackendFetchAction } from "~/lib/backend";
+import { createSignal } from "solid-js";
 
 type DisplayProps = {
   title: string;
   description: string;
   id: string;
+  setShowDeleteModal: (val: boolean) => void;
+  setDelID: (val: string) => void;
+  setDelTitle: (val: string) => void;
 };
 
 export function Square_New() {
@@ -18,22 +22,15 @@ export function Square_New() {
 }
 
 export function Square_File(props: DisplayProps) {
-  const [_, sendBackendRequest] = createBackendFetchAction();
-
-  async function deleteFlow() {
-    await sendBackendRequest({
-      route: `/api/v1/flows/${props.id}`,
-      init: {
-        method: "DELETE",
-      },
-    });
-  }
-
   return (
     <div class="group relative h-32 w-32 rounded-3xl bg-neutral-900 flex items-center justify-center align-items-center hover:scale-110 hover:bg-neutral-700 hover:shadow-lg focus:bg-green-700 focus:shadow-lg focus:outline-none focus:ring-00 transition duration-150 ease-in-out">
       <button
         class="bg-zinc-300 p-0.5 rounded-full absolute top-0 left-0 z-10 mr-2 mt-0 invisible group-hover:visible transition duration-150 ease-in-out"
-        onClick={deleteFlow}
+        onClick={() => {
+          props.setDelID(props.id);
+          props.setDelTitle(props.title);
+          props.setShowDeleteModal(true);
+        }}
       >
         <FaSolidXmark size={22} color="#e11d48" />
       </button>
