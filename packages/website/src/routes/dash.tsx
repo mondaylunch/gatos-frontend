@@ -49,6 +49,7 @@ export default function Dash() {
   const [name, setName] = createSignal("");
   const [description, setDescription] = createSignal("");
   const [showModal, setShowModal] = createSignal(false);
+  const [submitted, setSubmitted] = createSignal(false);
 
   async function handleSubmit() {
     if (name()) {
@@ -58,7 +59,7 @@ export default function Dash() {
           method: "POST",
           body: JSON.stringify({
             name: name(),
-            description: description(),
+            description: description() || "",
           }),
           headers: {
             "Content-Type": "application/json",
@@ -68,6 +69,8 @@ export default function Dash() {
         .then((res) => res.json())
         .then((flow) => navigate(`/flows/${flow._id}`));
       setShowModal(true);
+    } else {
+      setSubmitted(true);
     }
   }
 
@@ -100,9 +103,12 @@ export default function Dash() {
                     <input
                       value={name()}
                       onInput={(e) => setName(e.currentTarget.value)}
-                      class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      class={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+                        submitted() && !name() ? "border-red-500" : ""
+                      }`}
                       type="text"
-                      placeholder="Flow name"
+                      placeholder="Flow name..."
+                      required
                     />
                   </div>
                   <div class="mb-4">
@@ -114,7 +120,7 @@ export default function Dash() {
                       onInput={(e) => setDescription(e.currentTarget.value)}
                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       type="text"
-                      placeholder="Flow name"
+                      placeholder="Flow description..."
                     />
                   </div>
                   <div class="flex justify-end">
