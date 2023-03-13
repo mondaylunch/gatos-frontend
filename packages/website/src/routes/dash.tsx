@@ -64,7 +64,7 @@ export default function Dash() {
               </A>
             )}
           </For>
-          <Show when={showModal()}>{newModal()}</Show>
+          <Show when={showModal()}>{newModal(setShowModal)}</Show>
         </div>
       </div>
     </div>

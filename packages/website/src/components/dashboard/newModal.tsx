@@ -3,12 +3,11 @@ import { createSignal } from "solid-js";
 import { useNavigate } from "solid-start";
 import { createBackendFetchAction } from "~/lib/backend";
 
-export function newModal() {
+export function newModal(setShowModal: (val: boolean) => void) {
   const navigate = useNavigate();
   const [_, sendBackendRequest] = createBackendFetchAction();
   const [name, setName] = createSignal("");
   const [description, setDescription] = createSignal("");
-  const [showModal, setShowModal] = createSignal(false);
   const [submitted, setSubmitted] = createSignal(false);
 
   async function handleSubmit() {
