@@ -181,9 +181,9 @@ Deletes a flow.
 
 No response body.
 
-## GET `/api/v1/flows/{flowId}/graph/nodes/{nodeId}`
+## GET `/api/v1/flows/{flowId}/nodes/{nodeId}`
 
-Gets a flow graph node.
+Gets a flow node.
 
 > [Requires authentication.](/api/#authentication)
 
@@ -211,9 +211,9 @@ Response Body:
 }
 ```
 
-## POST `/api/v1/flows/{flowId}/graph/nodes`
+## POST `/api/v1/flows/{flowId}/nodes`
 
-Creates a new flow graph node. Returns the created node.
+Creates a new flow node. Returns the created node.
 
 > [Requires authentication.](/api/#authentication)
 
@@ -249,9 +249,9 @@ Response Body:
 }
 ```
 
-## PATCH `/api/v1/flows/{flowId}/graph/nodes/{node_id}/settings`
+## PATCH `/api/v1/flows/{flowId}/nodes/{node_id}/settings`
 
-Edits a flow graph node's settings. Returns the updated node.
+Edits a flow node's settings. Returns the updated node.
 
 > [Requires authentication.](/api/#authentication)
 
@@ -303,17 +303,17 @@ Response Body:
 }
 ```
 
-## DELETE `/api/v1/flows/{flowId}/graph/nodes/{nodeId}`
+## DELETE `/api/v1/flows/{flowId}/nodes/{nodeId}`
 
-Deletes a flow graph node.
+Deletes a flow node.
 
 > [Requires authentication.](/api/#authentication)
 
 No response body.
 
-## GET `/api/v1/flows/{flowId}/graph/connections/{nodeId}`
+## GET `/api/v1/flows/{flowId}/connections/{nodeId}`
 
-Gets a flow graph node's connections.
+Gets a flow node's connections.
 
 > [Requires authentication.](/api/#authentication)
 
@@ -336,9 +336,9 @@ Response Body:
 ]
 ```
 
-## POST `/api/v1/flows/{flowId}/graph/connections`
+## POST `/api/v1/flows/{flowId}/connections`
 
-Creates a new flow graph node connection. Returns the created connection.
+Creates a new flow node connection. Returns the created connection.
 
 > [Requires authentication.](/api/#authentication)
 
@@ -349,8 +349,7 @@ Request Body:
     "from_node_id": "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
     "from_name": "start_node_output",
     "to_node_id": "6f8de627-706d-4817-8921-73bff23006a8",
-    "to_name": "process_node_input",
-    "type": "number"
+    "to_name": "process_node_input"
 }
 ```
 
@@ -371,9 +370,9 @@ Response Body:
 }
 ```
 
-## DELETE `/api/v1/flows/{flowId}/graph/connections`
+## DELETE `/api/v1/flows/{flowId}/connections`
 
-Deletes a flow graph node connection.
+Deletes a flow node connection.
 
 > [Requires authentication.](/api/#authentication)
 
@@ -384,16 +383,15 @@ Request Body:
     "from_node_id": "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
     "from_name": "start_node_output",
     "to_node_id": "6f8de627-706d-4817-8921-73bff23006a8",
-    "to_name": "process_node_input",
-    "type": "number"
+    "to_name": "process_node_input"
 }
 ```
 
 No response body.
 
-## GET `/api/v1/flows/{flowId}/graph/nodes/{nodeId}/metadata`
+## GET `/api/v1/flows/{flowId}/nodes/{nodeId}/metadata`
 
-Gets a flow graph node's metadata.
+Gets a flow node's metadata.
 
 > [Requires authentication.](/api/#authentication)
 
@@ -406,9 +404,9 @@ Response Body:
 }
 ```
 
-## PATCH `/api/v1/flows/{flowId}/graph/nodes/{nodeId}/metadata`
+## PATCH `/api/v1/flows/{flowId}/nodes/{nodeId}/metadata`
 
-Edits a flow graph node's metadata. Returns the updated metadata.
+Edits a flow node's metadata. Returns the updated metadata.
 
 > [Requires authentication.](/api/#authentication)
 
@@ -429,3 +427,29 @@ Response Body:
     "y_pos": 2.0
 }
 ```
+
+## POST `/api/v1/flows/{flowId}/run/{startNodeId}`
+
+Runs a flow from the specified start node. The start node should be a webhook start node. Returns the flow output.
+
+> [Requires authentication.](/api/#authentication)
+
+Request Body:
+
+```json
+{
+    "input_field_name": "input_field_value"
+}
+```
+
+The request body can be any JSON object, or empty.
+
+Response Body:
+
+```json
+{
+    "output_field_name": "output_field_value"
+}
+```
+
+The response body can be any JSON object.

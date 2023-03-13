@@ -3,12 +3,15 @@ import styles from "./editor.module.css";
 import { createStore } from "solid-js/store";
 import { Meta } from "solid-start";
 import {
+  DataType,
   Flow,
   Graph,
   loadNodeTypes,
+  Metadata,
+  Node,
   NodeType,
-  NODE_TYPE_REGISTRY,
   SAMPLE_FLOW_DATA,
+  Setting,
 } from "~/lib/types";
 import { VariableNode } from "./Node";
 import { NodeSidebar } from "./NodeSidebar";
@@ -16,7 +19,11 @@ import { RenderConnections } from "./RenderConnections";
 import { RenderNodes } from "./RenderNodes";
 import { InteractiveCanvas } from "../editor/InteractiveCanvas";
 import { SettingsSidebar } from "./SettingsSidebar";
-import { Match, Switch } from "solid-js";
+import { createSignal, Match, onCleanup, Switch } from "solid-js";
+import { ENDPOINT } from "~/lib/env";
+import { user } from "~/lib/session";
+import { NodeTypeDrag } from "~/components/editor/NodeTypeDrag";
+import { createBackendFetchAction } from "~/lib/backend";
 
 /**
  * Populate Graph with missing metadata
@@ -28,12 +35,11 @@ function populate(
 ): Graph {
   const metadata = { ...graph.metadata };
   for (const node of graph.nodes) {
-    if (!metadata[node.id]) {
-      metadata[node.id] = {
-        xPos: 0,
-        yPos: 0,
-      };
-    }
+    metadata[node.id] = {
+      x_pos: 0,
+      y_pos: 0,
+      ...(metadata[node.id] as any),
+    };
   }
 
   return {
@@ -53,22 +59,182 @@ type Grabbable =
       name: string;
     };
 
+export type GraphAction =
+  | {
+      type: "CreateNode";
+      nodeType: string;
+      metadata: Metadata;
+    }
+  | {
+      type: "MoveNode";
+      id: string;
+      metadata: Metadata;
+    }
+  | {
+      type: "ConnectNode";
+      input: {
+        id: string;
+        name: string;
+      };
+      output: {
+        id: string;
+        name: string;
+      };
+      dataType: DataType;
+    }
+  | {
+      type: "DeleteNode";
+      id: string;
+    }
+  | {
+      type: "UpdateSettingsKey";
+      id: string;
+      key: string;
+      value: any;
+    };
+
+/**
+ * Debounce requests to the server
+ */
+const __requestQueue: Record<string, number> = {};
+
+/**
+ * Debounce an action to the server
+ * @param id Node ID
+ * @param ns Namespace
+ * @param fn Function
+ */
+function debounceRequest(id: string, ns: string, fn: () => void) {
+  clearTimeout(__requestQueue[ns + id]);
+  __requestQueue[ns + id] = setTimeout(fn, 1200) as never as number;
+}
+
 export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
   loadNodeTypes(props.nodeTypes);
   const [graph, updateGraph] = createStore<Graph>(populate(props.flow.graph));
+  const [selectedNode, setSelected] = createSignal<string>();
+  const [_, sendBackendRequest] = createBackendFetchAction();
 
   /**
-   * Debugging
+   * Send a request
+   * @param method Method request
+   * @param url Request URL
+   * @param body Request body stringified as JSON
+   * @returns T
    */
-  if (typeof window !== "undefined") {
-    loadNodeTypes([
-      { name: "test_start", category: "input" },
-      { name: "test_process", category: "process" },
-      { name: "test_end", category: "output" },
-    ]);
+  async function sendRequest<T>(
+    method: string,
+    url: string,
+    body?: any
+  ): Promise<T> {
+    const res = sendBackendRequest({
+      route: `/api/v1/flows/${props.flow._id}/${url}`,
+      init: {
+        method,
+        body: JSON.stringify(body),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    });
 
-    (window as any).__setDebugGraph = () =>
-      updateGraph(populate(SAMPLE_FLOW_DATA.graph));
+    return body ? await res.then((res) => res.json()) : undefined;
+  }
+
+  /**
+   * Execute an action against the graph
+   * @param action Action
+   */
+  async function executeAction(action: GraphAction) {
+    switch (action.type) {
+      case "CreateNode": {
+        const node: Node = await sendRequest("POST", `nodes`, {
+          type: action.nodeType,
+        });
+
+        executeAction({
+          type: "MoveNode",
+          id: node.id,
+          metadata: action.metadata,
+        });
+
+        updateGraph("nodes", (nodes) => [...nodes, node]);
+
+        break;
+      }
+      case "MoveNode": {
+        debounceRequest(action.id, "metadata", () =>
+          sendRequest("PATCH", `nodes/${action.id}/metadata`, action.metadata)
+        );
+
+        updateGraph("metadata", action.id, action.metadata);
+
+        break;
+      }
+      case "ConnectNode": {
+        updateGraph("connections", [
+          ...graph.connections,
+          {
+            output: {
+              node_id: action.output.id,
+              name: action.output.name,
+              type: action.dataType,
+            },
+            input: {
+              node_id: action.input.id,
+              name: action.input.name,
+              type: action.dataType,
+            },
+          },
+        ]);
+
+        await sendRequest("POST", `connections`, {
+          from_node_id: action.output.id,
+          from_name: action.output.name,
+          to_node_id: action.input.id,
+          to_name: action.input.name,
+        });
+
+        break;
+      }
+      case "DeleteNode": {
+        updateGraph("connections", (connections) =>
+          connections.filter(
+            (connection) =>
+              connection.input.node_id !== action.id &&
+              connection.output.node_id !== action.id
+          )
+        );
+
+        updateGraph("nodes", (nodes) =>
+          nodes.filter((node) => node.id !== action.id)
+        );
+
+        await sendRequest("DELETE", `nodes/${action.id}`);
+
+        break;
+      }
+      case "UpdateSettingsKey": {
+        const existingNode = graph.nodes.find((node) => node.id === action.id)!;
+        const node: Node = await sendRequest(
+          "PATCH",
+          `nodes/${action.id}/settings`,
+          {
+            [action.key]: {
+              ...existingNode.settings[action.key],
+              value: action.value,
+            },
+          }
+        );
+
+        updateGraph("nodes", (nodes) => [
+          ...nodes.filter((node) => node.id !== action.id),
+          node,
+        ]);
+
+        break;
+      }
+    }
   }
 
   /**
@@ -80,8 +246,15 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
     ref: { id: string },
     [movementX, movementY]: [number, number]
   ) {
-    updateGraph("metadata", ref.id, "xPos", (x) => x + movementX);
-    updateGraph("metadata", ref.id, "yPos", (y) => y + movementY);
+    const metadata = graph.metadata[ref.id];
+    executeAction({
+      type: "MoveNode",
+      id: ref.id,
+      metadata: {
+        x_pos: metadata.x_pos + movementX,
+        y_pos: metadata.y_pos + movementY,
+      },
+    });
   }
 
   /**
@@ -91,7 +264,7 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
    * @param targetNodeId Target drop zone
    */
   function handleDrop(
-    [xPos, yPos]: [number, number],
+    [x_pos, y_pos]: [number, number],
     ref: Grabbable,
     targetNodeId?: string
   ) {
@@ -100,74 +273,84 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
       if (type === "node") {
         // Get the node we are connecting to
         const inputNode = graph.nodes.find((node) => node.id === nodeId)!;
+        const outputNode = graph.nodes.find((node) => node.id === ref.id)!;
 
-        // Get node types of both nodes involved
-        const outputNodeType =
-          NODE_TYPE_REGISTRY[
-            graph.nodes.find((node) => node.id === ref.id)
-              ?.type as keyof typeof NODE_TYPE_REGISTRY
-          ];
-        const inputNodeType =
-          NODE_TYPE_REGISTRY[inputNode.type as keyof typeof NODE_TYPE_REGISTRY];
-
-        // 1. If the input does not exist, reject.
-        if (!inputNodeType) return;
+        // 1. If the input or output does not exist, reject.
+        if (!inputNode || !outputNode) return;
 
         // 2. If the variable types differ, reject.
-        const output = outputNodeType.outputs.find(
-          (output) => output.name === ref.name
-        )!;
-        const inputType = inputNode.inputTypes[inputName];
-        if (!output) throw `Output "${ref.name}" not registered in node types!`;
-        if (!inputType) throw `Input "${inputName}" not defined in the node!`;
-        if (output.type !== inputType) return;
+        const output = outputNode.outputs[ref.name];
+        const input = inputNode.inputs[inputName];
+        if (!output) throw `Output "${ref.name}" not defined in the node!`;
+        if (!input) throw `Input "${inputName}" not defined in the node!`;
+        if (
+          output.type !== input.type &&
+          input.type !== "any" &&
+          output.type !== "any" &&
+          !(input.type === "optional" && output.type.startsWith("optional"))
+        )
+          return;
 
         // 3. If an input connection already exists, reject.
         if (
           graph.connections.find(
             (connection) =>
-              connection.input.nodeId === nodeId &&
+              connection.input.node_id === nodeId &&
               connection.input.name === inputName
           )
         )
           return console.info("Ignoring duplicate connection to input.");
 
         // Connect the two sides
-        updateGraph("connections", [
-          ...graph.connections,
-          {
-            output: {
-              nodeId: ref.id,
-              name: ref.name,
-              type: output.type,
-            },
-            input: {
-              nodeId: nodeId,
-              name: inputName,
-              type: inputType,
-            },
+        executeAction({
+          type: "ConnectNode",
+          output: {
+            id: ref.id,
+            name: ref.name,
           },
-        ]);
+          input: {
+            id: nodeId,
+            name: inputName,
+          },
+          dataType: output.type,
+        });
       }
     }
 
     if (ref.type === "NodeType") {
-      // Create a new node
-      const id = crypto.randomUUID();
-      updateGraph("metadata", id, {
-        xPos,
-        yPos,
-      });
-      updateGraph("nodes", (nodes) => [
-        ...nodes,
-        {
-          id,
-          type: ref.node.name,
-          settings: {},
-          inputTypes: {},
+      executeAction({
+        type: "CreateNode",
+        nodeType: ref.node.name,
+        metadata: {
+          x_pos,
+          y_pos,
         },
-      ]);
+      });
     }
+  }
+
+  /**
+   * Handle key press for deleting selected node
+   * @param event Keyboard Event
+   */
+  function onKeyDown(event: KeyboardEvent) {
+    if (event.key === "Delete") {
+      event.preventDefault();
+
+      const id = selectedNode();
+      console.info("selected:", id);
+      if (id) {
+        executeAction({
+          type: "DeleteNode",
+          id,
+        });
+      }
+    }
+  }
+
+  if (typeof window !== "undefined") {
+    document.addEventListener("keydown", onKeyDown);
+    onCleanup(() => document.removeEventListener("keydown", onKeyDown));
   }
 
   /**
@@ -183,7 +366,11 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
             id={(ref as Grabbable & { type: "Variable" }).id}
           />
         </Match>
-        <Match when={ref.type === "NodeType"}>node</Match>
+        <Match when={ref.type === "NodeType"}>
+          <NodeTypeDrag
+            name={(ref as Grabbable & { type: "NodeType" }).node.name}
+          />
+        </Match>
       </Switch>
     );
   }
@@ -205,10 +392,10 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
           <NodeSidebar />
         </>
       }
-      postCanvas={<SettingsSidebar />}
+      postCanvas={<SettingsSidebar graph={graph} updateGraph={executeAction} />}
       handleMove={handleMove}
       handleDrop={handleDrop}
-      handleSelect={() => void 0}
+      handleSelect={setSelected}
       renderVirtualElement={renderVirtualElement}
     >
       <RenderConnections graph={graph} />

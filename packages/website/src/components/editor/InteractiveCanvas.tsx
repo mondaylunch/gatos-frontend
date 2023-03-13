@@ -2,10 +2,11 @@ import {
   Accessor,
   ComponentProps,
   createContext,
+  createEffect,
   createSignal,
   JSX,
+  on,
   onCleanup,
-  Setter,
   Show,
   Signal,
   useContext,
@@ -194,6 +195,11 @@ export function InteractiveCanvas<M, G, S>(props: Props<M, G, S>) {
       document.removeEventListener("mousemove", onMouseMove);
     });
   }
+
+  /**
+   * Pass-through the selected node information
+   */
+  createEffect(on(() => selected[0](), props.handleSelect));
 
   return (
     <CanvasContext.Provider

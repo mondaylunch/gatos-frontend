@@ -1,5 +1,7 @@
 .container {
-    height: 100vh;
+    flex-grow: 1;
+    max-height: 100vh;
+    min-height: 0;
     display: flex;
     user-select: none;
     flex-direction: row;

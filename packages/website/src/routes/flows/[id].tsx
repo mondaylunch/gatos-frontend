@@ -1,43 +1,83 @@
-import { useRouteData } from "solid-start";
+import { useParams, useRouteData } from "solid-start";
 
-import { Flow, NodeType } from "~/lib/types";
-import { createServerData$ } from "solid-start/server";
-import { MountUser, resolveUserByRouteEvent, setUser } from "~/lib/session";
+import { Flow, NodeType, User } from "~/lib/types";
+import { createServerData$, redirect } from "solid-start/server";
+import { constructUser, MountUser } from "~/lib/session";
 import { ENDPOINT } from "~/lib/env";
-import { Show } from "solid-js";
+import { getSession } from "@auth/solid-start";
+import { onMount, Show } from "solid-js";
 import { FlowEditor } from "~/components/nodes/FlowEditor";
+import { Navbar } from "~/components/shared/Navbar";
+import { createSignal } from "solid-js";
+import { authOpts } from "../api/auth/[...solidauth]";
+import {
+  backendServersideFetch,
+  createBackendFetchAction,
+} from "~/lib/backend";
 
 export function routeData() {
   return createServerData$(async (_, event) => {
-    const user = await resolveUserByRouteEvent(event);
+    const session = await getSession(event.request, authOpts);
 
-    // Route data doesn't provide params because Router is
-    // inaccessible, so we just read the URL instead, which
-    // is good enough for our purposes.
-    const flowId = event.request.url.split("/").pop()!;
+    if (!session || !session.user) {
+      throw redirect("/");
+    }
 
     return {
-      user,
-      flow: await fetch(`${ENDPOINT}/api/v1/flows/${flowId}`, {
-        method: "GET",
-        headers: {
-          "X-Auth-Token": user.auth_token,
-        },
-      }).then((res) => res.json() as Promise<Flow>),
-      nodeTypes: await fetch(`${ENDPOINT}/api/v1/node-types`).then(
-        (res) => res.json() as Promise<NodeType[]>
-      ),
+      user: constructUser(session),
+      nodeTypes: await backendServersideFetch(
+        "/api/v1/node-types",
+        {},
+        session
+      ).then((res) => res.json() as Promise<NodeType[]>),
     };
   });
 }
 
 export default function FlowPage() {
+  const params = useParams<{ id: string }>();
   const data = useRouteData<typeof routeData>();
 
   return (
-    <Show when={data()}>
-      <MountUser user={data()!.user} />
-      <FlowEditor flow={data()!.flow} nodeTypes={data()!.nodeTypes} />
+    <div class="flex flex-col h-screen max-h-screen min-h-0">
+      <Navbar />
+      <Show when={data()}>
+        <MountUser user={data()!.user} />
+        <LoadFlow
+          id={params.id}
+          user={data()!.user}
+          nodeTypes={data()!.nodeTypes}
+        />
+      </Show>
+    </div>
+  );
+}
+
+/**
+ * Route data is funky so data fetching is off-loaded to this sub-component
+ */
+function LoadFlow(props: { id: string; user: User; nodeTypes: NodeType[] }) {
+  const [flow, setFlow] = createSignal<Flow>();
+  const [_, sendBackendRequest] = createBackendFetchAction();
+
+  // Fetch the flow once client has loaded
+  onMount(() =>
+    sendBackendRequest({
+      route: `/api/v1/flows/${props.id}`,
+      init: {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    })
+      .then((res) => res.json() as Promise<Flow>)
+      .then(setFlow)
+  );
+
+  return (
+    <Show when={flow()}>
+      <FlowEditor flow={flow()!} nodeTypes={props.nodeTypes} />
     </Show>
   );
 }

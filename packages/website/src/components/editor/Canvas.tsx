@@ -199,6 +199,7 @@ export function Canvas(props: Props) {
     event.preventDefault();
     clampScale(-event.deltaY * 0.001, [mouseX(), mouseY()]);
   }
+
   /**
    * Handle key down event for intercepting shortcuts
    * @param event Keyboard Event
