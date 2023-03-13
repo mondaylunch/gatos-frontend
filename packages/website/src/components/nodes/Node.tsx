@@ -55,7 +55,7 @@ export function VariableDropZone(props: { children?: JSX.Element }) {
  * Node variable
  */
 export function VariableNode(props: { name: JSX.Element; id: string }) {
-  const bgHue = parseInt(props.id.substring(0, 3));
+  const bgHue = parseInt(props.id.substring(0, 6), 16);
   return (
     <div
       class="text-white p-4 h-8 rounded-[35px]  flex items-center justify-center place-content-stretch"
