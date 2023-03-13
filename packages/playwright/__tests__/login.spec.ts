@@ -1,41 +1,44 @@
-import { expect, test, chromium } from "@playwright/test";
+import { expect, test, Page } from "@playwright/test";
 
 const mainURL = "http://localhost:5173/";
 const dashURL = "http://localhost:5173/dash";
 const flowURL = "http://localhost:5173/flows/1";
 
-test.beforeEach(async ({page}, testInfo) => {
-    const browser = await chromium.launch();
-    const context = await browser.newContext();
-    page = await context.newPage();
+test.describe.configure({ mode: 'serial' });
+
+let page: Page;
+
+test.beforeAll(async ({ browser }) => {
+    page = await browser.newPage();
     await page.goto(mainURL);
 });
 
+test.afterAll(async () => {
+    await page.close();
+});
+
 test("it loads dashboard", async ({ page }) => {
-    await page.goto(dashURL);
+    await page.goto(mainURL);
     await page.click("text=Login or Sign Up");
     await page.click("text=Sign in with Auth0");
-    // Under email address input "amongus@example.com" and password input "TestPass123"
     const emailInput = page.getByLabel("Email address");
-    await emailInput.type("amongus@example.com", {delay: 100});
+    await emailInput.type("amongus@example.com");
     const passwordInput = page.getByLabel("Password");
-    await passwordInput.type("TestPass123", {delay: 100});
+    await passwordInput.type("TestPass123");
     await passwordInput.press("Enter");
+    await page.goto(dashURL);
     await expect(page).toHaveScreenshot();
-    page.close();
 });
 
 test("it loads flow page", async ({ page }) => {
-    await page.goto(dashURL);
+    await page.goto(mainURL);
     await page.click("text=Login or Sign Up");
     await page.click("text=Sign in with Auth0");
-    // Under email address input "amongus@example.com" and password input "TestPass123"
     const emailInput = page.getByLabel("Email address");
-    await emailInput.type("amongus@example.com", {delay: 100});
+    await emailInput.type("amongus@example.com");
     const passwordInput = page.getByLabel("Password");
-    await passwordInput.type("TestPass123", {delay: 100});
+    await passwordInput.type("TestPass123");
     await passwordInput.press("Enter");
     await page.goto(flowURL);
     await expect (page).toHaveScreenshot();
-    page.close();
 });
