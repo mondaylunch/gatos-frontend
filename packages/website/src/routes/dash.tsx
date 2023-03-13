@@ -1,4 +1,4 @@
-import { For } from "solid-js";
+import { For, createSignal, Show } from "solid-js";
 import { ENDPOINT } from "~/lib/env";
 import { A, useNavigate, useRouteData } from "solid-start";
 import { createServerData$, redirect } from "solid-start/server";
@@ -11,6 +11,7 @@ import {
   backendServersideFetch,
   createBackendFetchAction,
 } from "~/lib/backend";
+import { newModal } from "~/components/dashboard/newModal";
 
 type Flow = {
   _id: string;
@@ -44,28 +45,7 @@ export function routeData() {
 
 export default function Dash() {
   const data = useRouteData<typeof routeData>();
-  const navigate = useNavigate();
-  const [_, sendBackendRequest] = createBackendFetchAction();
-
-  async function createFlow() {
-    const name = prompt("Enter flow name:");
-    if (name) {
-      await sendBackendRequest({
-        route: "/api/v1/flows",
-        init: {
-          method: "POST",
-          body: JSON.stringify({
-            name,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      })
-        .then((res) => res.json())
-        .then((flow) => navigate(`/flows/${flow._id}`));
-    }
-  }
+  const [showModal, setShowModal] = createSignal(false);
 
   return (
     <div>
@@ -74,7 +54,7 @@ export default function Dash() {
         <MountUser user={data()!.user} />
         <div class="absolute top-0 right-0 mr-5 mt-5"></div>
         <div class="grid grid-cols-4 gap-5">
-          <a class="cursor-pointer" onClick={createFlow}>
+          <a class="cursor-pointer" onClick={() => setShowModal(true)}>
             <Square_New />
           </a>
           <For each={data()?.flows ?? []}>
@@ -84,6 +64,7 @@ export default function Dash() {
               </A>
             )}
           </For>
+          <Show when={showModal()}>{newModal(setShowModal)}</Show>
         </div>
       </div>
     </div>
