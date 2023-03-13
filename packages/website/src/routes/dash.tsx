@@ -12,6 +12,7 @@ import {
   createBackendFetchAction,
 } from "~/lib/backend";
 import { newModal } from "~/components/dashboard/newModal";
+import { deleteModal } from "~/components/dashboard/deleteModal";
 
 type Flow = {
   _id: string;
@@ -45,7 +46,10 @@ export function routeData() {
 
 export default function Dash() {
   const data = useRouteData<typeof routeData>();
-  const [showModal, setShowModal] = createSignal(false);
+  const [showNewModal, setShowNewModal] = createSignal(false);
+  const [showDeleteModal, setShowDeleteModal] = createSignal(false);
+  const [delTitle, setDelTitle] = createSignal("");
+  const [delId, setDelId] = createSignal("");
 
   return (
     <div>
@@ -54,17 +58,25 @@ export default function Dash() {
         <MountUser user={data()!.user} />
         <div class="absolute top-0 right-0 mr-5 mt-5"></div>
         <div class="grid grid-cols-4 gap-5">
-          <a class="cursor-pointer" onClick={() => setShowModal(true)}>
+          <a class="cursor-pointer" onClick={() => setShowNewModal(true)}>
             <Square_New />
           </a>
           <For each={data()?.flows ?? []}>
             {(flow) => (
-              <A href={`/flows/${flow._id}`}>
-                <Square_File title={flow.name} description={flow.description} />
-              </A>
+              <Square_File
+                title={flow.name}
+                description={flow.description}
+                id={flow._id}
+                setShowDeleteModal={setShowDeleteModal}
+                setDelID={setDelId}
+                setDelTitle={setDelTitle}
+              />
             )}
           </For>
-          <Show when={showModal()}>{newModal(setShowModal)}</Show>
+          <Show when={showNewModal()}>{newModal(setShowNewModal)}</Show>
+          <Show when={showDeleteModal()}>
+            {deleteModal(delId(), delTitle(), setShowDeleteModal)}
+          </Show>
         </div>
       </div>
     </div>
