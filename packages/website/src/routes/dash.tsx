@@ -11,6 +11,7 @@ import {
   backendServersideFetch,
   createBackendFetchAction,
 } from "~/lib/backend";
+import { FaSolidSquarePlus } from "solid-icons/fa";
 
 type Flow = {
   _id: string;
@@ -92,54 +93,55 @@ export default function Dash() {
             )}
           </For>
           <Show when={showModal()}>
-            <div class="fixed inset-0 top-0 bottom-0 z-50 flex items-center justify-center">
-              <div class="absolute inset-0 bg-gray-500 bg-opacity-75">
-                <div class="bg-white rounded-lg p-8 max-w-xs mx-auto">
-                  <div class="text-2xl font-bold mb-4">Create a new flow</div>
-                  <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">
-                      Name:
-                    </label>
-                    <input
-                      value={name()}
-                      onInput={(e) => setName(e.currentTarget.value)}
-                      class={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
-                        submitted() && !name() ? "border-red-500" : ""
-                      }`}
-                      type="text"
-                      placeholder="Flow name..."
-                      required
-                    />
-                  </div>
-                  <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">
-                      Description:
-                    </label>
-                    <input
-                      value={description()}
-                      onInput={(e) => setDescription(e.currentTarget.value)}
-                      class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                      type="text"
-                      placeholder="Flow description..."
-                    />
-                  </div>
-                  <div class="flex justify-end">
-                    <button
-                      class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                      onClick={handleSubmit}
-                    >
-                      Create
-                    </button>
-                    <button
-                      class="bg-gray-300 hover:bg-gray-400 text=gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ml-2"
-                      onClick={() => {
-                        setShowModal(false);
-                        setSubmitted(false);
-                      }}
-                    >
-                      Cancel
-                    </button>
-                  </div>
+            <div class="fixed inset-0 flex items-center justify-center flex-col bg-gray-500 bg-opacity-75">
+              <div class="bg-neutral-800 rounded-lg p-8 max-w-xs mx-auto outline outline-indigo-600 outline-offset-2">
+                <FaSolidSquarePlus size={48} color="#4f46e5" />
+                <div class="text-2xl font-bold mb-4 text-white">New Flow:</div>
+                <div class="mb-4">
+                  <label class="block text-sm font-bold mb-2 text-white">
+                    Name:
+                  </label>
+                  <input
+                    value={name()}
+                    onInput={(e) => setName(e.currentTarget.value)}
+                    class={`shadow bg-zinc-800 appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline ${
+                      submitted() && !name()
+                        ? "outline-red-500 outline outline-offset-1"
+                        : ""
+                    }`}
+                    type="text"
+                    placeholder="Flow name..."
+                    required
+                  />
+                </div>
+                <div class="mb-4">
+                  <label class="block text-white text-sm font-bold mb-2">
+                    Description:
+                  </label>
+                  <input
+                    value={description()}
+                    onInput={(e) => setDescription(e.currentTarget.value)}
+                    class="shadow bg-zinc-800 appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline"
+                    type="text"
+                    placeholder="Flow description..."
+                  />
+                </div>
+                <div class="flex justify-end">
+                  <button
+                    class="flex-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    onClick={handleSubmit}
+                  >
+                    Create
+                  </button>
+                  <button
+                    class="flex-auto bg-gray-300 hover:bg-gray-400 text=gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ml-2"
+                    onClick={() => {
+                      setShowModal(false);
+                      setSubmitted(false);
+                    }}
+                  >
+                    Cancel
+                  </button>
                 </div>
               </div>
             </div>
