@@ -79,9 +79,11 @@ export default function Dash() {
           </a>
           <For each={data()?.flows ?? []}>
             {(flow) => (
-              <A href={`/flows/${flow._id}`}>
-                <Square_File title={flow.name} description={flow.description} />
-              </A>
+              <Square_File
+                title={flow.name}
+                description={flow.description}
+                id={flow._id}
+              />
             )}
           </For>
         </div>
