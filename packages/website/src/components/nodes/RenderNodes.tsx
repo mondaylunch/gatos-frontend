@@ -90,7 +90,7 @@ export function RenderNodes(props: { graph: Graph }) {
                         name: output.name,
                       }}
                     >
-                      <VariableNode name={output.name} />
+                      <VariableNode name={output.name} id={output.id} />
                     </div>
                   )}
                 </For>

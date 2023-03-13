@@ -37,9 +37,12 @@ export function VariableDropZone(props: { children?: JSX.Element }) {
 /**
  * Node variable
  */
-export function VariableNode(props: { name: JSX.Element }) {
+export function VariableNode(props: { name: JSX.Element; id: string }) {
+  const bgHue = parseInt(props.id.substring(0, 3));
   return (
-    <div class="text-white p-4 h-8 rounded-[35px] bg-rose-500 flex items-center justify-center place-content-stretch">
+    <div
+      class={`text-white p-4 h-8 rounded-[35px] bg-hsl(${bgHue},80%,80%)  flex items-center justify-center place-content-stretch`}
+    >
       <p class="font-bold select-none">{props.name}</p>
     </div>
   );
