@@ -21,6 +21,14 @@ import {
   FaSolidTriangleExclamation,
   FaSolidGlobe,
   FaSolidCircleQuestion,
+  FaSolidListOl,
+  FaSolidMattressPillow,
+  FaSolidKeyboard,
+  FaSolidStrikethrough,
+  FaSolidHashtag,
+  FaSolidShuffle,
+  FaSolidArrowRightToBracket,
+  FaSolidArrowRightFromBracket,
 } from "solid-icons/fa";
 
 const Icons_Dict = {
@@ -43,6 +51,14 @@ const Icons_Dict = {
   math: FaSolidCalculator,
   boolean_operation: FaSolidToggleOn,
   optional_or_else: FaSolidBox,
+  ["value_provider_Optional[number]"]: FaSolidListOl,
+  ["value_provider_Optional[boolean]"]: FaSolidMattressPillow,
+  ["value_provider_Optional[string]"]: FaSolidKeyboard,
+  ["value_replacer_Optional[string]"]: FaSolidStrikethrough,
+  ["value_replacer_Optional[number]"]: FaSolidHashtag,
+  ["value_replacer_Optional[boolean]"]: FaSolidShuffle,
+  webhook_start: FaSolidArrowRightToBracket,
+  webhook_end: FaSolidArrowRightFromBracket,
 };
 
 export function NodeTypeDrag(props: { name: string }) {
