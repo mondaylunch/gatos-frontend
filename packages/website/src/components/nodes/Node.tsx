@@ -1,6 +1,8 @@
-import { JSX, Show, Match, Switch } from "solid-js";
+import { JSX, Match, Switch } from "solid-js";
 import { useSelfSelected } from "../editor/InteractiveCanvas";
 import getTextColour from "~/components/shared/TextColour";
+import { Icons_Dict } from "../shared/NodeIcons";
+import { FaSolidCircleQuestion } from "solid-icons/fa";
 /**
  * Node signifying given data is processed
  */
@@ -9,20 +11,40 @@ export function ProcessNode(props: {
   children?: JSX.Element;
 }) {
   const isSelected = useSelfSelected();
+  const IconFetch = Icons_Dict[props.title as keyof typeof Icons_Dict];
+  const Icon = (
+    <Switch
+      fallback={
+        <div>
+          <FaSolidCircleQuestion size={40} fill="red-700" />
+        </div>
+      }
+    >
+      <Match when={IconFetch}>
+        <IconFetch size={40} />
+      </Match>
+    </Switch>
+  );
+
+  const sharedContent = (
+    <div class="group flex-1 p-2 flex-col items-center justify-center text-center">
+      <div class="flex items-center justify-center gap-2">{Icon}</div>
+      <p class="flex-col font-bold text-black select-none text-2xl">
+        {props.title}
+      </p>
+      <div class="flex flex-col items-center justify-center gap-2 w-full">
+        {props.children}
+      </div>
+    </div>
+  );
+
   return (
     <Switch
       fallback={
         <div
           class={`group relative w-72 rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center`}
         >
-          <div class="group flex-1 p-4 flex-col items-center justify-center text-center">
-            <p class="flex-col font-bold text-black select-none text-2xl">
-              {props.title}
-            </p>
-            <div class="flex flex-col items-center justify-center gap-2 w-full">
-              {props.children}
-            </div>
-          </div>
+          {sharedContent}
         </div>
       }
     >
@@ -30,14 +52,7 @@ export function ProcessNode(props: {
         <div
           class={`group relative w-72 rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center outline outline-4 outline-indigo-500`}
         >
-          <div class="group flex-1 p-4 flex-col items-center justify-center text-center">
-            <p class="flex-col font-bold text-black select-none text-2xl">
-              {props.title}
-            </p>
-            <div class="flex flex-col items-center justify-center gap-2 w-full">
-              {props.children}
-            </div>
-          </div>
+          {sharedContent}
         </div>
       </Match>
     </Switch>
