@@ -1,6 +1,6 @@
 import { JSX, Show, Match, Switch } from "solid-js";
 import { useSelfSelected } from "../editor/InteractiveCanvas";
-
+import getTextColour from "~/components/shared/TextColour";
 /**
  * Node signifying given data is processed
  */
@@ -58,8 +58,11 @@ export function VariableNode(props: { name: JSX.Element; id: string }) {
   const bgHue = parseInt(props.id.substring(0, 6), 16);
   return (
     <div
-      class="text-white p-4 h-8 rounded-[35px]  flex items-center justify-center place-content-stretch"
-      style={{ background: `hsl(${bgHue}, 90%, 60%)` }}
+      class="p-4 h-8 rounded-[35px] flex items-center justify-center place-content-stretch"
+      style={{
+        background: `hsl(${bgHue}, 90%, 60%)`,
+        color: `${getTextColour(bgHue)}`,
+      }}
     >
       <p class="font-bold select-none">{props.name}</p>
     </div>
@@ -77,22 +80,26 @@ export function InputNode(props: {
   return (
     <Switch
       fallback={
-        <div
-          class={`rounded-t-full h-32 w-64 flex bg-neutral-900 items-center justify-center flex-col`}
-        >
-          <p class="flex-col font-bold text-white select-none">{props.title}</p>
-          <div class="flex flex-col text-center items-center text-white">
+        <div class="rounded-t-full relative w-max h-max bg-slate-600 flex items-center justify-center flex-col p-2">
+          <div class="flex flex-col text-center items-center">
+            <p class="flex-col font-bold text-white select-none text-2xl capitalize pt-4">
+              {props.title}
+            </p>
+          </div>
+          <div class="flex flex-col text-center items-center p-2 gap-2">
             {props.children}
           </div>
         </div>
       }
     >
       <Match when={isSelected?.()}>
-        <div
-          class={`rounded-t-full h-32 w-64 flex bg-neutral-900 items-center justify-center flex-col outline outline-4 outline-indigo-500`}
-        >
-          <p class="flex-col font-bold text-white select-none">{props.title}</p>
-          <div class="flex flex-col text-center items-center text-white">
+        <div class="rounded-t-full relative w-max h-max bg-slate-600 flex items-center justify-center flex-col outline outline-4 outline-indigo-600 p-2">
+          <div class="flex flex-col text-center items-center">
+            <p class="flex-col font-bold text-white select-none text-2xl capitalize pt-4">
+              {props.title}
+            </p>
+          </div>
+          <div class="flex flex-col text-center items-center p-2 gap-2">
             {props.children}
           </div>
         </div>
