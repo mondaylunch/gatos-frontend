@@ -105,8 +105,24 @@ const __requestQueue: Record<string, number> = {};
  * @param fn Function
  */
 function debounceRequest(id: string, ns: string, fn: () => void) {
-  clearTimeout(__requestQueue[ns + id]);
-  __requestQueue[ns + id] = setTimeout(fn, 1200) as never as number;
+  clearTimeout(__requestQueue[id + ns]);
+  __requestQueue[id + ns] = setTimeout(() => {
+    fn();
+    delete __requestQueue[id + ns];
+  }, 1200) as never as number;
+}
+
+/**
+ * Clear requests for a given ID
+ * @param id Node ID
+ */
+function clearRequests(id: string) {
+  Object.keys(__requestQueue)
+    .filter((key) => key.startsWith(id))
+    .forEach((key) => {
+      clearTimeout(__requestQueue[key]);
+      delete __requestQueue[key];
+    });
 }
 
 export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
@@ -283,6 +299,8 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
         break;
       }
       case "DeleteNode": {
+        clearRequests(action.id);
+
         updateGraph("connections", (connections) =>
           connections.filter(
             (connection) =>
