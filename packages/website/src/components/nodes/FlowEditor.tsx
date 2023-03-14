@@ -9,7 +9,8 @@ import {
   loadNodeTypes,
   Metadata,
   NodeType,
-  GraphChanges
+  GraphChanges,
+  Connection
 } from "~/lib/types";
 import { VariableNode } from "./Node";
 import { NodeSidebar } from "./NodeSidebar";
@@ -116,10 +117,18 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
   function applyChanges(changes: GraphChanges) {
     console.log("Applying changes:");
     console.log(JSON.stringify(changes));
+
+
+    const areConnectionsBetweenSameConnectors = (a: Connection, b: Connection) =>
+      a.input.node_id === b.input.node_id &&
+      a.input.name === b.input.name &&
+      a.output.node_id === b.output.node_id &&
+      a.output.name === b.output.name
+
     updateGraph((graph) => populate({
       nodes: graph.nodes.filter((node) => !changes.removed_nodes.includes(node.id) && !changes.added_nodes.some((added) => added.id === node.id))
         .concat(changes.added_nodes),
-      connections: graph.connections.filter((connection) => !changes.removed_connections.includes(connection) && !changes.added_connections.includes(connection))
+      connections: graph.connections.filter((connection) => !changes.removed_connections.some(c => areConnectionsBetweenSameConnectors(c, connection)) && !changes.added_connections.some(c => areConnectionsBetweenSameConnectors(c, connection)))
         .concat(changes.added_connections),
       metadata: Object.keys(graph.metadata)
         .filter((key) => !changes.removed_metadata.includes(key) && !changes.added_metadata[key])
@@ -178,8 +187,8 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
         break;
       }
       case "MoveNode": {
-        debounceRequest(action.id, "metadata", () =>
-          sendRequest("PATCH", `nodes/${action.id}/metadata`, action.metadata)
+        debounceRequest(action.id, "metadata", async () =>
+          applyChanges(await sendRequest("PATCH", `nodes/${action.id}/metadata`, action.metadata))
         );
 
         updateGraph("metadata", action.id, action.metadata);
