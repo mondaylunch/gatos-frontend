@@ -26,6 +26,7 @@ import {
   FaSolidShuffle,
   FaSolidArrowRightToBracket,
   FaSolidArrowRightFromBracket,
+  FaSolidCommentDots,
 } from "solid-icons/fa";
 
 export const Icons_Dict = {
@@ -56,4 +57,5 @@ export const Icons_Dict = {
   ["value_replacer_Optional[boolean]"]: FaSolidShuffle,
   webhook_start: FaSolidArrowRightToBracket,
   webhook_end: FaSolidArrowRightFromBracket,
+  parse_string_to_number: FaSolidCommentDots,
 };
