@@ -35,7 +35,12 @@ export function RenderConnections(props: { graph: Graph }) {
                 ${inputMetadata.x_pos + inputRect().width / 2} ${
               inputMetadata.y_pos
             }`}
-            class="stroke-white"
+            style={{
+              stroke: `hsl(${parseInt(
+                connection.output.node_id.substring(0, 6),
+                16
+              )}, 90%, 60%)`,
+            }}
             stroke-width="6"
             stroke-linecap="round"
             fill="transparent"
