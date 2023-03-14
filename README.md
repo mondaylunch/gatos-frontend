@@ -28,6 +28,18 @@ Prepare environment for testing:
 pnpm test:install
 ```
 
+Run tests:
+
+```bash
+
+# run basic test to see if the website works
+npx playwright test packages/playwright/__tests__/main-page.spec.ts
+
+# run test to see if the login works
+npx playwright test packages/playwright/__tests__/login.spec.ts
+
+```
+
 Start the dev server in the background:
 
 ```bash

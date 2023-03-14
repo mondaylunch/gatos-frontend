@@ -1,23 +1,15 @@
 import { test as setup } from '@playwright/test';
 
-const authFile = 'user.json';
+const mainURL = "http://localhost:5173/";
+const authFile = ".auth/user.json";
 
-setup('authenticate', async ({ request }) => {
-  // Send authentication request. Replace with your own.
-  await request.post("http://localhost:5173/signup", {
-    form: {
-        'username': 'username',
-        'email': 'email',
-        'password': 'password',
-        'confirm-password': 'password'
-    }
+setup('authenticate', async ({ page }) => {
+  await page.goto(mainURL);
+  await page.click("text=Login or Sign Up");
+  await page.click("text=Sign in with Auth0");
+  await page.getByLabel("Email address").fill("username");
+  await page.getByLabel("Password").fill("password");
+  await page.click("text=Continue");
+  await page.context().storageState({ path: authFile });
 
-    })
-  await request.post("http://localhost:5173/login", {
-    form: {
-      'email': 'email',
-      'password': 'password'
-    }
-  });
-  await request.storageState({ path: authFile });
 });

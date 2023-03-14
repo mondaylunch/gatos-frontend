@@ -1,29 +1,44 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, Page } from "@playwright/test";
 
-const URL = "http://localhost:5173/login";
+const mainURL = "http://localhost:5173/";
+const dashURL = "http://localhost:5173/dash";
+const flowURL = "http://localhost:5173/flows/1";
 
-test.beforeEach(async ({page}, testInfo) => {
-    await page.goto(URL);
+test.describe.configure({ mode: 'serial' });
+
+let page: Page;
+
+test.beforeAll(async ({ browser }) => {
+    page = await browser.newPage();
+    await page.goto(mainURL);
 });
 
-test("page has two buttons", async ({ page }) => {
-    const all_buttons = await page.locator("button").count();
-    expect(all_buttons).toBe(2);
+test.afterAll(async () => {
+    await page.close();
 });
 
-test("page has 2 fields", async ({ page }) => {
-    const all_fields = await page.locator("input").count();
-    expect(all_fields).toBe(2);
+test("it loads dashboard", async ({ page }) => {
+    await page.goto(mainURL);
+    await page.click("text=Login or Sign Up");
+    await page.click("text=Sign in with Auth0");
+    const emailInput = page.getByLabel("Email address");
+    await emailInput.type("amongus@example.com");
+    const passwordInput = page.getByLabel("Password");
+    await passwordInput.type("TestPass123");
+    await passwordInput.press("Enter");
+    await page.goto(dashURL);
+    await expect(page).toHaveScreenshot();
 });
 
-test("page has the correct email field", async ({ page }) => {
-    const email_address = page.locator(`[name=email]`);
-    expect(email_address).toBeEmpty();
-    await expect(email_address).toHaveAttribute("type", "email");
-});
-
-test("page has the correct password field", async ({ page }) => {
-    const password = page.locator(`[name=password]`);
-    await expect(password).toBeEmpty();
-    await expect(password).toHaveAttribute("type", "password");
+test("it loads flow page", async ({ page }) => {
+    await page.goto(mainURL);
+    await page.click("text=Login or Sign Up");
+    await page.click("text=Sign in with Auth0");
+    const emailInput = page.getByLabel("Email address");
+    await emailInput.type("amongus@example.com");
+    const passwordInput = page.getByLabel("Password");
+    await passwordInput.type("TestPass123");
+    await passwordInput.press("Enter");
+    await page.goto(flowURL);
+    await expect (page).toHaveScreenshot();
 });
