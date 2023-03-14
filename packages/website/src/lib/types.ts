@@ -85,6 +85,15 @@ export type Flow = {
   graph: Graph;
 };
 
+export type GraphChanges = {
+  removed_nodes: string[];
+  added_nodes: Node[];
+  removed_connections: Connection[];
+  added_connections: Connection[];
+  removed_metadata: string[];
+  added_metadata: Record<string, Metadata>;
+}
+
 export const NODE_TYPE_REGISTRY: Record<string, NodeType> = {};
 
 export function loadNodeTypes(types: NodeType[]) {

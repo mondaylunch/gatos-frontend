@@ -8,10 +8,8 @@ import {
   Graph,
   loadNodeTypes,
   Metadata,
-  Node,
   NodeType,
-  SAMPLE_FLOW_DATA,
-  Setting,
+  GraphChanges
 } from "~/lib/types";
 import { VariableNode } from "./Node";
 import { NodeSidebar } from "./NodeSidebar";
@@ -115,6 +113,20 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
   const [selectedNode, setSelected] = createSignal<string>();
   const [_, sendBackendRequest] = createBackendFetchAction();
 
+  function applyChanges(changes: GraphChanges) {
+    console.log("Applying changes:");
+    console.log(JSON.stringify(changes));
+    updateGraph((graph) => populate({
+      nodes: graph.nodes.filter((node) => !changes.removed_nodes.includes(node.id) && !changes.added_nodes.some((added) => added.id === node.id))
+        .concat(changes.added_nodes),
+      connections: graph.connections.filter((connection) => !changes.removed_connections.includes(connection) && !changes.added_connections.includes(connection))
+        .concat(changes.added_connections),
+      metadata: Object.keys(graph.metadata)
+        .filter((key) => !changes.removed_metadata.includes(key) && !changes.added_metadata[key])
+        .reduce((acc, key) => ({ ...acc, [key]: graph.metadata[key] }), changes.added_metadata)
+    }));
+  }
+
   /**
    * Send a request
    * @param method Method request
@@ -138,7 +150,7 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
       },
     });
 
-    return body ? await res.then((res) => res.json()) : undefined;
+    return await res.then((res) => res.json());
   }
 
   /**
@@ -148,17 +160,20 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
   async function executeAction(action: GraphAction) {
     switch (action.type) {
       case "CreateNode": {
-        const node: Node = await sendRequest("POST", `nodes`, {
+        const changes: GraphChanges = await sendRequest("POST", `nodes`, {
           type: action.nodeType,
         });
 
-        executeAction({
-          type: "MoveNode",
-          id: node.id,
-          metadata: action.metadata,
-        });
+        applyChanges(changes)
 
-        updateGraph("nodes", (nodes) => [...nodes, node]);
+        const node = changes.added_nodes[0];
+        if (node) {
+          executeAction({
+            type: "MoveNode",
+            id: node.id,
+            metadata: action.metadata,
+          });
+        }
 
         break;
       }
@@ -188,12 +203,12 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
           },
         ]);
 
-        await sendRequest("POST", `connections`, {
+        applyChanges(await sendRequest("POST", `connections`, {
           from_node_id: action.output.id,
           from_name: action.output.name,
           to_node_id: action.input.id,
           to_name: action.input.name,
-        });
+        }));
 
         break;
       }
@@ -210,13 +225,13 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
           nodes.filter((node) => node.id !== action.id)
         );
 
-        await sendRequest("DELETE", `nodes/${action.id}`);
+        applyChanges(await sendRequest("DELETE", `nodes/${action.id}`));
 
         break;
       }
       case "UpdateSettingsKey": {
         const existingNode = graph.nodes.find((node) => node.id === action.id)!;
-        const node: Node = await sendRequest(
+        applyChanges(await sendRequest(
           "PATCH",
           `nodes/${action.id}/settings`,
           {
@@ -225,12 +240,7 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
               value: action.value,
             },
           }
-        );
-
-        updateGraph("nodes", (nodes) => [
-          ...nodes.filter((node) => node.id !== action.id),
-          node,
-        ]);
+        ));
 
         break;
       }
