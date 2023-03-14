@@ -78,7 +78,6 @@ export function SettingsSidebar(props: SidebarProps) {
               props.updateGraph({ type: "DeleteNode", id: selected()! });
             }}
           >
-            <FaSolidXmark size={22} color="#e11d48" />
             Delete Node
           </button>
         </div>
