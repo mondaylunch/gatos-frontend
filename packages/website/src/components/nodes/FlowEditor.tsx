@@ -8,10 +8,10 @@ import {
   Graph,
   loadNodeTypes,
   Metadata,
-  Node,
   NodeType,
-  SAMPLE_FLOW_DATA,
-  Setting,
+  GraphChanges,
+  Connection,
+  Connector,
 } from "~/lib/types";
 import { VariableNode } from "./Node";
 import { NodeSidebar } from "./NodeSidebar";
@@ -20,10 +20,10 @@ import { RenderNodes } from "./RenderNodes";
 import { InteractiveCanvas } from "../editor/InteractiveCanvas";
 import { SettingsSidebar } from "./SettingsSidebar";
 import { createSignal, Match, onCleanup, Switch } from "solid-js";
-import { ENDPOINT } from "~/lib/env";
-import { user } from "~/lib/session";
 import { NodeTypeDrag } from "~/components/editor/NodeTypeDrag";
 import { createBackendFetchAction } from "~/lib/backend";
+import isEqual from "lodash.isequal";
+import pickBy from "lodash.pickby";
 
 /**
  * Populate Graph with missing metadata
@@ -105,8 +105,24 @@ const __requestQueue: Record<string, number> = {};
  * @param fn Function
  */
 function debounceRequest(id: string, ns: string, fn: () => void) {
-  clearTimeout(__requestQueue[ns + id]);
-  __requestQueue[ns + id] = setTimeout(fn, 1200) as never as number;
+  clearTimeout(__requestQueue[id + ns]);
+  __requestQueue[id + ns] = setTimeout(() => {
+    fn();
+    delete __requestQueue[id + ns];
+  }, 1200) as never as number;
+}
+
+/**
+ * Clear requests for a given ID
+ * @param id Node ID
+ */
+function clearRequests(id: string) {
+  Object.keys(__requestQueue)
+    .filter((key) => key.startsWith(id))
+    .forEach((key) => {
+      clearTimeout(__requestQueue[key]);
+      delete __requestQueue[key];
+    });
 }
 
 export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
@@ -114,6 +130,74 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
   const [graph, updateGraph] = createStore<Graph>(populate(props.flow.graph));
   const [selectedNode, setSelected] = createSignal<string>();
   const [_, sendBackendRequest] = createBackendFetchAction();
+
+  function applyChanges(changes: GraphChanges) {
+    console.info(changes);
+
+    const compareKeys = new Set(["node_id", "name"]);
+    const hasKey = (_: never, key: string) => compareKeys.has(key);
+    const connectorEqual = (a: Connector, b: Connector) =>
+      isEqual(pickBy(a, hasKey), pickBy(b, hasKey));
+    const connectionsEqual = (a: Connection, b: Connection) =>
+      connectorEqual(a.input, b.input) && connectorEqual(a.output, b.output);
+
+    // Remove connections
+    for (const connection of changes.removed_connections) {
+      updateGraph("connections", (connections) =>
+        connections.filter((entry) => !connectionsEqual(connection, entry))
+      );
+    }
+
+    // Remove nodes
+    for (const node_id of changes.removed_nodes) {
+      updateGraph("nodes", (nodes) =>
+        nodes.filter((node) => node.id !== node_id)
+      );
+    }
+
+    // Add metadata
+    for (const node_id of Object.keys(changes.added_metadata)) {
+      updateGraph("metadata", node_id, changes.added_metadata[node_id]);
+    }
+
+    // Add nodes
+    for (const node of changes.added_nodes) {
+      updateGraph("nodes", (nodes) => {
+        // Try to edit the node "in-place"
+        let found = false;
+        const newList = nodes.map((entry) => {
+          if (entry.id === node.id) {
+            found = true;
+            return node;
+          }
+
+          return entry;
+        });
+
+        return found ? newList : [...newList, node];
+      });
+    }
+
+    // Add connections
+    for (const connection of changes.added_connections) {
+      updateGraph("connections", (connections) => {
+        // Try to edit the connection "in-place"
+        let found = false;
+        const newList = connections.map((entry) => {
+          if (connectionsEqual(connection, entry)) {
+            found = true;
+            return connection;
+          }
+
+          return entry;
+        });
+
+        return found ? newList : [...newList, connection];
+      });
+    }
+
+    // We do not remove metadata from the client because we don't need to
+  }
 
   /**
    * Send a request
@@ -138,7 +222,13 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
       },
     });
 
-    return body ? await res.then((res) => res.json()) : undefined;
+    return await res.then((res) =>
+      res.ok
+        ? res.json()
+        : res.json().then((res) => {
+            throw res;
+          })
+    );
   }
 
   /**
@@ -148,23 +238,32 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
   async function executeAction(action: GraphAction) {
     switch (action.type) {
       case "CreateNode": {
-        const node: Node = await sendRequest("POST", `nodes`, {
+        const changes: GraphChanges = await sendRequest("POST", `nodes`, {
           type: action.nodeType,
         });
 
-        executeAction({
-          type: "MoveNode",
-          id: node.id,
-          metadata: action.metadata,
-        });
+        applyChanges(changes);
 
-        updateGraph("nodes", (nodes) => [...nodes, node]);
+        const node = changes.added_nodes[0];
+        if (node) {
+          executeAction({
+            type: "MoveNode",
+            id: node.id,
+            metadata: action.metadata,
+          });
+        }
 
         break;
       }
       case "MoveNode": {
-        debounceRequest(action.id, "metadata", () =>
-          sendRequest("PATCH", `nodes/${action.id}/metadata`, action.metadata)
+        debounceRequest(action.id, "metadata", async () =>
+          applyChanges(
+            await sendRequest(
+              "PATCH",
+              `nodes/${action.id}/metadata`,
+              action.metadata
+            )
+          )
         );
 
         updateGraph("metadata", action.id, action.metadata);
@@ -188,16 +287,20 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
           },
         ]);
 
-        await sendRequest("POST", `connections`, {
-          from_node_id: action.output.id,
-          from_name: action.output.name,
-          to_node_id: action.input.id,
-          to_name: action.input.name,
-        });
+        applyChanges(
+          await sendRequest("POST", `connections`, {
+            from_node_id: action.output.id,
+            from_name: action.output.name,
+            to_node_id: action.input.id,
+            to_name: action.input.name,
+          })
+        );
 
         break;
       }
       case "DeleteNode": {
+        clearRequests(action.id);
+
         updateGraph("connections", (connections) =>
           connections.filter(
             (connection) =>
@@ -210,27 +313,20 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
           nodes.filter((node) => node.id !== action.id)
         );
 
-        await sendRequest("DELETE", `nodes/${action.id}`);
+        applyChanges(await sendRequest("DELETE", `nodes/${action.id}`));
 
         break;
       }
       case "UpdateSettingsKey": {
         const existingNode = graph.nodes.find((node) => node.id === action.id)!;
-        const node: Node = await sendRequest(
-          "PATCH",
-          `nodes/${action.id}/settings`,
-          {
+        applyChanges(
+          await sendRequest("PATCH", `nodes/${action.id}/settings`, {
             [action.key]: {
               ...existingNode.settings[action.key],
               value: action.value,
             },
-          }
+          })
         );
-
-        updateGraph("nodes", (nodes) => [
-          ...nodes.filter((node) => node.id !== action.id),
-          node,
-        ]);
 
         break;
       }
