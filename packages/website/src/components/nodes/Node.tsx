@@ -15,11 +15,13 @@ export function ProcessNode(props: {
         <div
           class={`group relative w-72 rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center`}
         >
-          <div class="group flex-1 p-4 flex-col items-center justify-center text-left">
-            <p class="flex-col font-bold text-black select-none">
+          <div class="group flex-1 p-4 flex-col items-center justify-center text-center">
+            <p class="flex-col font-bold text-black select-none text-2xl">
               {props.title}
             </p>
-            {props.children}
+            <div class="flex flex-col items-center justify-center gap-2 w-full">
+              {props.children}
+            </div>
           </div>
         </div>
       }
@@ -28,11 +30,13 @@ export function ProcessNode(props: {
         <div
           class={`group relative w-72 rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center outline outline-4 outline-indigo-500`}
         >
-          <div class="group flex-1 p-4 flex-col items-center justify-center text-left">
-            <p class="flex-col font-bold text-black select-none">
+          <div class="group flex-1 p-4 flex-col items-center justify-center text-center">
+            <p class="flex-col font-bold text-black select-none text-2xl">
               {props.title}
             </p>
-            {props.children}
+            <div class="flex flex-col items-center justify-center gap-2 w-full">
+              {props.children}
+            </div>
           </div>
         </div>
       </Match>
@@ -45,7 +49,7 @@ export function ProcessNode(props: {
  */
 export function VariableDropZone(props: { children?: JSX.Element }) {
   return (
-    <div class="flex-col flex-1 p-2 min-h-fit w-full rounded-[35px] bg-neutral-800 flex align-text-top justify-center place-content-stretch">
+    <div class="flex-col flex-1 p-2 min-h-fit w-full rounded-[35px] bg-neutral-800 flex align-text-top justify-center place-content-stretch text-white font-bold capitalize">
       {props.children}
     </div>
   );
@@ -116,22 +120,26 @@ export function OutputNode(props: { title: string; children?: JSX.Element }) {
   return (
     <Switch
       fallback={
-        <div
-          class={`rounded-b-full h-32 w-64 flex bg-neutral-900 items-center justify-center flex-col`}
-        >
-          <p class="flex-col font-bold text-white select-none">{props.title}</p>
-          <div class="flex flex-col text-center items-center text-white">
+        <div class="rounded-b-full relative w-max h-max bg-slate-600 flex items-center justify-center flex-col p-2 pb-12">
+          <div class="flex flex-col text-center items-center">
+            <p class="flex-col font-bold text-white select-none text-2xl capitalize pt-2">
+              {props.title}
+            </p>
+          </div>
+          <div class="flex flex-col text-center items-center p-2 gap-2">
             {props.children}
           </div>
         </div>
       }
     >
       <Match when={isSelected?.()}>
-        <div
-          class={`rounded-b-full h-32 w-64 flex bg-neutral-900 items-center justify-center flex-col outline outline-4 outline-indigo-500`}
-        >
-          <p class="flex-col font-bold text-white select-none">{props.title}</p>
-          <div class="flex flex-col text-center items-center text-white">
+        <div class="rounded-b-full relative w-max h-max bg-slate-600 flex items-center justify-center flex-col outline outline-4 outline-indigo-600 p-2 pb-12">
+          <div class="flex flex-col text-center items-center">
+            <p class="flex-col font-bold text-white select-none text-2xl capitalize pt-2">
+              {props.title}
+            </p>
+          </div>
+          <div class="flex flex-col text-center items-center p-2 gap-2">
             {props.children}
           </div>
         </div>
