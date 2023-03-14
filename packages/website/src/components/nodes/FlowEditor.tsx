@@ -10,7 +10,8 @@ import {
   Metadata,
   NodeType,
   GraphChanges,
-  Connection
+  Connection,
+  Connector,
 } from "~/lib/types";
 import { VariableNode } from "./Node";
 import { NodeSidebar } from "./NodeSidebar";
@@ -19,10 +20,10 @@ import { RenderNodes } from "./RenderNodes";
 import { InteractiveCanvas } from "../editor/InteractiveCanvas";
 import { SettingsSidebar } from "./SettingsSidebar";
 import { createSignal, Match, onCleanup, Switch } from "solid-js";
-import { ENDPOINT } from "~/lib/env";
-import { user } from "~/lib/session";
 import { NodeTypeDrag } from "~/components/editor/NodeTypeDrag";
 import { createBackendFetchAction } from "~/lib/backend";
+import isEqual from "lodash.isequal";
+import pickBy from "lodash.pickby";
 
 /**
  * Populate Graph with missing metadata
@@ -115,25 +116,71 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
   const [_, sendBackendRequest] = createBackendFetchAction();
 
   function applyChanges(changes: GraphChanges) {
-    console.log("Applying changes:");
-    console.log(JSON.stringify(changes));
+    console.info(changes);
 
+    const compareKeys = new Set(["node_id", "name"]);
+    const hasKey = (_: never, key: string) => compareKeys.has(key);
+    const connectorEqual = (a: Connector, b: Connector) =>
+      isEqual(pickBy(a, hasKey), pickBy(b, hasKey));
+    const connectionsEqual = (a: Connection, b: Connection) =>
+      connectorEqual(a.input, b.input) && connectorEqual(a.output, b.output);
 
-    const areConnectionsBetweenSameConnectors = (a: Connection, b: Connection) =>
-      a.input.node_id === b.input.node_id &&
-      a.input.name === b.input.name &&
-      a.output.node_id === b.output.node_id &&
-      a.output.name === b.output.name
+    // Remove connections
+    for (const connection of changes.removed_connections) {
+      updateGraph("connections", (connections) =>
+        connections.filter((entry) => !connectionsEqual(connection, entry))
+      );
+    }
 
-    updateGraph((graph) => populate({
-      nodes: graph.nodes.filter((node) => !changes.removed_nodes.includes(node.id) && !changes.added_nodes.some((added) => added.id === node.id))
-        .concat(changes.added_nodes),
-      connections: graph.connections.filter((connection) => !changes.removed_connections.some(c => areConnectionsBetweenSameConnectors(c, connection)) && !changes.added_connections.some(c => areConnectionsBetweenSameConnectors(c, connection)))
-        .concat(changes.added_connections),
-      metadata: Object.keys(graph.metadata)
-        .filter((key) => !changes.removed_metadata.includes(key) && !changes.added_metadata[key])
-        .reduce((acc, key) => ({ ...acc, [key]: graph.metadata[key] }), changes.added_metadata)
-    }));
+    // Remove nodes
+    for (const node_id of changes.removed_nodes) {
+      updateGraph("nodes", (nodes) =>
+        nodes.filter((node) => node.id !== node_id)
+      );
+    }
+
+    // Add metadata
+    for (const node_id of Object.keys(changes.added_metadata)) {
+      updateGraph("metadata", node_id, changes.added_metadata[node_id]);
+    }
+
+    // Add nodes
+    for (const node of changes.added_nodes) {
+      updateGraph("nodes", (nodes) => {
+        // Try to edit the node "in-place"
+        let found = false;
+        const newList = nodes.map((entry) => {
+          if (entry.id === node.id) {
+            found = true;
+            return node;
+          }
+
+          return entry;
+        });
+
+        return found ? newList : [...newList, node];
+      });
+    }
+
+    // Add connections
+    for (const connection of changes.added_connections) {
+      updateGraph("connections", (connections) => {
+        // Try to edit the connection "in-place"
+        let found = false;
+        const newList = connections.map((entry) => {
+          if (connectionsEqual(connection, entry)) {
+            found = true;
+            return connection;
+          }
+
+          return entry;
+        });
+
+        return found ? newList : [...newList, connection];
+      });
+    }
+
+    // We do not remove metadata from the client because we don't need to
   }
 
   /**
@@ -159,7 +206,13 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
       },
     });
 
-    return await res.then((res) => res.json());
+    return await res.then((res) =>
+      res.ok
+        ? res.json()
+        : res.json().then((res) => {
+            throw res;
+          })
+    );
   }
 
   /**
@@ -173,7 +226,7 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
           type: action.nodeType,
         });
 
-        applyChanges(changes)
+        applyChanges(changes);
 
         const node = changes.added_nodes[0];
         if (node) {
@@ -188,7 +241,13 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
       }
       case "MoveNode": {
         debounceRequest(action.id, "metadata", async () =>
-          applyChanges(await sendRequest("PATCH", `nodes/${action.id}/metadata`, action.metadata))
+          applyChanges(
+            await sendRequest(
+              "PATCH",
+              `nodes/${action.id}/metadata`,
+              action.metadata
+            )
+          )
         );
 
         updateGraph("metadata", action.id, action.metadata);
@@ -212,12 +271,14 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
           },
         ]);
 
-        applyChanges(await sendRequest("POST", `connections`, {
-          from_node_id: action.output.id,
-          from_name: action.output.name,
-          to_node_id: action.input.id,
-          to_name: action.input.name,
-        }));
+        applyChanges(
+          await sendRequest("POST", `connections`, {
+            from_node_id: action.output.id,
+            from_name: action.output.name,
+            to_node_id: action.input.id,
+            to_name: action.input.name,
+          })
+        );
 
         break;
       }
@@ -240,16 +301,14 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
       }
       case "UpdateSettingsKey": {
         const existingNode = graph.nodes.find((node) => node.id === action.id)!;
-        applyChanges(await sendRequest(
-          "PATCH",
-          `nodes/${action.id}/settings`,
-          {
+        applyChanges(
+          await sendRequest("PATCH", `nodes/${action.id}/settings`, {
             [action.key]: {
               ...existingNode.settings[action.key],
               value: action.value,
             },
-          }
-        ));
+          })
+        );
 
         break;
       }
