@@ -362,7 +362,7 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
       <Switch>
         <Match when={ref.type === "Variable"}>
           <VariableNode
-            name={(ref as Grabbable & { type: "Variable" }).id}
+            name={(ref as Grabbable & { type: "Variable" }).name}
             id={(ref as Grabbable & { type: "Variable" }).id}
           />
         </Match>

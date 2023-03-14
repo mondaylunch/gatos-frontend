@@ -3,6 +3,7 @@ import { For, Match, Switch, useContext } from "solid-js";
 import { SelectedElementContext } from "../editor/InteractiveCanvas";
 import { FormInput } from "../forms/FormInput";
 import { GraphAction } from "./FlowEditor";
+import { FaSolidXmark } from "solid-icons/fa";
 
 interface SidebarProps {
   graph: Graph;
@@ -71,6 +72,14 @@ export function SettingsSidebar(props: SidebarProps) {
               );
             }}
           </For>
+          <button
+            class="bg-red-600 p-2 rounded-lg flex z-10 items-center justify-center font-bold "
+            onClick={() => {
+              props.updateGraph({ type: "DeleteNode", id: selected()! });
+            }}
+          >
+            Delete Node
+          </button>
         </div>
       </Match>
     </Switch>
