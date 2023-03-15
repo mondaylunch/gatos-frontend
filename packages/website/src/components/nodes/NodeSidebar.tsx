@@ -53,7 +53,7 @@ function loadNodeTypes() {
 export function NodeSidebar() {
   loadNodeTypes();
   return (
-    <div class="w-[240px] bg-neutral-700 min-h-0 ">
+    <div class="w-[240px] bg-neutral-700 min-h-0" style="overflow-y: auto;">
       <div class="flex flex-col gap-2 pl-2 pr-2">
         <For each={nodeTypes()}>
           {(nodeType) => {

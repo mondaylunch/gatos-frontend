@@ -70,6 +70,7 @@ export function RenderNodes(props: { graph: Graph }) {
                                     {(connection) => (
                                       <VariableNode
                                         name={connection.output.name}
+                                        id={connection.output.node_id}
                                       />
                                     )}
                                   </For>
@@ -95,6 +96,7 @@ export function RenderNodes(props: { graph: Graph }) {
                       >
                         <VariableNode
                           name={`${output}: ${node.outputs[output].type}`}
+                          id={node.id}
                         />
                       </div>
                     )}

@@ -113,7 +113,7 @@ export function Navbar() {
                       </button>
                       <Show when={dropdownVisible()}>
                         <div
-                          class="absolute right-0 z-10 mt-2 w-32 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none transition ease-in-out duration-500"
+                          class="absolute right-0 z-10 mt-2 w-fit origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none transition ease-in-out duration-500 whitespace-nowrap"
                           role="menu"
                           aria-orientation="vertical"
                           aria-labelledby="user-menu-button"
@@ -130,10 +130,10 @@ export function Navbar() {
                           </a>
                           <button
                             onClick={() => signOut()}
-                            class="block px-4 py-2 text-sm text-gray-700 text-right hover:bg-gray-300 transition ease-in-out duration-150"
+                            class="block px-4 py-2 w-full text-sm text-gray-700 text-right hover:bg-gray-300 transition ease-in-out duration-150"
                             role="menuitem"
-                            tabindex="-1"
-                            id="user-menu-item-2"
+                            tabindex="0"
+                            id="user-menu-item-1"
                           >
                             Logout
                           </button>
