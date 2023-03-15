@@ -58,9 +58,19 @@ export function RenderNodes(props: { graph: Graph }) {
 
                       return (
                         <>
-                          <span>
-                            {inputName}: {node.inputs[inputName].type}
-                          </span>
+                          <Switch
+                            fallback={
+                              <div class="text-white font-medium capitalize">
+                                {inputName}: {node.inputs[inputName].type}
+                              </div>
+                            }
+                          >
+                            <Match when={nodeType.category == "process"}>
+                              <div class="text-black font-medium capitalize">
+                                {inputName}: {node.inputs[inputName].type}
+                              </div>
+                            </Match>
+                          </Switch>
                           <VariableDropZone>
                             {/** @ts-expect-error directives are not supported */}
                             <div use:dropZone={`node:${node.id}:${inputName}`}>
@@ -70,6 +80,7 @@ export function RenderNodes(props: { graph: Graph }) {
                                     {(connection) => (
                                       <VariableNode
                                         name={connection.output.name}
+                                        id={connection.output.node_id}
                                       />
                                     )}
                                   </For>
@@ -95,6 +106,7 @@ export function RenderNodes(props: { graph: Graph }) {
                       >
                         <VariableNode
                           name={`${output}: ${node.outputs[output].type}`}
+                          id={node.id}
                         />
                       </div>
                     )}

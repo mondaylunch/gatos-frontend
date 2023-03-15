@@ -1,6 +1,8 @@
-import { JSX, Show, Match, Switch } from "solid-js";
+import { JSX, Match, Switch } from "solid-js";
 import { useSelfSelected } from "../editor/InteractiveCanvas";
-
+import getTextColour from "~/components/shared/TextColour";
+import { Icons_Dict } from "../shared/NodeIcons";
+import { FaSolidCircleQuestion } from "solid-icons/fa";
 /**
  * Node signifying given data is processed
  */
@@ -9,18 +11,40 @@ export function ProcessNode(props: {
   children?: JSX.Element;
 }) {
   const isSelected = useSelfSelected();
+  const IconFetch = Icons_Dict[props.title as keyof typeof Icons_Dict];
+  const Icon = (
+    <Switch
+      fallback={
+        <div>
+          <FaSolidCircleQuestion size={40} fill="red-700" />
+        </div>
+      }
+    >
+      <Match when={IconFetch}>
+        <IconFetch size={40} />
+      </Match>
+    </Switch>
+  );
+
+  const sharedContent = (
+    <div class="group flex-1 p-2 flex-col items-center justify-center text-center">
+      <div class="flex items-center justify-center gap-2">{Icon}</div>
+      <p class="flex-col font-bold text-black select-none text-2xl">
+        {props.title}
+      </p>
+      <div class="flex flex-col items-center justify-center gap-2 w-full">
+        {props.children}
+      </div>
+    </div>
+  );
+
   return (
     <Switch
       fallback={
         <div
           class={`group relative w-72 rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center`}
         >
-          <div class="group flex-1 p-4 flex-col items-center justify-center text-left">
-            <p class="flex-col font-bold text-black select-none">
-              {props.title}
-            </p>
-            {props.children}
-          </div>
+          {sharedContent}
         </div>
       }
     >
@@ -28,12 +52,7 @@ export function ProcessNode(props: {
         <div
           class={`group relative w-72 rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center outline outline-4 outline-indigo-500`}
         >
-          <div class="group flex-1 p-4 flex-col items-center justify-center text-left">
-            <p class="flex-col font-bold text-black select-none">
-              {props.title}
-            </p>
-            {props.children}
-          </div>
+          {sharedContent}
         </div>
       </Match>
     </Switch>
@@ -45,7 +64,7 @@ export function ProcessNode(props: {
  */
 export function VariableDropZone(props: { children?: JSX.Element }) {
   return (
-    <div class="flex-col flex-1 p-2 min-h-fit w-full rounded-[35px] bg-neutral-800 flex align-text-top justify-center place-content-stretch">
+    <div class="flex-col flex-1 p-2 min-h-fit w-full rounded-[35px] bg-neutral-800 flex align-text-top justify-center place-content-stretch text-white font-bold capitalize">
       {props.children}
     </div>
   );
@@ -54,9 +73,16 @@ export function VariableDropZone(props: { children?: JSX.Element }) {
 /**
  * Node variable
  */
-export function VariableNode(props: { name: JSX.Element }) {
+export function VariableNode(props: { name: JSX.Element; id: string }) {
+  const bgHue = parseInt(props.id.substring(0, 6), 16);
   return (
-    <div class="text-white p-4 h-8 rounded-[35px] bg-rose-500 flex items-center justify-center place-content-stretch">
+    <div
+      class="p-4 h-8 rounded-[35px] flex items-center justify-center place-content-stretch"
+      style={{
+        background: `hsl(${bgHue}, 90%, 60%)`,
+        color: `${getTextColour(bgHue)}`,
+      }}
+    >
       <p class="font-bold select-none">{props.name}</p>
     </div>
   );
@@ -73,22 +99,26 @@ export function InputNode(props: {
   return (
     <Switch
       fallback={
-        <div
-          class={`rounded-t-full h-32 w-64 flex bg-neutral-900 items-center justify-center flex-col`}
-        >
-          <p class="flex-col font-bold text-white select-none">{props.title}</p>
-          <div class="flex flex-col text-center items-center text-white">
+        <div class="rounded-t-full relative w-max h-max bg-slate-600 flex items-center justify-center flex-col p-2">
+          <div class="flex flex-col text-center items-center">
+            <p class="flex-col font-bold text-white select-none text-2xl capitalize pt-4">
+              {props.title}
+            </p>
+          </div>
+          <div class="flex flex-col text-center items-center p-2 gap-2">
             {props.children}
           </div>
         </div>
       }
     >
       <Match when={isSelected?.()}>
-        <div
-          class={`rounded-t-full h-32 w-64 flex bg-neutral-900 items-center justify-center flex-col outline outline-4 outline-indigo-500`}
-        >
-          <p class="flex-col font-bold text-white select-none">{props.title}</p>
-          <div class="flex flex-col text-center items-center text-white">
+        <div class="rounded-t-full relative w-max h-max bg-slate-600 flex items-center justify-center flex-col outline outline-4 outline-indigo-600 p-2">
+          <div class="flex flex-col text-center items-center">
+            <p class="flex-col font-bold text-white select-none text-2xl capitalize pt-4">
+              {props.title}
+            </p>
+          </div>
+          <div class="flex flex-col text-center items-center p-2 gap-2">
             {props.children}
           </div>
         </div>
@@ -105,22 +135,26 @@ export function OutputNode(props: { title: string; children?: JSX.Element }) {
   return (
     <Switch
       fallback={
-        <div
-          class={`rounded-b-full h-32 w-64 flex bg-neutral-900 items-center justify-center flex-col`}
-        >
-          <p class="flex-col font-bold text-white select-none">{props.title}</p>
-          <div class="flex flex-col text-center items-center text-white">
+        <div class="rounded-b-full relative w-max h-max bg-slate-600 flex items-center justify-center flex-col p-2 pb-12">
+          <div class="flex flex-col text-center items-center">
+            <p class="flex-col font-bold text-white select-none text-2xl capitalize pt-2">
+              {props.title}
+            </p>
+          </div>
+          <div class="flex flex-col text-center items-center p-2 gap-2">
             {props.children}
           </div>
         </div>
       }
     >
       <Match when={isSelected?.()}>
-        <div
-          class={`rounded-b-full h-32 w-64 flex bg-neutral-900 items-center justify-center flex-col outline outline-4 outline-indigo-500`}
-        >
-          <p class="flex-col font-bold text-white select-none">{props.title}</p>
-          <div class="flex flex-col text-center items-center text-white">
+        <div class="rounded-b-full relative w-max h-max bg-slate-600 flex items-center justify-center flex-col outline outline-4 outline-indigo-600 p-2 pb-12">
+          <div class="flex flex-col text-center items-center">
+            <p class="flex-col font-bold text-white select-none text-2xl capitalize pt-2">
+              {props.title}
+            </p>
+          </div>
+          <div class="flex flex-col text-center items-center p-2 gap-2">
             {props.children}
           </div>
         </div>
