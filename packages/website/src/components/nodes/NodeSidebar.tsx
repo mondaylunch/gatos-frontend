@@ -57,8 +57,8 @@ export function NodeSidebar() {
       <div class="flex flex-col gap-2 pl-2 pr-2">
         <For each={nodeTypes()}>
           {(nodeType) => {
-            // @ts-expect-error directives are not supported
             return (
+              // @ts-expect-error directives are not supported
               <div use:grabSource={{ type: "NodeType", node: nodeType }}>
                 <NodeTypeDrag name={nodeType.name} />
               </div>
