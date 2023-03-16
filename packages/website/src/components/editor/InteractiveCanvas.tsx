@@ -14,6 +14,7 @@ import {
 import { Portal } from "solid-js/web";
 import { Canvas } from "./Canvas";
 import { CanvasContext } from "./context";
+import isEqual from "lodash.isequal";
 
 type Props<MoveRef, GrabRef, SelectRef> = {
   /**
@@ -107,6 +108,11 @@ function searchForDropZone(clientX: number, clientY: number) {
 }
 
 /**
+ * Provide the currently grabbed element information
+ */
+export const GrabbedSignalContext = createContext<Accessor<any>>();
+
+/**
  * Provide the currently selected element information
  */
 export const SelectedElementContext = createContext<Signal<string>>();
@@ -122,8 +128,7 @@ export const SelectionSignalContext = createContext<Accessor<boolean>>();
  * @returns Accessor
  */
 export function useSelected<SelectRef>(id: SelectRef) {
-  // TODO: for complex types, this needs equalsDeep
-  return () => useContext(SelectedElementContext)![0]() === id;
+  return () => isEqual(useContext(SelectedElementContext)![0](), id);
 }
 
 /**
@@ -214,49 +219,51 @@ export function InteractiveCanvas<M, G, S>(props: Props<M, G, S>) {
         },
       }}
     >
-      <SelectedElementContext.Provider value={selected as Signal<any>}>
-        <div
-          {...props.containerProps}
-          onMouseMove={(e) => {
-            // Check if we are moving an element,
-            // if so transform mouse movement and apply.
-            const movingRef = moving();
-            if (movingRef) {
-              props.handleMove(movingRef, [
-                e.movementX / zoomRef!(),
-                e.movementY / zoomRef!(),
-              ]);
-            }
-          }}
-          onMouseLeave={() => setMoving(undefined)}
-        >
-          {props.preCanvas}
-          <Canvas
-            {...props.canvasProps}
-            zoomRef={(ref) => (zoomRef = ref)}
-            transformRef={(ref) => (transformRef = ref)}
-            onMouseDown={() => selected[1](undefined)}
+      <GrabbedSignalContext.Provider value={grabbed}>
+        <SelectedElementContext.Provider value={selected as Signal<any>}>
+          <div
+            {...props.containerProps}
+            onMouseMove={(e) => {
+              // Check if we are moving an element,
+              // if so transform mouse movement and apply.
+              const movingRef = moving();
+              if (movingRef) {
+                props.handleMove(movingRef, [
+                  e.movementX / zoomRef!(),
+                  e.movementY / zoomRef!(),
+                ]);
+              }
+            }}
+            onMouseLeave={() => setMoving(undefined)}
           >
-            {props.children}
-          </Canvas>
-          {props.postCanvas}
-        </div>
-
-        <Show when={grabbed()}>
-          <Portal>
-            <div
-              style={{
-                position: "fixed",
-                left: virtualCoords()[0] + "px",
-                top: virtualCoords()[1] + "px",
-                transform: "translate(-50%, -50%) rotateZ(-3deg)",
-              }}
+            {props.preCanvas}
+            <Canvas
+              {...props.canvasProps}
+              zoomRef={(ref) => (zoomRef = ref)}
+              transformRef={(ref) => (transformRef = ref)}
+              onMouseDown={() => selected[1](undefined)}
             >
-              {props.renderVirtualElement(grabbed()!)}
-            </div>
-          </Portal>
-        </Show>
-      </SelectedElementContext.Provider>
+              {props.children}
+            </Canvas>
+            {props.postCanvas}
+          </div>
+
+          <Show when={grabbed()}>
+            <Portal>
+              <div
+                style={{
+                  position: "fixed",
+                  left: virtualCoords()[0] + "px",
+                  top: virtualCoords()[1] + "px",
+                  transform: "translate(-50%, -50%) rotateZ(-3deg)",
+                }}
+              >
+                {props.renderVirtualElement(grabbed()!)}
+              </div>
+            </Portal>
+          </Show>
+        </SelectedElementContext.Provider>
+      </GrabbedSignalContext.Provider>
     </CanvasContext.Provider>
   );
 }

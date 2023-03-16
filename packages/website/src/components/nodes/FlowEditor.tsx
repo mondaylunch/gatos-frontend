@@ -48,7 +48,15 @@ function populate(
   };
 }
 
-type Grabbable =
+// Check if two connections are equal
+const compareKeys = new Set(["node_id", "name"]);
+const hasKey = (_: never, key: string) => compareKeys.has(key);
+const connectorEqual = (a: Connector, b: Connector) =>
+  isEqual(pickBy(a, hasKey), pickBy(b, hasKey));
+export const connectionsEqual = (a: Connection, b: Connection) =>
+  connectorEqual(a.input, b.input) && connectorEqual(a.output, b.output);
+
+export type Grabbable =
   | {
       type: "NodeType";
       node: NodeType;
@@ -57,6 +65,11 @@ type Grabbable =
       type: "Variable";
       id: string;
       name: string;
+    }
+  | {
+      type: "ExistingConnection";
+      connector: Connector;
+      currentZone: string;
     };
 
 export type GraphAction =
@@ -81,6 +94,10 @@ export type GraphAction =
         name: string;
       };
       dataType: DataType;
+    }
+  | {
+      type: "DisconnectNode";
+      connection: Connection;
     }
   | {
       type: "DeleteNode";
@@ -133,13 +150,6 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
 
   function applyChanges(changes: GraphChanges) {
     console.info(changes);
-
-    const compareKeys = new Set(["node_id", "name"]);
-    const hasKey = (_: never, key: string) => compareKeys.has(key);
-    const connectorEqual = (a: Connector, b: Connector) =>
-      isEqual(pickBy(a, hasKey), pickBy(b, hasKey));
-    const connectionsEqual = (a: Connection, b: Connection) =>
-      connectorEqual(a.input, b.input) && connectorEqual(a.output, b.output);
 
     // Remove connections
     for (const connection of changes.removed_connections) {
@@ -298,6 +308,24 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
 
         break;
       }
+      case "DisconnectNode": {
+        updateGraph("connections", (connections) =>
+          connections.filter(
+            (connection) => !connectionsEqual(connection, action.connection)
+          )
+        );
+
+        applyChanges(
+          await sendRequest("DELETE", `connections`, {
+            from_node_id: action.connection.output.node_id,
+            from_name: action.connection.output.name,
+            to_node_id: action.connection.input.node_id,
+            to_name: action.connection.input.name,
+          })
+        );
+
+        break;
+      }
       case "DeleteNode": {
         clearRequests(action.id);
 
@@ -359,15 +387,44 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
    * @param ref Reference object
    * @param targetNodeId Target drop zone
    */
-  function handleDrop(
+  async function handleDrop(
     [x_pos, y_pos]: [number, number],
     ref: Grabbable,
     targetNodeId?: string
   ) {
+    if (ref.type === "ExistingConnection") {
+      // If the connection hasn't changed, just ignore.
+      if (targetNodeId === ref.currentZone) return;
+      const [_, nodeId, inputName] = ref.currentZone.split(":");
+
+      // Remove the current connection:
+      executeAction({
+        type: "DisconnectNode",
+        connection: {
+          input: {
+            name: inputName,
+            node_id: nodeId,
+          } as Connector,
+          output: ref.connector,
+        },
+      });
+
+      // Setup the new connection, if applicable.
+      handleDrop(
+        [x_pos, y_pos],
+        {
+          type: "Variable",
+          id: ref.connector.node_id,
+          name: ref.connector.name,
+        },
+        targetNodeId
+      );
+    }
+
     if (ref.type === "Variable" && targetNodeId) {
       const [type, nodeId, inputName] = targetNodeId.split(":");
       if (type === "node") {
-        // Get the node we are connecting to
+        // Get the node we are connecting to:
         const inputNode = graph.nodes.find((node) => node.id === nodeId)!;
         const outputNode = graph.nodes.find((node) => node.id === ref.id)!;
 
@@ -460,6 +517,17 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
           <VariableNode
             name={(ref as Grabbable & { type: "Variable" }).name}
             id={(ref as Grabbable & { type: "Variable" }).id}
+          />
+        </Match>
+        <Match when={ref.type === "ExistingConnection"}>
+          <VariableNode
+            name={
+              (ref as Grabbable & { type: "ExistingConnection" }).connector.name
+            }
+            id={
+              (ref as Grabbable & { type: "ExistingConnection" }).connector
+                .node_id
+            }
           />
         </Match>
         <Match when={ref.type === "NodeType"}>
