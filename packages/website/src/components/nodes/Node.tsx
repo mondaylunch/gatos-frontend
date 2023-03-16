@@ -29,7 +29,7 @@ export function ProcessNode(props: {
   const sharedContent = (
     <div class="group flex-1 p-2 flex-col items-center justify-center text-center">
       <div class="flex items-center justify-center gap-2">{Icon}</div>
-      <p class="flex-col font-bold text-black select-none text-2xl">
+      <p class="flex-col font-bold text-black select-none text-xl font-mono capitalize">
         {props.title}
       </p>
       <div class="flex flex-col items-center justify-center gap-2 w-full">
@@ -42,7 +42,7 @@ export function ProcessNode(props: {
     <Switch
       fallback={
         <div
-          class={`group relative w-fit rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center`}
+          class={`group relative w-max rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center`}
         >
           {sharedContent}
         </div>
@@ -50,7 +50,7 @@ export function ProcessNode(props: {
     >
       <Match when={isSelected?.()}>
         <div
-          class={`group relative w-fit rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center outline outline-4 outline-indigo-500`}
+          class={`group relative w-max rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center outline outline-4 outline-indigo-500`}
         >
           {sharedContent}
         </div>
