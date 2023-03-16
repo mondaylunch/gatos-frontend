@@ -99,7 +99,7 @@ export function InputNode(props: {
   return (
     <Switch
       fallback={
-        <div class="rounded-t-full relative w-max h-max bg-slate-600 flex items-center justify-center flex-col p-2">
+        <div class="rounded-t-full relative w-max h-max bg-slate-600 flex items-center justify-center flex-col pl-6 pr-6 pt-2 pb-2">
           <div class="flex flex-col text-center items-center">
             <p class="flex-col font-bold text-white select-none text-2xl capitalize pt-4">
               {props.title}
@@ -112,7 +112,7 @@ export function InputNode(props: {
       }
     >
       <Match when={isSelected?.()}>
-        <div class="rounded-t-full relative w-max h-max bg-slate-600 flex items-center justify-center flex-col outline outline-4 outline-indigo-600 p-2">
+        <div class="rounded-t-full relative w-max h-max bg-slate-600 flex items-center justify-center flex-col outline outline-4 outline-indigo-600 pl-6 pr-6 pt-2 pb-2">
           <div class="flex flex-col text-center items-center">
             <p class="flex-col font-bold text-white select-none text-2xl capitalize pt-4">
               {props.title}
