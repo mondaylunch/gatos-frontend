@@ -20,8 +20,8 @@ export function SettingsSidebar(props: SidebarProps) {
   return (
     <Switch
       fallback={
-        <div class="h-screen bg-neutral-700 w-[360px]">
-          <h1 class="text-white text-2xl text-center bg-indigo-500 rounded-md mt-2 ml-1 mr-1 mb-2 font-mono">
+        <div class="h-full bg-neutral-700 w-[360px]">
+          <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-2 font-mono">
             Node Settings
           </h1>
           <hr class="border-t-2 my-2 mx-2" />
@@ -30,7 +30,7 @@ export function SettingsSidebar(props: SidebarProps) {
       }
     >
       <Match when={node()}>
-        <div class="h-screen bg-neutral-700 w-[360px]">
+        <div class="h-full bg-neutral-700 w-[360px]">
           <h1 class="text-white text-2xl text-center bg-indigo-500 rounded-md mt-2 ml-1 mr-1 mb-2 font-mono">
             Node Settings
           </h1>

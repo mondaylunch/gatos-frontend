@@ -53,8 +53,8 @@ function loadNodeTypes() {
 export function NodeSidebar() {
   loadNodeTypes();
   return (
-    <div class="w-fit bg-neutral-700 min-h-0 overflow-y-auto">
-      <h1 class="text-white text-2xl text-center bg-indigo-500 rounded-md mt-2 ml-1 mr-1 mb-2 font-mono">
+    <div class="w-fit bg-neutral-700 min-h-0" style="overflow-y: auto;">
+      <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-2font-mono">
         Node Toolbox
       </h1>
       <hr class="border-t-2 my-2 mx-2" />
