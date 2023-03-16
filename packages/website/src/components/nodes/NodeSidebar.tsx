@@ -18,6 +18,7 @@ const [nodeTypes, setNodeTypes] = createSignal<NodeType[]>([]);
 type NodeType = {
   name: string;
   category: string;
+  displayName: string;
 };
 
 export function routeData() {
@@ -59,8 +60,12 @@ export function NodeSidebar() {
           {(nodeType) => {
             return (
               // @ts-expect-error directives are not supported
+
               <div use:grabSource={{ type: "NodeType", node: nodeType }}>
-                <NodeTypeDrag name={nodeType.name} />
+                <NodeTypeDrag
+                  name={nodeType.name}
+                  displayName={nodeType.displayName}
+                />
               </div>
             );
           }}
