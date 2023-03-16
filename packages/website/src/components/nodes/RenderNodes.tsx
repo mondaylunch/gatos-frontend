@@ -1,4 +1,14 @@
-import { Component, For, JSX, Match, Show, Switch } from "solid-js";
+import {
+  Component,
+  For,
+  JSX,
+  JSXElement,
+  Match,
+  Show,
+  splitProps,
+  Switch,
+  useContext,
+} from "solid-js";
 import { Graph, NodeType, NODE_TYPE_REGISTRY } from "~/lib/types";
 
 import { movable } from "../editor/directives/movable";
@@ -12,42 +22,74 @@ import {
   VariableDropZone,
   VariableNode,
 } from "./Node";
+import { GrabbedSignalContext } from "../editor/InteractiveCanvas";
+import { Grabbable } from "./FlowEditor";
 
 movable;
 dropZone;
 grabSource;
 
-const COMPONENTS: Record<
-  NodeType["category"],
-  Component<{ title: string; children?: JSX.Element }>
-> = {
-  start: InputNode,
-  process: ProcessNode,
-  end: OutputNode,
-};
+/**
+ * Pick the correct component to render
+ */
+function NodeTypeWrapper(props: {
+  title: string;
+  category: NodeType["category"];
+  children: JSX.Element;
+}) {
+  const [local, remote] = splitProps(props, ["category"]);
+
+  return (
+    <Switch fallback={<ProcessNode {...remote} />}>
+      <Match when={local.category === "start"}>
+        <InputNode {...remote} />
+      </Match>
+      <Match when={local.category === "end"}>
+        <OutputNode {...remote} />
+      </Match>
+    </Switch>
+  );
+}
 
 /**
  * Render nodes within the graph
  */
 export function RenderNodes(props: { graph: Graph }) {
+  const grabbed = useContext(GrabbedSignalContext);
+
   return (
     <For each={props.graph.nodes}>
       {(node) => {
-        // Find all relevant information to render the node
-        const metadata = props.graph.metadata[node.id];
-        const nodeType =
+        // Resolve metadata for node
+        const metadata = () =>
+          props.graph.metadata[node.id] ?? {
+            x_pos: 0,
+            y_pos: 0,
+          };
+
+        // Resolve node type
+        const nodeType = () =>
           NODE_TYPE_REGISTRY[node.type as keyof typeof NODE_TYPE_REGISTRY];
-        const Component = COMPONENTS[nodeType.category];
 
         return (
-          <Show when={metadata && nodeType}>
-            <CanvasElement x={metadata.x_pos} y={metadata.y_pos} id={node.id}>
+          <Show when={nodeType()}>
+            <CanvasElement
+              x={metadata().x_pos}
+              y={metadata().y_pos}
+              id={node.id}
+            >
               {/** @ts-expect-error directives are not supported */}
               <div use:movable={{ id: node.id }}>
-                <Component title={nodeType.name}>
+                <NodeTypeWrapper
+                  title={nodeType().name}
+                  category={nodeType().category}
+                >
                   {/** Render each input drop zone */}
                   <For each={Object.keys(node.inputs)}>
                     {(inputName) => {
+                      // Build current zone string
+                      const currentZone = `node:${node.id}:${inputName}`;
+
                       // Find all connections for this node matching this input
                       const connections = () =>
                         props.graph.connections.filter(
@@ -55,6 +97,24 @@ export function RenderNodes(props: { graph: Graph }) {
                             x.input.node_id === node.id &&
                             x.input.name === inputName
                         );
+
+                      // We can only have one connection per node so lets just pull it out
+                      const connection = () => {
+                        const connection = connections()[0];
+                        if (!connection) return undefined;
+
+                        // Hide the connection if it is currently grabbed
+                        const ref = grabbed!() as Grabbable;
+                        if (
+                          ref?.type === "ExistingConnection" &&
+                          ref.connector === connection.output &&
+                          ref.currentZone === currentZone
+                        ) {
+                          return undefined;
+                        }
+
+                        return connection;
+                      };
 
                       return (
                         <>
@@ -65,7 +125,7 @@ export function RenderNodes(props: { graph: Graph }) {
                               </div>
                             }
                           >
-                            <Match when={nodeType.category == "process"}>
+                            <Match when={nodeType().category == "process"}>
                               <div class="text-black font-medium capitalize">
                                 {inputName}: {node.inputs[inputName].type}
                               </div>
@@ -73,17 +133,22 @@ export function RenderNodes(props: { graph: Graph }) {
                           </Switch>
                           <VariableDropZone>
                             {/** @ts-expect-error directives are not supported */}
-                            <div use:dropZone={`node:${node.id}:${inputName}`}>
+                            <div use:dropZone={currentZone}>
                               <Switch fallback={"Drop variables here"}>
-                                <Match when={connections().length}>
-                                  <For each={connections()}>
-                                    {(connection) => (
-                                      <VariableNode
-                                        name={connection.output.name}
-                                        id={connection.output.node_id}
-                                      />
-                                    )}
-                                  </For>
+                                <Match when={connection()}>
+                                  <div
+                                    // @ts-expect-error directives are not supported
+                                    use:grabSource={{
+                                      type: "ExistingConnection",
+                                      connector: connection()!.output,
+                                      currentZone,
+                                    }}
+                                  >
+                                    <VariableNode
+                                      name={connection()!.output.name}
+                                      id={connection()!.output.node_id}
+                                    />
+                                  </div>
                                 </Match>
                               </Switch>
                             </div>
@@ -111,7 +176,7 @@ export function RenderNodes(props: { graph: Graph }) {
                       </div>
                     )}
                   </For>
-                </Component>
+                </NodeTypeWrapper>
               </div>
             </CanvasElement>
           </Show>

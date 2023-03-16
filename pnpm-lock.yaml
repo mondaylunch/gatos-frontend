@@ -52,12 +52,16 @@ importers:
       '@solidjs/testing-library': ^0.5.1
       '@testing-library/jest-dom': ^5.16.5
       '@thisbeyond/solid-dnd': ^0.7.3
+      '@types/lodash.isequal': ^4.5.6
+      '@types/lodash.pickby': ^4.6.7
       '@types/node': ^18.11.11
       '@types/testing-library__jest-dom': ^5.14.5
       '@vitest/coverage-c8': ^0.26.2
       '@vitest/ui': ^0.26.2
       autoprefixer: ^10.4.13
       jsdom: ^20.0.2
+      lodash.isequal: ^4.5.0
+      lodash.pickby: ^4.6.0
       solid-icons: ^1.0.4
       solid-js: ^1.6.2
       solid-start: ^0.2.23
@@ -73,6 +77,8 @@ importers:
       '@thisbeyond/solid-dnd': 0.7.3_solid-js@1.6.9
       '@types/node': 18.11.18
       autoprefixer: 10.4.13
+      lodash.isequal: 4.5.0
+      lodash.pickby: 4.6.0
       solid-icons: 1.0.4_solid-js@1.6.9
       tailwindcss: 3.2.4
     devDependencies:
@@ -80,6 +86,8 @@ importers:
       '@solidjs/router': 0.6.0_solid-js@1.6.9
       '@solidjs/testing-library': 0.5.2_solid-js@1.6.9
       '@testing-library/jest-dom': 5.16.5
+      '@types/lodash.isequal': 4.5.6
+      '@types/lodash.pickby': 4.6.7
       '@types/testing-library__jest-dom': 5.14.5
       '@vitest/coverage-c8': 0.26.3_lae363bjhdipllr6jstkmuhhna
       '@vitest/ui': 0.26.3
@@ -3152,6 +3160,22 @@ packages:
       '@types/node': 18.11.18
     dev: false
 
+  /@types/lodash.isequal/4.5.6:
+    resolution: {integrity: sha512-Ww4UGSe3DmtvLLJm2F16hDwEQSv7U0Rr8SujLUA2wHI2D2dm8kPu6Et+/y303LfjTIwSBKXB/YTUcAKpem/XEg==}
+    dependencies:
+      '@types/lodash': 4.14.191
+    dev: true
+
+  /@types/lodash.pickby/4.6.7:
+    resolution: {integrity: sha512-4ebXRusuLflfscbD0PUX4eVknDHD9Yf+uMtBIvA/hrnTqeAzbuHuDjvnYriLjUrI9YrhCPVKUf4wkRSXJQ6gig==}
+    dependencies:
+      '@types/lodash': 4.14.191
+    dev: true
+
+  /@types/lodash/4.14.191:
+    resolution: {integrity: sha512-BdZ5BCCvho3EIXw6wUCXHe7rS53AIDPLE+JzwgT+OsJk53oBfbSmZZ7CX4VaRoN78N+TJpFi9QPlfIVNmJYWxQ==}
+    dev: true
+
   /@types/mdast/3.0.10:
     resolution: {integrity: sha512-W864tg/Osz1+9f4lrGTZpCSO5/z4608eUp19tbozkq2HJK6i3z1kT0H9tlADXuYIb1YYOBByU4Jsqkk75q48qA==}
     dependencies:
@@ -3700,7 +3724,7 @@ packages:
   /axios/0.25.0_debug@4.3.4:
     resolution: {integrity: sha512-cD8FOb0tRH3uuEe6+evtAbgJtfxr7ly3fQjYcMcuPlgkwVS9xboaVIpcDV+cYQe+yGykgwZCs1pzjntcGa6l5g==}
     dependencies:
-      follow-redirects: 1.15.2_debug@4.3.4
+      follow-redirects: 1.15.2
     transitivePeerDependencies:
       - debug
 
@@ -5767,17 +5791,6 @@ packages:
       debug:
         optional: true
 
-  /follow-redirects/1.15.2_debug@4.3.4:
-    resolution: {integrity: sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==}
-    engines: {node: '>=4.0'}
-    peerDependencies:
-      debug: '*'
-    peerDependenciesMeta:
-      debug:
-        optional: true
-    dependencies:
-      debug: 4.3.4
-
   /for-each/0.3.3:
     resolution: {integrity: sha512-jqYfLp7mo9vIyQf8ykW2v7A+2N4QjeCeI5+Dz9XraiO1ign81wjiH7Fb9vSOWvQfNtmSa4H2RoQTrrXivdUZmw==}
     dependencies:
@@ -7120,8 +7133,16 @@ packages:
     resolution: {integrity: sha512-ff3BX/tSioo+XojX4MOsOMhJw0nZoUEF011LX8g8d3gvjVbxd89cCio4BCXronjxcTUIJUoqKEUA+n4CqvvRPw==}
     dev: false
 
+  /lodash.isequal/4.5.0:
+    resolution: {integrity: sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==}
+    dev: false
+
   /lodash.memoize/4.1.2:
     resolution: {integrity: sha512-t7j+NzmgnQzTAYXcsHYLgimltOV1MXHtlOWf6GjL9Kj8GK5FInw5JotxvbOs+IvV1/Dzo04/fCGfLVs7aXb4Ag==}
+    dev: false
+
+  /lodash.pickby/4.6.0:
+    resolution: {integrity: sha512-AZV+GsS/6ckvPOVQPXSiFFacKvKB4kOQu6ynt9wz0F3LO4R9Ij4K1ddYsIytDpSgLz88JHd9P+oaLeej5/Sl7Q==}
     dev: false
 
   /lodash.uniq/4.5.0:
