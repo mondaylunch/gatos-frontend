@@ -52,13 +52,24 @@ export function SettingsSidebar(props: SidebarProps) {
                     />
                   </Match>
                   <Match when={type() === "boolean"}>
-                    <span>{key}</span>
-                    <input
-                      type="checkbox"
-                      checked={entry()!.value as boolean}
-                      onChange={(ev) => apply(ev.currentTarget.checked)}
-                    />
+                    <span class="capitalize">{key}:</span>
+                    <label
+                      class={`group inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
+                        entry()!.value
+                          ? "bg-green-500 hover:bg-green-600 focus:ring-green-500"
+                          : "bg-red-500 hover:bg-red-600 focus:ring-red-500"
+                      } focus:outline-none focus:ring-2 focus:ring-offset-2`}
+                    >
+                      {entry()!.value ? "True" : "False"}
+                      <input
+                        type="checkbox"
+                        checked={entry()!.value as boolean}
+                        onChange={(ev) => apply(ev.currentTarget.checked)}
+                        class="sr-only"
+                      />
+                    </label>
                   </Match>
+
                   <Match when={type() === "number"}>
                     <span>{key}</span>
                     <FormInput
@@ -72,8 +83,9 @@ export function SettingsSidebar(props: SidebarProps) {
               );
             }}
           </For>
+          <hr class="border-t-2 my-2" />
           <button
-            class="bg-red-600 p-2 rounded-lg flex z-10 items-center justify-center font-bold "
+            class="bg-red-600 p-2 rounded-lg flex z-10 items-center justify-center font-bold"
             onClick={() => {
               props.updateGraph({ type: "DeleteNode", id: selected()! });
             }}
