@@ -398,7 +398,7 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
       const [_, nodeId, inputName] = ref.currentZone.split(":");
 
       // Remove the current connection:
-      await executeAction({
+      executeAction({
         type: "DisconnectNode",
         connection: {
           input: {
