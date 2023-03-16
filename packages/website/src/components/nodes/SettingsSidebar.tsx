@@ -73,6 +73,7 @@ export function SettingsSidebar(props: SidebarProps) {
             }}
           </For>
           <button
+            data-testid="delete_node_button"
             class="bg-red-600 p-2 rounded-lg flex z-10 items-center justify-center font-bold "
             onClick={() => {
               props.updateGraph({ type: "DeleteNode", id: selected()! });

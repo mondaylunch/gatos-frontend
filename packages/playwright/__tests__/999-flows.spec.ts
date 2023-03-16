@@ -35,6 +35,38 @@ test("it can create a flow", async ({ page }) => {
 
 });
 
+test("it can create a node", async ({ page }) => {
+    await page.goto(mainURL);
+    await page.click("text=Login or Sign Up");
+    await page.click("text=Sign in with Auth0");
+    const emailInput = page.getByLabel("Email address");
+    await emailInput.type("amongus@example.com");
+    const passwordInput = page.getByLabel("Password");
+    await passwordInput.type("TestPass123");
+    await passwordInput.press("Enter");
+    await page.goto(dashURL);
+    await page.getByText("Test Flow").click();
+    await page.getByText("Math").click();
+    const testNode = page.getByTestId("process_node");
+    await expect(testNode).toBeEnabled();
+});
+
+test("it can delete a node", async ({ page }) => {
+    await page.goto(mainURL);
+    await page.click("text=Login or Sign Up");
+    await page.click("text=Sign in with Auth0");
+    const emailInput = page.getByLabel("Email address");
+    await emailInput.type("amongus@example.com");
+    const passwordInput = page.getByLabel("Password");
+    await passwordInput.type("TestPass123");
+    await passwordInput.press("Enter");
+    await page.goto(dashURL);
+    await page.getByText("Test Flow").click();
+    await page.getByTestId("process_node").click();
+    await page.getByTestId("delete_node_button").click();
+    await expect(page).toHaveScreenshot();
+});
+
 test("it can delete a flow", async ({ page }) => {
 
     await page.goto(mainURL);
