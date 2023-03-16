@@ -45,8 +45,9 @@ export function SettingsSidebar(props: SidebarProps) {
               return (
                 <Switch fallback={`Cannot edit type ${type()}`}>
                   <Match when={type() === "string"}>
+                    <span class="capitalize">{key}:</span>
                     <FormInput
-                      label={key}
+                      label={""}
                       value={entry()!.value as string}
                       onChange={(ev) => apply(ev.currentTarget.value)}
                     />
@@ -69,11 +70,10 @@ export function SettingsSidebar(props: SidebarProps) {
                       />
                     </label>
                   </Match>
-
                   <Match when={type() === "number"}>
-                    <span>{key}</span>
+                    <span class="capitalize">{key}:</span>
                     <FormInput
-                      label={key}
+                      label={""}
                       type="number"
                       value={entry()!.value as number}
                       onChange={(ev) => apply(ev.currentTarget.valueAsNumber)}
