@@ -21,21 +21,19 @@ export function SettingsSidebar(props: SidebarProps) {
     <Switch
       fallback={
         <div class="h-full bg-neutral-700 w-[360px]">
-          <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-2 font-mono">
+          <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-4 font-mono">
             Node Settings
           </h1>
-          <hr class="border-t-2 my-2 mx-2" />
           <div class="text-white grid place-items-center">Select a node</div>
         </div>
       }
     >
       <Match when={node()}>
-        <div class="h-full bg-neutral-700 w-[360px]">
-          <h1 class="text-white text-2xl text-center bg-indigo-500 rounded-md mt-2 ml-1 mr-1 mb-2 font-mono">
+        <div class="h-full bg-neutral-700 w-[360px] flex flex-col">
+          <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-4 font-mono">
             Node Settings
           </h1>
-          <hr class="border-t-2 my-2 mx-2" />
-          <div class=" text-white flex flex-col gap-4 p-4">
+          <div class=" text-white flex flex-col gap-4 p-4 bg-neutral-600 ml-2 mr-2 mb-2 rounded-md">
             <span class="text-xl">{node()!.type}</span>
             <span class="text-xs select-all">{selected()}</span>
             <For each={Object.keys(node()!.settings)}>
@@ -92,16 +90,15 @@ export function SettingsSidebar(props: SidebarProps) {
                 );
               }}
             </For>
-            <hr class="border-t-2 my-2" />
-            <button
-              class="bg-red-600 p-2 rounded-lg flex z-10 items-center justify-center font-bold"
-              onClick={() => {
-                props.updateGraph({ type: "DeleteNode", id: selected()! });
-              }}
-            >
-              Delete Node
-            </button>
           </div>
+          <button
+            class="bg-red-600 rounded-lg flex z-10 items-center justify-center font-bold text-white m-2 pt-1 pb-1"
+            onClick={() => {
+              props.updateGraph({ type: "DeleteNode", id: selected()! });
+            }}
+          >
+            Delete Node
+          </button>
         </div>
       </Match>
     </Switch>
