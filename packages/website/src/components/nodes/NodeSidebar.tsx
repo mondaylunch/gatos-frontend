@@ -54,8 +54,12 @@ function loadNodeTypes() {
 export function NodeSidebar() {
   loadNodeTypes();
   return (
-    <div class="w-[240px] bg-neutral-700 min-h-0" style="overflow-y: auto;">
-      <div class="flex flex-col gap-2 pl-2 pr-2">
+    <div class="w-fit bg-neutral-700 min-h-0" style="overflow-y: auto;">
+      <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-2font-mono">
+        Node Toolbox
+      </h1>
+      <hr class="border-t-2 my-2 mx-2" />
+      <div class="flex flex-col gap-2 pl-2 pr-2 font-bold mb-4">
         <For each={nodeTypes()}>
           {(nodeType) => {
             return (

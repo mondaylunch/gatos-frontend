@@ -29,7 +29,7 @@ export function ProcessNode(props: {
   const sharedContent = (
     <div class="group flex-1 p-2 flex-col items-center justify-center text-center">
       <div class="flex items-center justify-center gap-2">{Icon}</div>
-      <p class="flex-col font-bold text-black select-none text-2xl">
+      <p class="flex-col font-bold text-black select-none text-xl font-mono capitalize">
         {props.title}
       </p>
       <div class="flex flex-col items-center justify-center gap-2 w-full">
@@ -42,7 +42,7 @@ export function ProcessNode(props: {
     <Switch
       fallback={
         <div
-          class={`group relative w-72 rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center`}
+          class={`group relative w-max rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center`}
         >
           {sharedContent}
         </div>
@@ -50,7 +50,7 @@ export function ProcessNode(props: {
     >
       <Match when={isSelected?.()}>
         <div
-          class={`group relative w-72 rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center outline outline-4 outline-indigo-500`}
+          class={`group relative w-max rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center outline outline-4 outline-indigo-500`}
         >
           {sharedContent}
         </div>
@@ -99,7 +99,7 @@ export function InputNode(props: {
   return (
     <Switch
       fallback={
-        <div class="rounded-t-full relative w-max h-max bg-slate-600 flex items-center justify-center flex-col p-2">
+        <div class="rounded-t-full relative w-max h-max bg-slate-600 flex items-center justify-center flex-col pl-6 pr-6 pt-2 pb-2">
           <div class="flex flex-col text-center items-center">
             <p class="flex-col font-bold text-white select-none text-2xl capitalize pt-4">
               {props.title}
@@ -112,7 +112,7 @@ export function InputNode(props: {
       }
     >
       <Match when={isSelected?.()}>
-        <div class="rounded-t-full relative w-max h-max bg-slate-600 flex items-center justify-center flex-col outline outline-4 outline-indigo-600 p-2">
+        <div class="rounded-t-full relative w-max h-max bg-slate-600 flex items-center justify-center flex-col outline outline-4 outline-indigo-600 pl-6 pr-6 pt-2 pb-2">
           <div class="flex flex-col text-center items-center">
             <p class="flex-col font-bold text-white select-none text-2xl capitalize pt-4">
               {props.title}
