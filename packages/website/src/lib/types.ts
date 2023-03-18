@@ -7,7 +7,6 @@ export type User = {
 export type NodeType = {
   name: string;
   category: "start" | "process" | "end";
-  displayName: string;
 };
 
 export type DataType =
@@ -93,6 +92,19 @@ export type GraphChanges = {
   added_connections: Connection[];
   removed_metadata: string[];
   added_metadata: Record<string, Metadata>;
+}
+
+export type DisplayNames = Record<string, string>;
+export const DISPLAY_NAMES: DisplayNames = {};
+
+export function loadDisplayNames(displayNames: DisplayNames) {
+  for (const key in displayNames) {
+    DISPLAY_NAMES[key] = displayNames[key];
+  }
+}
+
+export function getDisplayName(type: string, key: string) {
+  return DISPLAY_NAMES[`${type}.${key}`] || key;
 }
 
 export const NODE_TYPE_REGISTRY: Record<string, NodeType> = {};

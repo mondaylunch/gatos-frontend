@@ -1,27 +1,28 @@
 import styles from "./editor.module.css";
 
-import { createStore } from "solid-js/store";
-import { Meta } from "solid-start";
+import {createStore} from "solid-js/store";
+import {Meta} from "solid-start";
 import {
+  Connection,
+  Connector,
   DataType,
+  DisplayNames,
   Flow,
   Graph,
+  GraphChanges, loadDisplayNames,
   loadNodeTypes,
   Metadata,
   NodeType,
-  GraphChanges,
-  Connection,
-  Connector,
 } from "~/lib/types";
-import { VariableNode } from "./Node";
-import { NodeSidebar } from "./NodeSidebar";
-import { RenderConnections } from "./RenderConnections";
-import { RenderNodes } from "./RenderNodes";
-import { InteractiveCanvas } from "../editor/InteractiveCanvas";
-import { SettingsSidebar } from "./SettingsSidebar";
-import { createSignal, Match, onCleanup, Switch } from "solid-js";
-import { NodeTypeDrag } from "~/components/editor/NodeTypeDrag";
-import { createBackendFetchAction } from "~/lib/backend";
+import {VariableNode} from "./Node";
+import {NodeSidebar} from "./NodeSidebar";
+import {RenderConnections} from "./RenderConnections";
+import {RenderNodes} from "./RenderNodes";
+import {InteractiveCanvas} from "../editor/InteractiveCanvas";
+import {SettingsSidebar} from "./SettingsSidebar";
+import {createSignal, Match, onCleanup, Switch} from "solid-js";
+import {NodeTypeDrag} from "~/components/editor/NodeTypeDrag";
+import {createBackendFetchAction} from "~/lib/backend";
 import isEqual from "lodash.isequal";
 import pickBy from "lodash.pickby";
 
@@ -142,7 +143,8 @@ function clearRequests(id: string) {
     });
 }
 
-export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
+export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[], displayNames: DisplayNames }) {
+  loadDisplayNames(props.displayNames);
   loadNodeTypes(props.nodeTypes);
   const [graph, updateGraph] = createStore<Graph>(populate(props.flow.graph));
   const [selectedNode, setSelected] = createSignal<string>();
@@ -533,9 +535,6 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
         <Match when={ref.type === "NodeType"}>
           <NodeTypeDrag
             name={(ref as Grabbable & { type: "NodeType" }).node.name}
-            displayName={
-              (ref as Grabbable & { type: "NodeType" }).node.displayName
-            }
           />
         </Match>
       </Switch>
