@@ -36,7 +36,7 @@ Select "Regular Web Application":
 
 ![Auth0 New App](/img/examples/auth0-new-app.png)
 
-Open settings and make note of the domain, client ID, and client secret:
+Open settings and make note of the domain (referred to as `<your tenant>`), client ID, and client secret:
 
 ![Auth0 New App](/img/examples/auth0-app-settings.png)
 
@@ -82,8 +82,8 @@ And create an `.env` file and populate with your keys:
 
 ```dotenv
 # Auth0 Tenant Information
+AUTH0_AUDIENCE=https://<frontend origin>
 AUTH0_TOKEN_URL=https://<your tenant>.auth0.com/oauth/token
-AUTH0_AUDIENCE=https://<your tenant>.mondaylunch.club
 AUTH0_MANAGEMENT_AUDIENCE=https://<your tenant>.auth0.com/api/v2/
 AUTH0_ISSUER=https://<your tenant>.auth0.com/
 VITE_AUTH0_ISSUER=https://<your tenant>.auth0.com
