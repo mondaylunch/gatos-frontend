@@ -68,7 +68,7 @@ services:
     image: mongo
     restart: always
     volumes:
-      - ./db:/data/db
+      - ./data/db:/data/db
 
   frontend:
     image: ghcr.io/mondaylunch/gatos-frontend:master
@@ -76,6 +76,21 @@ services:
     depends_on:
       - database
     restart: always
+    ports:
+      # change left-hand side assignment if not suitable
+      - 3000:3000
+
+  backend:
+    image: ghcr.io/mondaylunch/gatos-backend-api:master
+    env_file: .env
+    environment:
+      - MONGODB_URI=mongodb://database
+    depends_on:
+      - database
+    restart: always
+    ports:
+      # change left-hand side assignment if not suitable
+      - 8080:8080
 ```
 
 And create an `.env` file and populate with your keys:
