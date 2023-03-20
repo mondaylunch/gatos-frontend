@@ -8,9 +8,9 @@ Doc of the gato
 
 ## Data Types
 
-string
-bool
-object
-number
-list[x]
-optional[x] (alternative syntax `?x`)
+- String
+- Bool
+- Object
+- Number
+- List[x]
+- Optional[x] (alternative syntax `?x`)
