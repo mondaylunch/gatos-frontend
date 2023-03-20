@@ -1,4 +1,4 @@
-# Object: Extract Element(s)
+# List: Extract Element(s)
 
 This node can take a list and destruct it into individual elements in the list.
 
