@@ -533,9 +533,6 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
         <Match when={ref.type === "NodeType"}>
           <NodeTypeDrag
             name={(ref as Grabbable & { type: "NodeType" }).node.name}
-            displayName={
-              (ref as Grabbable & { type: "NodeType" }).node.displayName
-            }
           />
         </Match>
       </Switch>

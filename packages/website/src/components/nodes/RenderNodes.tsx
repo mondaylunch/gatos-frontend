@@ -81,7 +81,7 @@ export function RenderNodes(props: { graph: Graph }) {
               {/** @ts-expect-error directives are not supported */}
               <div use:movable={{ id: node.id }}>
                 <NodeTypeWrapper
-                  title={nodeType().displayName}
+                  title={nodeType().name}
                   category={nodeType().category}
                 >
                   {/** Render each input drop zone */}

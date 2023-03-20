@@ -7,7 +7,6 @@ export type User = {
 export type NodeType = {
   name: string;
   category: "start" | "process" | "end";
-  displayName: string;
 };
 
 export type DataType =

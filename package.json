@@ -3,8 +3,6 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "cd packages/website && npm run dev",
-    "build": "cd packages/website && npm run build",
-    "start": "cd packages/website && npm run start",
     "test:integration": "pnpm --filter playwright test",
     "test:install": "pnpm --filter playwright playwright install",
     "docs": "cd packages/documentation && npm run start",
