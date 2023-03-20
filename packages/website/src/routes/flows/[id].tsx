@@ -1,9 +1,8 @@
 import { useParams, useRouteData } from "solid-start";
 
-import { Flow, NodeType, User } from "~/lib/types";
+import { DisplayNames, Flow, NodeType, User } from "~/lib/types";
 import { createServerData$, redirect } from "solid-start/server";
 import { constructUser, MountUser } from "~/lib/session";
-import { ENDPOINT } from "~/lib/env";
 import { getSession } from "@auth/solid-start";
 import { onMount, Show } from "solid-js";
 import { FlowEditor } from "~/components/nodes/FlowEditor";
@@ -23,6 +22,16 @@ export function routeData() {
       throw redirect("/");
     }
 
+    const displayNames = await (backendServersideFetch(
+      `/api/v1/display-names`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept-Language": event.request.headers.get("Accept-Language") ?? "en"
+        }
+      }).then(res => res.json() as Promise<DisplayNames>))
+
     return {
       user: constructUser(session),
       nodeTypes: await backendServersideFetch(
@@ -30,6 +39,7 @@ export function routeData() {
         {},
         session
       ).then((res) => res.json() as Promise<NodeType[]>),
+      displayNames
     };
   });
 }
@@ -47,6 +57,7 @@ export default function FlowPage() {
           id={params.id}
           user={data()!.user}
           nodeTypes={data()!.nodeTypes}
+          displayNames={data()!.displayNames}
         />
       </Show>
     </div>
@@ -56,7 +67,7 @@ export default function FlowPage() {
 /**
  * Route data is funky so data fetching is off-loaded to this sub-component
  */
-function LoadFlow(props: { id: string; user: User; nodeTypes: NodeType[] }) {
+function LoadFlow(props: { id: string; user: User; nodeTypes: NodeType[], displayNames: DisplayNames }) {
   const [flow, setFlow] = createSignal<Flow>();
   const [_, sendBackendRequest] = createBackendFetchAction();
 
@@ -77,7 +88,7 @@ function LoadFlow(props: { id: string; user: User; nodeTypes: NodeType[] }) {
 
   return (
     <Show when={flow()}>
-      <FlowEditor flow={flow()!} nodeTypes={props.nodeTypes} />
+      <FlowEditor flow={flow()!} nodeTypes={props.nodeTypes} displayNames={props.displayNames} />
     </Show>
   );
 }

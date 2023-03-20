@@ -18,7 +18,6 @@ const [nodeTypes, setNodeTypes] = createSignal<NodeType[]>([]);
 type NodeType = {
   name: string;
   category: string;
-  displayName: string;
 };
 
 export function routeData() {
@@ -68,7 +67,6 @@ export function NodeSidebar() {
               <div use:grabSource={{ type: "NodeType", node: nodeType }}>
                 <NodeTypeDrag
                   name={nodeType.name}
-                  displayName={nodeType.displayName}
                 />
               </div>
             );
