@@ -7,5 +7,4 @@ RUN pnpm i
 RUN pnpm build
 
 EXPOSE 3000
-ENV PORT 3000
-CMD ["pnpm", "start"]
+CMD pnpm start --port 3000

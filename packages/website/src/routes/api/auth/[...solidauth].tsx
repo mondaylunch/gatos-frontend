@@ -5,7 +5,6 @@ import {
   AUTH0_ID,
   AUTH0_ISSUER,
   AUTH0_SECRET,
-  AUTH_SECRET,
 } from "~/lib/env";
 
 export const authOpts: SolidAuthConfig = {
@@ -19,8 +18,6 @@ export const authOpts: SolidAuthConfig = {
     }),
   ],
   debug: false,
-  secret: AUTH_SECRET,
-  trustHost: true,
 };
 
 export const { GET, POST } = SolidAuth(authOpts);
