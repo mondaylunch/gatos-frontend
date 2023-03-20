@@ -1,9 +1,8 @@
 import { useParams, useRouteData } from "solid-start";
 
-import {DisplayNames, Flow, NodeType, User} from "~/lib/types";
+import { DisplayNames, Flow, NodeType, User } from "~/lib/types";
 import { createServerData$, redirect } from "solid-start/server";
 import { constructUser, MountUser } from "~/lib/session";
-import { ENDPOINT } from "~/lib/env";
 import { getSession } from "@auth/solid-start";
 import { onMount, Show } from "solid-js";
 import { FlowEditor } from "~/components/nodes/FlowEditor";

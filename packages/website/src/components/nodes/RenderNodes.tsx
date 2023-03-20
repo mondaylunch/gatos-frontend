@@ -1,15 +1,13 @@
 import {
-  Component,
   For,
   JSX,
-  JSXElement,
   Match,
   Show,
   splitProps,
   Switch,
   useContext,
 } from "solid-js";
-import {Graph, NodeType, NODE_TYPE_REGISTRY, getDisplayName} from "~/lib/types";
+import { Graph, NodeType, NODE_TYPE_REGISTRY, getDisplayName } from "~/lib/types";
 
 import { movable } from "../editor/directives/movable";
 import { dropZone } from "../editor/directives/dropZone";

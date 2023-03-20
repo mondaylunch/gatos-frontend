@@ -1,7 +1,7 @@
 import styles from "./editor.module.css";
 
-import {createStore} from "solid-js/store";
-import {Meta} from "solid-start";
+import { createStore } from "solid-js/store";
+import { Meta } from "solid-start";
 import {
   Connection,
   Connector,
@@ -9,20 +9,21 @@ import {
   DisplayNames,
   Flow,
   Graph,
-  GraphChanges, loadDisplayNames,
+  GraphChanges,
+  loadDisplayNames,
   loadNodeTypes,
   Metadata,
   NodeType,
 } from "~/lib/types";
-import {VariableNode} from "./Node";
-import {NodeSidebar} from "./NodeSidebar";
-import {RenderConnections} from "./RenderConnections";
-import {RenderNodes} from "./RenderNodes";
-import {InteractiveCanvas} from "../editor/InteractiveCanvas";
-import {SettingsSidebar} from "./SettingsSidebar";
-import {createSignal, Match, onCleanup, Switch} from "solid-js";
-import {NodeTypeDrag} from "~/components/editor/NodeTypeDrag";
-import {createBackendFetchAction} from "~/lib/backend";
+import { VariableNode } from "./Node";
+import { NodeSidebar } from "./NodeSidebar";
+import { RenderConnections } from "./RenderConnections";
+import { RenderNodes } from "./RenderNodes";
+import { InteractiveCanvas } from "../editor/InteractiveCanvas";
+import { SettingsSidebar } from "./SettingsSidebar";
+import { createSignal, Match, onCleanup, Switch } from "solid-js";
+import { NodeTypeDrag } from "~/components/editor/NodeTypeDrag";
+import { createBackendFetchAction } from "~/lib/backend";
 import isEqual from "lodash.isequal";
 import pickBy from "lodash.pickby";
 

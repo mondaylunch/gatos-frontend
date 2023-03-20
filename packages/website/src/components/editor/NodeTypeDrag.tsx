@@ -1,7 +1,7 @@
 import { FaSolidCircleQuestion } from "solid-icons/fa";
 import { Icons_Dict } from "../shared/NodeIcons";
-import {getDisplayName} from "~/lib/types";
-import {Match, Switch } from "solid-js";
+import { getDisplayName } from "~/lib/types";
+import { Match, Switch } from "solid-js";
 
 export function NodeTypeDrag(props: { name: string }) {
   const Icon = Icons_Dict[props.name as keyof typeof Icons_Dict];
