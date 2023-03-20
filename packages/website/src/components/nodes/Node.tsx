@@ -43,7 +43,7 @@ export function ProcessNode(props: {
       fallback={
         <div
           data-testid="process_node"
-          class={`group relative w-72 rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center`}
+          class={`group relative w-max rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center`}
         >
           {sharedContent}
         </div>
@@ -52,7 +52,7 @@ export function ProcessNode(props: {
       <Match when={isSelected?.()}>
         <div
           data-testid="process_node"
-          class={`group relative w-72 rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center outline outline-4 outline-indigo-500`}
+          class={`group relative w-max rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center outline outline-4 outline-indigo-500`}
         >
           {sharedContent}
         </div>
