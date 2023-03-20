@@ -1,6 +1,6 @@
 # Number: Is Finite
 
-This node return if a given number is finite.
+This node returns true if a given number is finite and false otherwise.
 
 | Input          | Configuration | Output          |
 | -------------- | ------------- | --------------- |
