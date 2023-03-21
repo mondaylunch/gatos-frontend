@@ -17,8 +17,8 @@ To begin, find a server to deploy to, any VPS with a public IP works.
 
 Configure two DNS records to point to your server:
 
-- `A your.domain` to your IP (this will be referred to as `<frontend origin>`)
-- `A api.your.domain` to your IP (this will be referred to as `<backend origin>`)
+- `A your.domain` to your IP (this will be referred to as `<frontend origin>`, in the example shown this is `mondaylunch.club`)
+- `A api.your.domain` to your IP (this will be referred to as `<backend origin>`, in the example shown this is `api.mondaylunch.club`)
 
 ![DNS](/img/examples/dns.png)
 
@@ -96,7 +96,7 @@ services:
       # change left-hand side assignment if not suitable
       - 3000:3000
 
-  backend:
+  api:
     image: ghcr.io/mondaylunch/gatos-backend-api:master
     env_file: .env
     environment:
@@ -138,3 +138,111 @@ NEXTAUTH_SECRET=
 # or go to: https://generate-secret.vercel.app/64
 AUTH_SECRET=
 ```
+
+:::info
+
+For example, this might look like:
+
+```dotenv
+# Auth0 Tenant Information
+AUTH0_AUDIENCE=https://api.mondaylunch.club
+AUTH0_TOKEN_URL=https://mondaylunch.uk.auth0.com/oauth/token
+AUTH0_MANAGEMENT_AUDIENCE=https://mondaylunch.uk.auth0.com/api/v2/
+AUTH0_ISSUER=https://mondaylunch.uk.auth0.com/
+AUTH0_AUTHORIZATION_LINK=https://mondaylunch.uk.auth0.com/authorize
+
+# Auth0 Client ID
+AUTH0_CLIENT_ID=sLbeZ6xzoR3SB6q3l3yZRTr4SPq1JxT9
+
+# Auth0 Client Secret
+AUTH0_CLIENT_SECRET=supersecrettoken1234
+
+# Public Host
+NEXTAUTH_URL=https://<frontend origin>
+
+# JWT Secret
+# `openssl rand -base64 32`
+# or go to: https://generate-secret.vercel.app/32
+NEXTAUTH_SECRET=4MODj149L2v5fDv5L2mcJ65gxCTqeCDoDoMa2oVeKxA=
+
+# Cookie Secret
+# `openssl rand -hex 32`
+# or go to: https://generate-secret.vercel.app/64
+AUTH_SECRET=35bed7f8f7d084168d61f1fd4ad2afd7e864260f6bcc15e8dfe32ca7329b90eb
+```
+
+:::
+
+You can now start the software by running:
+
+```bash
+docker-compose up -d
+```
+
+To update the software, simply run:
+
+```bash
+docker-compose pull
+```
+
+And then run the start command again.
+
+:::warning
+
+Please check this page for any specific upgrade information before pulling new containers. Currently there are no special instructions, but some may appear here in the future.
+
+:::
+
+## 4. Reverse Proxy
+
+You must now reverse proxy:
+
+- `http://<backend origin>` to `http://localhost:8080` or `http://api:8080` (within the container network).
+- `http://<frontend origin>` to `http://localhost:3000` or `http://frontend:3000` (within the container network).
+
+For example, you may wish to use Caddy to handle SSL automatically.
+
+### Caddy
+
+To configure Caddy, first add the following service to `docker-compose.yml`:
+
+```yml
+caddy:
+  image: caddy
+  restart: always
+  network_mode: host
+  volumes:
+    - ./Caddyfile:/etc/caddy/Caddyfile
+    - ./caddy-data:/data
+    - ./caddy-config:/config
+```
+
+Then create a corresponding `Caddyfile`:
+
+```caddyfile
+<backend origin> {
+  reverse_proxy api:8080
+}
+
+<frontend origin> {
+  reverse_proxy frontend:3000
+}
+```
+
+At this point, you can run `docker-compose up -d` again to start Caddy. You may also want to remove port allocations from the API and frontend.
+
+:::info
+
+For example, this might look like:
+
+```caddyfile
+https://api.mondaylunch.club {
+  reverse_proxy api:8080
+}
+
+https://mondaylunch.club {
+  reverse_proxy frontend:3000
+}
+```
+
+:::
