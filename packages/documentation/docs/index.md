@@ -9,7 +9,7 @@ Doc of the gato
 ## Data Types
 
 - String
-- Bool
+- Boolean
 - Object
 - Number
 - List[x]
