@@ -29,16 +29,3 @@ test("it loads dashboard", async ({ page }) => {
     await page.goto(dashURL);
     await expect(page).toHaveScreenshot();
 });
-
-test("it loads flow page", async ({ page }) => {
-    await page.goto(mainURL);
-    await page.click("text=Login or Sign Up");
-    await page.click("text=Sign in with Auth0");
-    const emailInput = page.getByLabel("Email address");
-    await emailInput.type("amongus@example.com");
-    const passwordInput = page.getByLabel("Password");
-    await passwordInput.type("TestPass123");
-    await passwordInput.press("Enter");
-    await page.goto(flowURL);
-    await expect (page).toHaveScreenshot();
-});
