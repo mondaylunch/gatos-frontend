@@ -13,5 +13,5 @@ export default function getTextColor(hue: number): string {
       : 12.92 * perceivedBrightness;
 
   // Return "black" if the perceived brightness is low, "white" if high
-  return perceivedBrightness < 0.3 ? "#1e293b" : "#FFFFFF";
+  return perceivedBrightness < 0.6 ? "#1e293b" : "#FFFFFF";
 }

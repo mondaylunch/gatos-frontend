@@ -53,14 +53,20 @@ function loadNodeTypes() {
 export function NodeSidebar() {
   loadNodeTypes();
   return (
-    <div class="w-[240px] bg-neutral-700 min-h-0" style="overflow-y: auto;">
-      <div class="flex flex-col gap-2 pl-2 pr-2">
+    <div class="w-fit bg-neutral-700 min-h-0" style="overflow-y: auto;">
+      <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-4 font-mono">
+        Node Toolbox
+      </h1>
+      <div class="flex flex-col gap-2 pl-2 pr-2 font-bold mb-4">
         <For each={nodeTypes()}>
           {(nodeType) => {
             return (
               // @ts-expect-error directives are not supported
+
               <div use:grabSource={{ type: "NodeType", node: nodeType }}>
-                <NodeTypeDrag name={nodeType.name} />
+                <NodeTypeDrag
+                  name={nodeType.name}
+                />
               </div>
             );
           }}
