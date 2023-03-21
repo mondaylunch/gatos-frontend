@@ -1,13 +1,14 @@
 import { Graph } from "~/lib/types";
-import { For, Match, Switch, useContext } from "solid-js";
+import { createSignal, For, Match, Show, Switch, useContext } from "solid-js";
 import { SelectedElementContext } from "../editor/InteractiveCanvas";
 import { FormInput } from "../forms/FormInput";
 import { GraphAction } from "./FlowEditor";
-import { FaSolidXmark } from "solid-icons/fa";
+import { ExecuteModal } from "./modals/ExecuteModal";
 
 interface SidebarProps {
   graph: Graph;
   updateGraph: (action: GraphAction) => void;
+  execute: (node_id: string, data: object) => Promise<unknown>;
 }
 
 export function SettingsSidebar(props: SidebarProps) {
@@ -16,6 +17,8 @@ export function SettingsSidebar(props: SidebarProps) {
     selected()
       ? props.graph.nodes.find((node) => node.id === selected())
       : undefined;
+
+  const [showExecute, setShowExecute] = createSignal(false);
 
   return (
     <Switch
@@ -30,6 +33,25 @@ export function SettingsSidebar(props: SidebarProps) {
     >
       <Match when={node()}>
         <div class="h-full bg-neutral-700 w-[360px] flex flex-col">
+          <Show when={node()!.type === "webhook_start"}>
+            <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-4 font-mono">
+              Webhook
+            </h1>
+            <button
+              class="bg-green-600 rounded-lg flex z-10 items-center justify-center font-bold text-white m-2 pt-1 pb-1"
+              onClick={() => setShowExecute(true)}
+            >
+              Execute
+            </button>
+
+            <Show when={showExecute()}>
+              <ExecuteModal
+                onHide={() => setShowExecute(false)}
+                execute={(data) => props.execute(node()!.id, JSON.parse(data))}
+              />
+            </Show>
+          </Show>
+
           <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-4 font-mono">
             Node Settings
           </h1>

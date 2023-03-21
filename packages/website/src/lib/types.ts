@@ -92,6 +92,22 @@ export type GraphChanges = {
   added_connections: Connection[];
   removed_metadata: string[];
   added_metadata: Record<string, Metadata>;
+};
+
+export type Conversions = { from: string; to: string }[];
+var CONVERSIONS: Conversions = [];
+
+const findConversion = (from: string, to: string) =>
+  CONVERSIONS.find((entry) => entry.from === from && entry.to === to);
+
+export async function isConversionValid(
+  output_type: string,
+  input_type: string,
+  fetch: () => Promise<Conversions>
+) {
+  if (findConversion(output_type, input_type)) return true;
+  CONVERSIONS = await fetch();
+  return findConversion(output_type, input_type);
 }
 
 export type DisplayNames = Record<string, string>;
