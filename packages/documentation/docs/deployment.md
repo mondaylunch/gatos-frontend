@@ -54,6 +54,20 @@ https://<frontend origin>
 
 Then scroll to the end and save settings.
 
+Now go to "APIs", and select "+ Create API":
+
+![Auth0 APIs](/img/examples/auth0-apis.png)
+
+Fill out the details with a name and identifier (just set this to API origin, this will be the `audience url` later):
+
+![Auth0 APIs](/img/examples/auth0-new-api.png)
+
+Now select the new API you just created, go to "Machine To Machine Applications" and authorize the app created earlier.
+
+![Auth0 APIs](/img/examples/auth0-authorize-api.png)
+
+You now have the required configuration.
+
 ## 3. Deploy
 
 Create a new directory for the deployment.
@@ -68,13 +82,15 @@ services:
     image: mongo
     restart: always
     volumes:
-      - ./data/db:/data/db
+      - ./db:/data/db
 
   frontend:
     image: ghcr.io/mondaylunch/gatos-frontend:master
     env_file: .env
     depends_on:
       - database
+    environment:
+      - API_URL=http://backend:8080
     restart: always
     ports:
       # change left-hand side assignment if not suitable
@@ -97,20 +113,28 @@ And create an `.env` file and populate with your keys:
 
 ```dotenv
 # Auth0 Tenant Information
-AUTH0_AUDIENCE=https://<frontend origin>
+AUTH0_AUDIENCE=https://<audience url>
 AUTH0_TOKEN_URL=https://<your tenant>.auth0.com/oauth/token
 AUTH0_MANAGEMENT_AUDIENCE=https://<your tenant>.auth0.com/api/v2/
 AUTH0_ISSUER=https://<your tenant>.auth0.com/
-VITE_AUTH0_ISSUER=https://<your tenant>.auth0.com
+AUTH0_AUTHORIZATION_LINK=https://<your tenant>.auth0.com/authorize
 
 # Auth0 Client ID
 AUTH0_CLIENT_ID=
-VITE_AUTH0_ID=
 
 # Auth0 Client Secret
 AUTH0_CLIENT_SECRET=
-AUTH0_SECRET=
 
-# cookie hash secret; this should be random data
-AUTH_SECRET=409urfj439208fru432jr89043jwrufw3498prfj4uru3wjp90r8f34jr
+# Public Host
+NEXTAUTH_URL=https://<frontend origin>
+
+# JWT Secret
+# `openssl rand -base64 32`
+# or go to: https://generate-secret.vercel.app/32
+NEXTAUTH_SECRET=
+
+# Cookie Secret
+# `openssl rand -hex 32`
+# or go to: https://generate-secret.vercel.app/64
+AUTH_SECRET=
 ```
