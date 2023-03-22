@@ -21,7 +21,7 @@ test("it loads about page", async ({ page }) => {
     await page.click("text=Login or Sign Up");
     await page.click("text=Sign in with Auth0");
     const emailInput = page.getByLabel("Email address");
-    await emailInput.type("amongus@example.com");
+    await emailInput.type("testuser123@example.com");
     const passwordInput = page.getByLabel("Password");
     await passwordInput.type("TestPass123");
     await passwordInput.press("Enter");

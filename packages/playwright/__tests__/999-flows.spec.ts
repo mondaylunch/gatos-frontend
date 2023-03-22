@@ -21,7 +21,7 @@ test("setup creates a flow", async ({ page }) => {
     await page.click("text=Login or Sign Up");
     await page.click("text=Sign in with Auth0");
     const emailInput = page.getByLabel("Email address");
-    await emailInput.type("amongus@example.com");
+    await emailInput.type("testuser123@example.com");
     const passwordInput = page.getByLabel("Password");
     await passwordInput.type("TestPass123");
     await passwordInput.press("Enter");
@@ -39,7 +39,7 @@ test("it can create a flow", async ({ page }) => {
     await page.click("text=Login or Sign Up");
     await page.click("text=Sign in with Auth0");
     const emailInput = page.getByLabel("Email address");
-    await emailInput.type("amongus@example.com");
+    await emailInput.type("testuser123@example.com");
     const passwordInput = page.getByLabel("Password");
     await passwordInput.type("TestPass123");
     await passwordInput.press("Enter");
@@ -52,7 +52,7 @@ test("it can create a node", async ({ page }) => {
     await page.click("text=Login or Sign Up");
     await page.click("text=Sign in with Auth0");
     const emailInput = page.getByLabel("Email address");
-    await emailInput.type("amongus@example.com");
+    await emailInput.type("testuser123@example.com");
     const passwordInput = page.getByLabel("Password");
     await passwordInput.type("TestPass123");
     await passwordInput.press("Enter");
@@ -68,7 +68,7 @@ test("it can delete a node", async ({ page }) => {
     await page.click("text=Login or Sign Up");
     await page.click("text=Sign in with Auth0");
     const emailInput = page.getByLabel("Email address");
-    await emailInput.type("amongus@example.com");
+    await emailInput.type("testuser123@example.com");
     const passwordInput = page.getByLabel("Password");
     await passwordInput.type("TestPass123");
     await passwordInput.press("Enter");
@@ -87,7 +87,7 @@ test("it can delete a flow", async ({ page }) => {
     await page.click("text=Login or Sign Up");
     await page.click("text=Sign in with Auth0");
     const emailInput = page.getByLabel("Email address");
-    await emailInput.type("amongus@example.com");
+    await emailInput.type("testuser123@example.com");
     const passwordInput = page.getByLabel("Password");
     await passwordInput.type("TestPass123");
     await passwordInput.press("Enter");
