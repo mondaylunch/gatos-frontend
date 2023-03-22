@@ -7,7 +7,12 @@ import {
   Switch,
   useContext,
 } from "solid-js";
-import { Graph, NodeType, NODE_TYPE_REGISTRY, getDisplayName } from "~/lib/types";
+import {
+  Graph,
+  NodeType,
+  NODE_TYPE_REGISTRY,
+  getDisplayName,
+} from "~/lib/types";
 
 import { movable } from "../editor/directives/movable";
 import { dropZone } from "../editor/directives/dropZone";
@@ -32,6 +37,7 @@ grabSource;
  */
 function NodeTypeWrapper(props: {
   title: string;
+  displayName: string;
   category: NodeType["category"];
   children: JSX.Element;
 }) {
@@ -79,8 +85,9 @@ export function RenderNodes(props: { graph: Graph }) {
               {/** @ts-expect-error directives are not supported */}
               <div use:movable={{ id: node.id }}>
                 <NodeTypeWrapper
-                  title={getDisplayName("node_type", nodeType().name)}
+                  title={nodeType().name}
                   category={nodeType().category}
+                  displayName={getDisplayName("node_type", nodeType().name)}
                 >
                   {/** Render each input drop zone */}
                   <For each={Object.keys(node.inputs)}>
@@ -119,13 +126,21 @@ export function RenderNodes(props: { graph: Graph }) {
                           <Switch
                             fallback={
                               <div class="text-white font-medium capitalize">
-                                {inputName}: {getDisplayName("data_type", node.inputs[inputName].type)}
+                                {inputName}:{" "}
+                                {getDisplayName(
+                                  "data_type",
+                                  node.inputs[inputName].type
+                                )}
                               </div>
                             }
                           >
                             <Match when={nodeType().category == "process"}>
                               <div class="text-black font-medium capitalize">
-                                {inputName}: {getDisplayName("data_type", node.inputs[inputName].type)}
+                                {inputName}:{" "}
+                                {getDisplayName(
+                                  "data_type",
+                                  node.inputs[inputName].type
+                                )}
                               </div>
                             </Match>
                           </Switch>
@@ -168,7 +183,10 @@ export function RenderNodes(props: { graph: Graph }) {
                         }}
                       >
                         <VariableNode
-                          name={`${output}: ${getDisplayName("data_type", node.outputs[output].type)}`}
+                          name={`${output}: ${getDisplayName(
+                            "data_type",
+                            node.outputs[output].type
+                          )}`}
                           id={node.id}
                         />
                       </div>
