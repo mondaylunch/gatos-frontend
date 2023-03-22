@@ -30,6 +30,7 @@ export function deleteModal(
           </p>
           <div class="flex justify-end">
             <button
+              data-testid="delete_confirm_button"
               class="flex-auto bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
               onClick={deleteFlow}
             >

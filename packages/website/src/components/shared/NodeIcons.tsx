@@ -27,6 +27,14 @@ import {
   FaSolidArrowRightToBracket,
   FaSolidArrowRightFromBracket,
   FaSolidCommentDots,
+  FaSolidObjectUngroup,
+  FaSolidIndent,
+  FaSolidWandMagicSparkles,
+  FaSolidFile,
+  FaSolidPersonDigging,
+  FaSolidToggleOff,
+  FaSolidDiagramSuccessor,
+  FaSolidArrowDownAZ,
 } from "solid-icons/fa";
 
 export const Icons_Dict = {
@@ -58,4 +66,16 @@ export const Icons_Dict = {
   webhook_start: FaSolidArrowRightToBracket,
   webhook_end: FaSolidArrowRightFromBracket,
   parse_string_to_number: FaSolidCommentDots,
+  object_set_value: FaSolidObjectUngroup,
+  value_provider_number: FaSolidListOl,
+  get_at_index: FaSolidIndent,
+  value_provider_string: FaSolidKeyboard,
+  value_replacer_boolean: FaSolidWandMagicSparkles,
+  value_replacer_number: FaSolidWandMagicSparkles,
+  value_replacer_string: FaSolidWandMagicSparkles,
+  empty_list: FaSolidFile,
+  list_mapping: FaSolidPersonDigging,
+  value_provider_boolean: FaSolidToggleOff,
+  list_set_operation: FaSolidDiagramSuccessor,
+  list_sort: FaSolidArrowDownAZ,
 };

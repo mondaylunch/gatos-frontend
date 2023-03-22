@@ -5,14 +5,13 @@ import { Meta } from "solid-start";
 import {
   Connection,
   Connector,
-  DataType,
+  DataTypeWithWidget,
   DisplayNames,
   Flow,
   Graph,
   GraphChanges,
   isConversionValid,
-  loadDisplayNames,
-  loadNodeTypes,
+  loadDynamicData,
   Metadata,
   NodeType,
 } from "~/lib/types";
@@ -96,7 +95,7 @@ export type GraphAction =
         id: string;
         name: string;
       };
-      dataType: DataType;
+      dataType: string;
     }
   | {
       type: "DisconnectNode";
@@ -149,9 +148,9 @@ export function FlowEditor(props: {
   flow: Flow;
   nodeTypes: NodeType[];
   displayNames: DisplayNames;
+  dataTypeWidgets: DataTypeWithWidget[];
 }) {
-  loadDisplayNames(props.displayNames);
-  loadNodeTypes(props.nodeTypes);
+  loadDynamicData(props.nodeTypes, props.displayNames, props.dataTypeWidgets);
   const [graph, updateGraph] = createStore<Graph>(populate(props.flow.graph));
   const [selectedNode, setSelected] = createSignal<string>();
   const [_, sendBackendRequest] = createBackendFetchAction();
