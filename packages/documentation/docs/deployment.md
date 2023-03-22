@@ -140,7 +140,7 @@ Then, enable the connection for your applications:
 
 Auth0 will now be able to authenticate users with Discord.
 
-## 4. Deploy
+## 5. Deploy
 
 Create a new directory for the deployment.
 
@@ -272,7 +272,7 @@ Please check this page for any specific upgrade information before pulling new c
 
 :::
 
-## 5. Reverse Proxy
+## 6. Reverse Proxy
 
 You must now reverse proxy:
 
