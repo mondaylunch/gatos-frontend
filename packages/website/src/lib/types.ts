@@ -9,42 +9,38 @@ export type NodeType = {
   category: "start" | "process" | "end";
 };
 
-export type DataType =
-  | "any"
-  | "number"
-  | "optional"
-  | `optional$${string}`
-  | `list$${string}`;
-
-export type Setting =
+export type Widget =
   | {
-      type: `optional$${string}`;
-      value: {
-        present: boolean;
-        value: any;
-      };
+      name: "textbox";
     }
   | {
-      type: `list$${string}`;
-      value: any[];
+      name: "textarea";
     }
   | {
-      type: "number";
-      value: number;
+      name: "numberbox";
     }
   | {
-      type: "boolean";
-      value: boolean;
+      name: "checkbox";
     }
   | {
-      type: "string";
-      value: string;
+      name: "dropdown";
+      options: string[];
     };
+
+export type DataTypeWithWidget = {
+  name: string;
+  widget: Widget;
+};
+
+export type Setting = {
+  type: string;
+  value: any;
+};
 
 export type IO = {
   node_id: string;
   name: string;
-  type: DataType;
+  type: string;
 };
 
 export type Node = {
@@ -58,7 +54,7 @@ export type Node = {
 export type Connector = {
   node_id: string;
   name: string;
-  type: DataType;
+  type: string;
 };
 
 export type Connection = {
@@ -94,6 +90,8 @@ export type GraphChanges = {
   added_metadata: Record<string, Metadata>;
 }
 
+export type SettingValues = Record<string, string[]>;
+
 export type DisplayNames = Record<string, string>;
 export const DISPLAY_NAMES: DisplayNames = {};
 
@@ -113,4 +111,16 @@ export function loadNodeTypes(types: NodeType[]) {
   for (const type of types) {
     NODE_TYPE_REGISTRY[type.name] = type;
   }
+}
+
+export const DATA_TYPE_WIDGET_REGISTRY: Record<string, Widget> = {};
+
+export function loadDataTypeWidgets(types: DataTypeWithWidget[]) {
+  for (const type of types) {
+    DATA_TYPE_WIDGET_REGISTRY[type.name] = type.widget;
+  }
+}
+
+export function getWidget(typeName: string): Widget {
+  return DATA_TYPE_WIDGET_REGISTRY[typeName] ?? "textbox";
 }

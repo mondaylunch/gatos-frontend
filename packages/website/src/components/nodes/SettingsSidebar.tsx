@@ -1,9 +1,8 @@
-import { Graph } from "~/lib/types";
-import { For, Match, Switch, useContext } from "solid-js";
+import { getWidget, Graph } from "~/lib/types";
+import { For, Match, Switch, useContext} from "solid-js";
 import { SelectedElementContext } from "../editor/InteractiveCanvas";
 import { FormInput } from "../forms/FormInput";
 import { GraphAction } from "./FlowEditor";
-import { FaSolidXmark } from "solid-icons/fa";
 
 interface SidebarProps {
   graph: Graph;
@@ -41,6 +40,8 @@ export function SettingsSidebar(props: SidebarProps) {
                 const entry = () => node()!.settings[key];
                 const type = () => entry().type;
 
+                const widget = () => getWidget(type());
+
                 const apply = (value: any) =>
                   props.updateGraph({
                     type: "UpdateSettingsKey",
@@ -50,8 +51,9 @@ export function SettingsSidebar(props: SidebarProps) {
                   });
 
                 return (
+                  //TODO handle list/optional settings
                   <Switch fallback={`Cannot edit type ${type()}`}>
-                    <Match when={type() === "string"}>
+                    <Match when={widget().name === "textbox"}>
                       <span class="capitalize">{key}:</span>
                       <FormInput
                         label={""}
@@ -59,7 +61,14 @@ export function SettingsSidebar(props: SidebarProps) {
                         onChange={(ev) => apply(ev.currentTarget.value)}
                       />
                     </Match>
-                    <Match when={type() === "boolean"}>
+                    <Match when={widget().name === "textarea"}>
+                      <span class="capitalize">{key}:</span>
+                      <textarea
+                        value={entry()!.value as string}
+                        onChange={(ev) => apply(ev.currentTarget.value)}
+                      />
+                    </Match>
+                    <Match when={widget().name === "checkbox"}>
                       <span class="capitalize">{key}:</span>
                       <label
                         class={`group inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
@@ -77,7 +86,7 @@ export function SettingsSidebar(props: SidebarProps) {
                         />
                       </label>
                     </Match>
-                    <Match when={type() === "number"}>
+                    <Match when={widget().name === "numberbox"}>
                       <span class="capitalize">{key}:</span>
                       <FormInput
                         label={""}
@@ -85,6 +94,18 @@ export function SettingsSidebar(props: SidebarProps) {
                         value={entry()!.value as number}
                         onChange={(ev) => apply(ev.currentTarget.valueAsNumber)}
                       />
+                    </Match>
+                    <Match when={widget().name === "dropdown"}>
+                      <span class="capitalize">{key}:</span>
+                      <select
+                        value={entry()!.value}
+                        onChange={(ev) => apply(ev.currentTarget.value)}>
+                        <For each={(widget() as {options: string[]}).options}>
+                          {(option) => (
+                            <option>{option}</option>
+                          )}
+                        </For>
+                      </select>
                     </Match>
                   </Switch>
                 );
