@@ -39,11 +39,7 @@ export function routeData() {
     const dataTypeWidgets = await backendServersideFetch(
       `/api/v1/data-types`,
       {}
-    )
-      .then((res) => res.json() as Promise<DataTypeWithWidget[]>)
-      .then((json) => {
-        return json;
-      });
+    ).then((res) => res.json() as Promise<DataTypeWithWidget[]>);
 
     return {
       user: constructUser(session),
