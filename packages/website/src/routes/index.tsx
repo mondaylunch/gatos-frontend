@@ -14,7 +14,7 @@ export default function Home() {
         <span class="text-6xl font-semibold mb-1 text-white">
             Welcome to
           </span>
-
+        <img src="/images/gatos logo colour.png" class="h-auto max-w-sm rounded-[45px]" alt="Flow image"/>
         <div class="gradient-text text-4xl font-bold">
 
 
