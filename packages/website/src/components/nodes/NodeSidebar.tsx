@@ -35,7 +35,6 @@ export function NodeSidebar() {
         Node Toolbox
       </h1>
       <div class="flex flex-col gap-2 pl-2 pr-2 font-bold mb-4">
-        <NodeTypeDrag name={nodeType.name} />
         <NodeTypeList category="start" />
         <NodeTypeList category="end" />
         <NodeTypeList category="process" />
