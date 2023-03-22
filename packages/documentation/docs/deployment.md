@@ -78,9 +78,69 @@ Give the backend application access to the `read:users` permission on the Auth0 
 
 ![Auth0 APIs](/img/examples/auth0-authorize-management-api.png)
 
-You now have the required configuration.
+Auth0 is now set up.
 
-## 3. Deploy
+## 3. Configure Discord
+
+Go to https://discord.com/developers/applications and create a new application:
+
+![Discord Add Application](/img/examples/discord-create-app.png)
+
+Navigate to the 'OAuth2' tab. Take a note of the client ID and client secret (referred to as `<Discord client ID>` and `<Discord client secret>`):
+
+![Discord OAuth2](/img/examples/discord-copy-oauth2-secret.png)
+
+Add a redirect URI, `https://<your tenant>/login/callback`:
+
+![Discord OAuth2](/img/examples/discord-oauth2-create-redirect.png)
+
+Navigate to the 'Bot' tab and create a new bot for the application:
+
+![Discord Bot](/img/examples/discord-create-bot.png)
+
+Make a note of the Discord bot token (referred to as `<Discord bot token>`):
+
+![Discord Bot](/img/examples/discord-copy-token.png)
+
+Next, enable the 'Server Members' and 'Message Content' in the 'Privileged Gateway Intents' section:
+
+![Discord Bot](/img/examples/discord-intents.png)
+
+You can now add your bot to your server. Go to the 'OAuth2 -> URL Generator' tab, and select the 'bot' scope, with 'Administrator' permissions:
+
+:::info
+
+You can give the bot more restrictive permissions, but this is the easiest way to set it up.
+
+:::
+
+![Discord Bot](/img/examples/discord-create-invite-link.png)
+
+Scroll down, and copy the generated link:
+
+![Discord Bot](/img/examples/discord-copy-invite-link.png)
+
+Open this link in a new tab, and select the server you want to add the bot to.
+
+The discord bot is now set up.
+
+## 4. Connect Auth0 and Discord
+
+In the Auth0 Dashboard, navigate to the 'Authentication -> Social' tab. Create a new connection:
+
+![Auth0 Social Connections](/img/examples/auth0-create-connection.png)
+
+Select 'Discord' as the provider, and enter the Discord client ID and Discord client secret from earlier:
+
+![Auth0 Social Connections](/img/examples/auth0-connection-select-discord.png)
+
+Then, enable the connection for your applications:
+
+![Auth0 Social Connections](/img/examples/auth0-enable-discord-connection.png)
+
+Auth0 will now be able to authenticate users with Discord.
+
+## 4. Deploy
 
 Create a new directory for the deployment.
 
@@ -138,6 +198,9 @@ BACKEND_AUTH0_CLIENT_ID=<backend application client ID>
 # Auth0 Client Secrets
 AUTH0_CLIENT_SECRET=<frontend application client secret>
 BACKEND_AUTH0_CLIENT_SECRET=<backend application client secret>
+
+# Discord Bot Token
+DISCORD_TOKEN=<Discord bot token>
 
 # Public Host
 NEXTAUTH_URL=https://<frontend origin>
@@ -209,7 +272,7 @@ Please check this page for any specific upgrade information before pulling new c
 
 :::
 
-## 4. Reverse Proxy
+## 5. Reverse Proxy
 
 You must now reverse proxy:
 
