@@ -12,3 +12,4 @@ packages/website/.env
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+test-results

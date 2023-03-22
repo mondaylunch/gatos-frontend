@@ -42,6 +42,7 @@ export function ProcessNode(props: {
     <Switch
       fallback={
         <div
+          data-testid="process_node"
           class={`group relative w-max rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center`}
         >
           {sharedContent}
@@ -50,6 +51,7 @@ export function ProcessNode(props: {
     >
       <Match when={isSelected?.()}>
         <div
+          data-testid="process_node"
           class={`group relative w-max rounded-[35px] bg-white flex align-text-top items-center justify-center align-items-center outline outline-4 outline-indigo-500`}
         >
           {sharedContent}
