@@ -26,16 +26,6 @@ const config: PlaywrightTestConfig = {
         storageState: '.auth/user.json',
       },
     },
-  
-    // removing firefox testing cause it's not working, tested manually and it works so we can solve this later
-    // TODO: fix firefox testing
-    // {
-    //   name: "firefox",
-    //   use: {
-    //     ...devices["Desktop Firefox"],
-    //     storageState: '.auth/user.json',
-    //   },
-    // },
   ],
 
   outputDir: "results/",
