@@ -72,9 +72,6 @@ const backendFetchInternal = server$(
     session: Session | null
   ) => {
     const userEmail = session?.user?.email ?? "";
-    console.log(
-      "Fetching from backend: " + opts.route + " with email " + userEmail
-    );
     const newInit = {
       ...opts.init,
       headers: {
