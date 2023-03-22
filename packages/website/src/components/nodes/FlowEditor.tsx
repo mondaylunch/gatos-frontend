@@ -5,11 +5,12 @@ import { Meta } from "solid-start";
 import {
   Connection,
   Connector,
-  DataType,
+  DataTypeWithWidget,
   DisplayNames,
   Flow,
   Graph,
   GraphChanges,
+  loadDataTypeWidgets,
   loadDisplayNames,
   loadNodeTypes,
   Metadata,
@@ -95,7 +96,7 @@ export type GraphAction =
         id: string;
         name: string;
       };
-      dataType: DataType;
+      dataType: string;
     }
   | {
       type: "DisconnectNode";
@@ -144,9 +145,10 @@ function clearRequests(id: string) {
     });
 }
 
-export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[], displayNames: DisplayNames }) {
+export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[], displayNames: DisplayNames, dataTypeWidgets: DataTypeWithWidget[] }) {
   loadDisplayNames(props.displayNames);
   loadNodeTypes(props.nodeTypes);
+  loadDataTypeWidgets(props.dataTypeWidgets);
   const [graph, updateGraph] = createStore<Graph>(populate(props.flow.graph));
   const [selectedNode, setSelected] = createSignal<string>();
   const [_, sendBackendRequest] = createBackendFetchAction();

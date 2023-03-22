@@ -1,6 +1,6 @@
 import { useParams, useRouteData } from "solid-start";
 
-import { DisplayNames, Flow, NodeType, User } from "~/lib/types";
+import { DataTypeWithWidget, DisplayNames, Flow, NodeType, User } from "~/lib/types";
 import { createServerData$, redirect } from "solid-start/server";
 import { constructUser, MountUser } from "~/lib/session";
 import { getSession } from "@auth/solid-start";
@@ -32,6 +32,14 @@ export function routeData() {
         }
       }).then(res => res.json() as Promise<DisplayNames>))
 
+    const dataTypeWidgets = await (backendServersideFetch(
+      `/api/v1/data-types`,
+      {
+      }).then(res => res.json() as Promise<DataTypeWithWidget[]>).then(json => {
+        console.log(json);
+        return json;
+    }))
+
     return {
       user: constructUser(session),
       nodeTypes: await backendServersideFetch(
@@ -39,7 +47,8 @@ export function routeData() {
         {},
         session
       ).then((res) => res.json() as Promise<NodeType[]>),
-      displayNames
+      displayNames,
+      dataTypeWidgets
     };
   });
 }
@@ -58,6 +67,7 @@ export default function FlowPage() {
           user={data()!.user}
           nodeTypes={data()!.nodeTypes}
           displayNames={data()!.displayNames}
+          dataTypeWidgets={data()!.dataTypeWidgets}
         />
       </Show>
     </div>
@@ -67,7 +77,7 @@ export default function FlowPage() {
 /**
  * Route data is funky so data fetching is off-loaded to this sub-component
  */
-function LoadFlow(props: { id: string; user: User; nodeTypes: NodeType[], displayNames: DisplayNames }) {
+function LoadFlow(props: { id: string; user: User; nodeTypes: NodeType[], displayNames: DisplayNames, dataTypeWidgets: DataTypeWithWidget[] }) {
   const [flow, setFlow] = createSignal<Flow>();
   const [_, sendBackendRequest] = createBackendFetchAction();
 
@@ -88,7 +98,7 @@ function LoadFlow(props: { id: string; user: User; nodeTypes: NodeType[], displa
 
   return (
     <Show when={flow()}>
-      <FlowEditor flow={flow()!} nodeTypes={props.nodeTypes} displayNames={props.displayNames} />
+      <FlowEditor flow={flow()!} nodeTypes={props.nodeTypes} displayNames={props.displayNames} dataTypeWidgets={props.dataTypeWidgets} />
     </Show>
   );
 }
