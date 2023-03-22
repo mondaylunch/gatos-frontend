@@ -1,6 +1,8 @@
 import {signIn} from "@auth/solid-start/client";
 
 import {Navbar} from "~/components/shared/Navbar";
+import {Show} from "solid-js";
+import {user} from "~/lib/session";
 
 export default function Home() {
   const login = () => signIn("auth0");
@@ -12,24 +14,23 @@ export default function Home() {
         <span class="text-6xl font-semibold mb-1 text-white">
             Welcome to
           </span>
-        <span class="text-9xl font-semibold mb-20 text-blue-500"
-              style="background: linear-gradient(-45deg, #eca100, #ec540d, #f44653, #4d58c7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-            GATOS
-          </span>
+
         <div class="gradient-text text-4xl font-bold">
 
 
         </div>
         <div class="w-full max-w-md">
-          <div class="bg-white p-7 rounded-[45px] shadow-md flex justify-center">
-            <button
-              type="button"
-              onClick={login}
-              class="w-full mr-2 bg-indigo-500 text-white p-3 rounded-[30px] hover:bg-indigo-600"
-            >
-              Log in or Sign Up
-            </button>
-          </div>
+          <Show when={!user()}>
+            <div class="bg-white p-7 rounded-[45px] shadow-md flex justify-center">
+              <button
+                type="button"
+                onClick={login}
+                class="w-full mr-2 bg-indigo-500 text-white p-3 rounded-[30px] hover:bg-indigo-600"
+              >
+                Log in or Sign Up
+              </button>
+            </div>
+          </Show>
         </div>
 
 
