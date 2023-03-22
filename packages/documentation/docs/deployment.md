@@ -36,6 +36,8 @@ Select "Regular Web Application":
 
 ![Auth0 New App](/img/examples/auth0-new-app.png)
 
+We will refer to this as the "frontend application".
+
 Open settings and make note of the domain (referred to as `<your tenant>`), client ID, and client secret:
 
 ![Auth0 New App](/img/examples/auth0-app-settings.png)
@@ -65,6 +67,16 @@ Fill out the details with a name and identifier (just set this to API origin, th
 Now select the new API you just created, go to "Machine To Machine Applications" and authorize the app created earlier.
 
 ![Auth0 APIs](/img/examples/auth0-authorize-api.png)
+
+Next, create another Application. This time, select "Machine to Machine Applications":
+
+![Auth0 APIs](/img/examples/auth0-new-backend-app.png)
+
+We will refer to this as the "backend application".
+
+Give the backend application access to the `read:users` permission on the Auth0 Management API:
+
+![Auth0 APIs](/img/examples/auth0-authorize-management-api.png)
 
 You now have the required configuration.
 
@@ -113,17 +125,19 @@ And create an `.env` file and populate with your keys:
 
 ```dotenv
 # Auth0 Tenant Information
-AUTH0_AUDIENCE=https://<audience url>
 AUTH0_TOKEN_URL=https://<your tenant>.auth0.com/oauth/token
-AUTH0_MANAGEMENT_AUDIENCE=https://<your tenant>.auth0.com/api/v2/
 AUTH0_ISSUER=https://<your tenant>.auth0.com/
 AUTH0_AUTHORIZATION_LINK=https://<your tenant>.auth0.com/authorize
+AUTH0_AUDIENCE=https://<audience url>
+AUTH0_MANAGEMENT_AUDIENCE=https://<your tenant>.auth0.com/api/v2/
 
-# Auth0 Client ID
-AUTH0_CLIENT_ID=
+# Auth0 Client IDs
+AUTH0_CLIENT_ID=<frontend application client ID>
+BACKEND_AUTH0_CLIENT_ID=<backend application client ID>
 
-# Auth0 Client Secret
-AUTH0_CLIENT_SECRET=
+# Auth0 Client Secrets
+AUTH0_CLIENT_SECRET=<frontend application client secret>
+BACKEND_AUTH0_CLIENT_SECRET=<backend application client secret>
 
 # Public Host
 NEXTAUTH_URL=https://<frontend origin>
@@ -145,17 +159,19 @@ For example, this might look like:
 
 ```dotenv
 # Auth0 Tenant Information
-AUTH0_AUDIENCE=https://api.mondaylunch.club
 AUTH0_TOKEN_URL=https://mondaylunch.uk.auth0.com/oauth/token
-AUTH0_MANAGEMENT_AUDIENCE=https://mondaylunch.uk.auth0.com/api/v2/
 AUTH0_ISSUER=https://mondaylunch.uk.auth0.com/
 AUTH0_AUTHORIZATION_LINK=https://mondaylunch.uk.auth0.com/authorize
+AUTH0_AUDIENCE=https://api.mondaylunch.club
+AUTH0_MANAGEMENT_AUDIENCE=https://mondaylunch.uk.auth0.com/api/v2/
 
 # Auth0 Client ID
 AUTH0_CLIENT_ID=sLbeZ6xzoR3SB6q3l3yZRTr4SPq1JxT9
+BACKEND_AUTH0_CLIENT_ID=WRCrcJ4VKL32ZRTr4SPr33fCgjsd324
 
 # Auth0 Client Secret
 AUTH0_CLIENT_SECRET=supersecrettoken1234
+BACKEND_AUTH0_CLIENT_SECRET=anothersupersecrettoken5678
 
 # Public Host
 NEXTAUTH_URL=https://<frontend origin>
