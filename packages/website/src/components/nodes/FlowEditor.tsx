@@ -10,9 +10,7 @@ import {
   Flow,
   Graph,
   GraphChanges,
-  loadDataTypeWidgets,
-  loadDisplayNames,
-  loadNodeTypes,
+  loadDynamicData,
   Metadata,
   NodeType,
 } from "~/lib/types";
@@ -145,10 +143,13 @@ function clearRequests(id: string) {
     });
 }
 
-export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[], displayNames: DisplayNames, dataTypeWidgets: DataTypeWithWidget[] }) {
-  loadDisplayNames(props.displayNames);
-  loadNodeTypes(props.nodeTypes);
-  loadDataTypeWidgets(props.dataTypeWidgets);
+export function FlowEditor(props: {
+  flow: Flow;
+  nodeTypes: NodeType[];
+  displayNames: DisplayNames;
+  dataTypeWidgets: DataTypeWithWidget[];
+}) {
+  loadDynamicData(props.nodeTypes, props.displayNames, props.dataTypeWidgets);
   const [graph, updateGraph] = createStore<Graph>(populate(props.flow.graph));
   const [selectedNode, setSelected] = createSignal<string>();
   const [_, sendBackendRequest] = createBackendFetchAction();
