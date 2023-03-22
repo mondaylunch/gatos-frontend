@@ -35,6 +35,7 @@ import {
   FaSolidToggleOff,
   FaSolidDiagramSuccessor,
   FaSolidArrowDownAZ,
+  FaBrandsDiscord,
 } from "solid-icons/fa";
 
 export const Icons_Dict = {
@@ -78,4 +79,21 @@ export const Icons_Dict = {
   value_provider_boolean: FaSolidToggleOff,
   list_set_operation: FaSolidDiagramSuccessor,
   list_sort: FaSolidArrowDownAZ,
+  ["discord.receive_command"]: FaBrandsDiscord,
+  ["discord.reply_to_command"]: FaBrandsDiscord,
+  ["discord.send_message"]: FaBrandsDiscord,
+  ["discord.apply_role"]: FaBrandsDiscord,
+  ["discord.users_with_role"]: FaBrandsDiscord,
+  ["discord.receive_message"]: FaBrandsDiscord,
+  ["discord.react_to_message"]: FaBrandsDiscord,
+  ["discord.reply_to_message"]: FaBrandsDiscord,
+  ["discord.create_embed"]: FaBrandsDiscord,
+  ["discord.guild_id"]: FaBrandsDiscord,
+  ["discord.channel_id"]: FaBrandsDiscord,
+  ["discord.users_id"]: FaBrandsDiscord,
+  ["discord.role_id"]: FaBrandsDiscord,
+  ["discord.emoji_id"]: FaBrandsDiscord,
+  ["discord.slash_command_event"]: FaBrandsDiscord,
+  ["discord.message"]: FaBrandsDiscord,
+  ["discord.message_embed"]: FaBrandsDiscord,
 };
