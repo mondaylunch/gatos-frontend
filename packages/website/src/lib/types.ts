@@ -88,14 +88,14 @@ export type GraphChanges = {
   added_connections: Connection[];
   removed_metadata: string[];
   added_metadata: Record<string, Metadata>;
-}
+};
 
 export type SettingValues = Record<string, string[]>;
 
 export type DisplayNames = Record<string, string>;
 export const DISPLAY_NAMES: DisplayNames = {};
 
-export function loadDisplayNames(displayNames: DisplayNames) {
+function loadDisplayNames(displayNames: DisplayNames) {
   for (const key in displayNames) {
     DISPLAY_NAMES[key] = displayNames[key];
   }
@@ -106,8 +106,9 @@ export function getDisplayName(type: string, key: string) {
 }
 
 export const NODE_TYPE_REGISTRY: Record<string, NodeType> = {};
+export let SORTED_NODE_TYPES: NodeType[] = [];
 
-export function loadNodeTypes(types: NodeType[]) {
+function loadNodeTypes(types: NodeType[]) {
   for (const type of types) {
     NODE_TYPE_REGISTRY[type.name] = type;
   }
@@ -115,7 +116,7 @@ export function loadNodeTypes(types: NodeType[]) {
 
 export const DATA_TYPE_WIDGET_REGISTRY: Record<string, Widget> = {};
 
-export function loadDataTypeWidgets(types: DataTypeWithWidget[]) {
+function loadDataTypeWidgets(types: DataTypeWithWidget[]) {
   for (const type of types) {
     DATA_TYPE_WIDGET_REGISTRY[type.name] = type.widget;
   }
@@ -123,4 +124,20 @@ export function loadDataTypeWidgets(types: DataTypeWithWidget[]) {
 
 export function getWidget(typeName: string): Widget {
   return DATA_TYPE_WIDGET_REGISTRY[typeName] ?? "textbox";
+}
+
+export function loadDynamicData(
+  types: NodeType[],
+  displayNames: DisplayNames,
+  widgets: DataTypeWithWidget[]
+) {
+  loadNodeTypes(types);
+  loadDisplayNames(displayNames);
+  loadDataTypeWidgets(widgets);
+
+  SORTED_NODE_TYPES = [...types].sort((b, a) =>
+    getDisplayName("node_type", b.name).localeCompare(
+      getDisplayName("node_type", a.name)
+    )
+  );
 }
