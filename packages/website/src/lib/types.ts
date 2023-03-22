@@ -108,6 +108,13 @@ export async function isConversionValid(
 
 export type SettingValues = Record<string, string[]>;
 
+export type ValidationResult = {
+  errors: {
+    relatedNode: string | null;
+    message: string;
+  }[];
+};
+
 export type DisplayNames = Record<string, string>;
 export const DISPLAY_NAMES: DisplayNames = {};
 

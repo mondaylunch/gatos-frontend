@@ -1,8 +1,34 @@
-import { JSX, Match, Switch } from "solid-js";
-import { useSelfSelected } from "../editor/InteractiveCanvas";
+import { JSX, Match, Show, Switch, useContext } from "solid-js";
+import {
+  ElementIdContext,
+  SelectedElementContext,
+  useSelfSelected,
+} from "../editor/InteractiveCanvas";
 import getTextColour from "~/components/shared/TextColour";
 import { Icons_Dict } from "../shared/NodeIcons";
 import { FaSolidCircleQuestion } from "solid-icons/fa";
+import { ValidationResultContext } from "./FlowEditor";
+
+export function ErrorIndicator(props: { flip?: boolean }) {
+  const id = useContext(ElementIdContext)!;
+  const validationResult = useContext(ValidationResultContext)!;
+  const error = () =>
+    validationResult().errors.find((error) => error.relatedNode === id);
+
+  return (
+    <Show when={error()}>
+      <span
+        class={`z-50 flex h-5 w-5 absolute left-0 ${
+          props.flip ? "bottom-0" : "top-0"
+        } ml-[-5px] ${props.flip ? "mb-[-5px]" : "mt-[-5px]"}`}
+      >
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-5 w-5 bg-red-500"></span>
+      </span>
+    </Show>
+  );
+}
+
 /**
  * Node signifying given data is processed
  */
@@ -30,6 +56,7 @@ export function ProcessNode(props: {
 
   const sharedContent = (
     <div class="group flex-1 p-2 flex-col items-center justify-center text-center">
+      <ErrorIndicator />
       <div class="flex items-center justify-center gap-2">{Icon}</div>
       <p class="flex-col font-bold text-black select-none text-xl capitalize">
         {props.displayName}
@@ -104,6 +131,7 @@ export function InputNode(props: {
     <Switch
       fallback={
         <div class="rounded-t-full relative w-max h-max bg-slate-600 flex items-center justify-center flex-col pl-6 pr-6 pt-2 pb-2">
+          <ErrorIndicator flip />
           <div class="flex flex-col text-center items-center">
             <p class="flex-col font-bold text-white select-none text-2xl capitalize pt-4">
               {props.title}
@@ -117,6 +145,7 @@ export function InputNode(props: {
     >
       <Match when={isSelected?.()}>
         <div class="rounded-t-full relative w-max h-max bg-slate-600 flex items-center justify-center flex-col outline outline-4 outline-indigo-600 pl-6 pr-6 pt-2 pb-2">
+          <ErrorIndicator flip />
           <div class="flex flex-col text-center items-center">
             <p class="flex-col font-bold text-white select-none text-2xl capitalize pt-4">
               {props.title}
@@ -140,6 +169,7 @@ export function OutputNode(props: { title: string; children?: JSX.Element }) {
     <Switch
       fallback={
         <div class="rounded-b-full relative w-max h-max bg-slate-600 flex items-center justify-center flex-col p-2 pb-12">
+          <ErrorIndicator />
           <div class="flex flex-col text-center items-center">
             <p class="flex-col font-bold text-white select-none text-2xl capitalize pt-2">
               {props.title}
@@ -152,6 +182,7 @@ export function OutputNode(props: { title: string; children?: JSX.Element }) {
       }
     >
       <Match when={isSelected?.()}>
+        <ErrorIndicator />
         <div class="rounded-b-full relative w-max h-max bg-slate-600 flex items-center justify-center flex-col outline outline-4 outline-indigo-600 p-2 pb-12">
           <div class="flex flex-col text-center items-center">
             <p class="flex-col font-bold text-white select-none text-2xl capitalize pt-2">

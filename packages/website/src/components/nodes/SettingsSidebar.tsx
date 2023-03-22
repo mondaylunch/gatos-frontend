@@ -3,7 +3,7 @@ import { getWidget, Graph } from "~/lib/types";
 import { createSignal, For, Match, Show, Switch, useContext } from "solid-js";
 import { SelectedElementContext } from "../editor/InteractiveCanvas";
 import { FormInput } from "../forms/FormInput";
-import { GraphAction } from "./FlowEditor";
+import { GraphAction, ValidationResultContext } from "./FlowEditor";
 import { getDisplayName } from "~/lib/types";
 
 interface SidebarProps {
@@ -14,6 +14,7 @@ interface SidebarProps {
 
 export function SettingsSidebar(props: SidebarProps) {
   const [selected] = useContext(SelectedElementContext)!;
+  const validationResult = useContext(ValidationResultContext)!;
   const node = () =>
     selected()
       ? props.graph.nodes.find((node) => node.id === selected())
@@ -21,38 +22,64 @@ export function SettingsSidebar(props: SidebarProps) {
 
   const [showExecute, setShowExecute] = createSignal(false);
 
+  const errors = () =>
+    node()
+      ? validationResult().errors.filter(
+          (error) => error.relatedNode === node()?.id
+        )
+      : validationResult().errors.filter((error) => !error.relatedNode);
+
+  const webhookExecuteNodeId = () => {
+    const current = node();
+    if (current) {
+      return current.type === "webhook_start" ? current.id : undefined;
+    }
+
+    const webhookNodes = props.graph.nodes.filter(
+      (node) => node.type === "webhook_start"
+    );
+
+    if (webhookNodes.length === 1) {
+      return webhookNodes[0].id;
+    }
+  };
+
   return (
-    <Switch
-      fallback={
-        <div class="h-full bg-neutral-700 w-[360px]">
-          <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-4 font-bold">
-            Node Settings
-          </h1>
-          <div class="text-white grid place-items-center">Select a node</div>
+    <div class="h-full bg-neutral-700 w-[360px] flex flex-col">
+      <Show when={errors().length}>
+        <h1 class="text-white text-2xl text-center bg-red-500 rounded-md mt-2 ml-1 mr-1 mb-4 font-bold">
+          Errors
+        </h1>
+        <div class=" text-white flex flex-col gap-4 p-4 bg-neutral-600 ml-2 mr-2 mb-2 rounded-md">
+          <For each={errors()}>
+            {(error) => <span class="text-white mx-1">{error.message}</span>}
+          </For>
         </div>
-      }
-    >
-      <Match when={node()}>
-        <div class="h-full bg-neutral-700 w-[360px] flex flex-col">
-          <Show when={node()!.type === "webhook_start"}>
+      </Show>
+
+      <Show when={webhookExecuteNodeId()}>
+        <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-2 font-bold">
+          Webhook
+        </h1>
+        <button
+          class="bg-green-600 rounded-lg flex z-10 items-center justify-center font-bold text-white m-2 pt-1 pb-1"
+          onClick={() => setShowExecute(true)}
+        >
+          Execute
+        </button>
+      </Show>
+
+      <Switch
+        fallback={
+          <>
             <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-4 font-bold">
-              Webhook
+              Node Settings
             </h1>
-            <button
-              class="bg-green-600 rounded-lg flex z-10 items-center justify-center font-bold text-white m-2 pt-1 pb-1"
-              onClick={() => setShowExecute(true)}
-            >
-              Execute
-            </button>
-
-            <Show when={showExecute()}>
-              <ExecuteModal
-                onHide={() => setShowExecute(false)}
-                execute={(data) => props.execute(node()!.id, JSON.parse(data))}
-              />
-            </Show>
-          </Show>
-
+            <div class="text-white grid place-items-center">Select a node</div>
+          </>
+        }
+      >
+        <Match when={node()}>
           <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-4 font-bold">
             Node Settings
           </h1>
@@ -148,8 +175,17 @@ export function SettingsSidebar(props: SidebarProps) {
           >
             Delete Node
           </button>
-        </div>
-      </Match>
-    </Switch>
+        </Match>
+      </Switch>
+
+      <Show when={showExecute()}>
+        <ExecuteModal
+          onHide={() => setShowExecute(false)}
+          execute={(data) =>
+            props.execute(webhookExecuteNodeId()!, JSON.parse(data))
+          }
+        />
+      </Show>
+    </div>
   );
 }

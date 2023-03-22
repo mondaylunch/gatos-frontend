@@ -1,6 +1,7 @@
 import { createEffect, JSX, on, splitProps, useContext } from "solid-js";
 import { ElementSizeContext, ZoomFactorContext } from "./Canvas";
 import {
+  ElementIdContext,
   SelectedElementContext,
   SelectionSignalContext,
 } from "./InteractiveCanvas";
@@ -85,19 +86,21 @@ export function CanvasElement(props: Props) {
   const isSelected = () => (props.id ? selection() === props.id : false);
 
   return (
-    <SelectionSignalContext.Provider value={isSelected}>
-      <foreignObject
-        {...remote}
-        ref={ref}
-        x={local.x}
-        y={local.y}
-        style={{
-          width: "1px",
-          height: "1px",
-          overflow: "visible",
-        }}
-        onClick={() => local.id && setSelected(local.id)}
-      />
-    </SelectionSignalContext.Provider>
+    <ElementIdContext.Provider value={props.id}>
+      <SelectionSignalContext.Provider value={isSelected}>
+        <foreignObject
+          {...remote}
+          ref={ref}
+          x={local.x}
+          y={local.y}
+          style={{
+            width: "1px",
+            height: "1px",
+            overflow: "visible",
+          }}
+          onClick={() => local.id && setSelected(local.id)}
+        />
+      </SelectionSignalContext.Provider>
+    </ElementIdContext.Provider>
   );
 }

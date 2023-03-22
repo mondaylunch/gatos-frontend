@@ -14,6 +14,7 @@ import {
   loadDynamicData,
   Metadata,
   NodeType,
+  ValidationResult,
 } from "~/lib/types";
 import { VariableNode } from "./Node";
 import { NodeSidebar } from "./NodeSidebar";
@@ -21,11 +22,19 @@ import { RenderConnections } from "./RenderConnections";
 import { RenderNodes } from "./RenderNodes";
 import { InteractiveCanvas } from "../editor/InteractiveCanvas";
 import { SettingsSidebar } from "./SettingsSidebar";
-import { createSignal, Match, onCleanup, Switch } from "solid-js";
+import {
+  Accessor,
+  createSignal,
+  Match,
+  onCleanup,
+  onMount,
+  Switch,
+} from "solid-js";
 import { NodeTypeDrag } from "~/components/editor/NodeTypeDrag";
 import { createBackendFetchAction } from "~/lib/backend";
 import isEqual from "lodash.isequal";
 import pickBy from "lodash.pickby";
+import { createContext } from "solid-js";
 
 /**
  * Populate Graph with missing metadata
@@ -144,6 +153,9 @@ function clearRequests(id: string) {
     });
 }
 
+export const ValidationResultContext =
+  createContext<Accessor<ValidationResult>>();
+
 export function FlowEditor(props: {
   flow: Flow;
   nodeTypes: NodeType[];
@@ -154,6 +166,8 @@ export function FlowEditor(props: {
   const [graph, updateGraph] = createStore<Graph>(populate(props.flow.graph));
   const [selectedNode, setSelected] = createSignal<string>();
   const [_, sendBackendRequest] = createBackendFetchAction();
+  const [validationResult, setValidationResult] =
+    createSignal<ValidationResult>({ errors: [] });
 
   function applyChanges(changes: GraphChanges) {
     console.info(changes);
@@ -214,6 +228,9 @@ export function FlowEditor(props: {
     }
 
     // We do not remove metadata from the client because we don't need to
+
+    // Re-validate the graph
+    validate();
   }
 
   /**
@@ -247,6 +264,15 @@ export function FlowEditor(props: {
           })
     );
   }
+
+  /**
+   * Validate the graph
+   */
+  function validate() {
+    sendRequest("GET", "validate").then(setValidationResult);
+  }
+
+  onMount(validate);
 
   /**
    * Execute an action against the graph
@@ -562,36 +588,38 @@ export function FlowEditor(props: {
   }
 
   return (
-    <InteractiveCanvas
-      containerProps={{
-        class: styles.container,
-      }}
-      canvasProps={{
-        class: styles.canvas,
-      }}
-      preCanvas={
-        <>
-          <Meta
-            name="viewport"
-            content="width=device-width, initial-scale=1, user-scalable=no"
+    <ValidationResultContext.Provider value={validationResult}>
+      <InteractiveCanvas
+        containerProps={{
+          class: styles.container,
+        }}
+        canvasProps={{
+          class: styles.canvas,
+        }}
+        preCanvas={
+          <>
+            <Meta
+              name="viewport"
+              content="width=device-width, initial-scale=1, user-scalable=no"
+            />
+            <NodeSidebar />
+          </>
+        }
+        postCanvas={
+          <SettingsSidebar
+            graph={graph}
+            updateGraph={executeAction}
+            execute={executeFlow}
           />
-          <NodeSidebar />
-        </>
-      }
-      postCanvas={
-        <SettingsSidebar
-          graph={graph}
-          updateGraph={executeAction}
-          execute={executeFlow}
-        />
-      }
-      handleMove={handleMove}
-      handleDrop={handleDrop}
-      handleSelect={setSelected}
-      renderVirtualElement={renderVirtualElement}
-    >
-      <RenderConnections graph={graph} />
-      <RenderNodes graph={graph} />
-    </InteractiveCanvas>
+        }
+        handleMove={handleMove}
+        handleDrop={handleDrop}
+        handleSelect={setSelected}
+        renderVirtualElement={renderVirtualElement}
+      >
+        <RenderConnections graph={graph} />
+        <RenderNodes graph={graph} />
+      </InteractiveCanvas>
+    </ValidationResultContext.Provider>
   );
 }
