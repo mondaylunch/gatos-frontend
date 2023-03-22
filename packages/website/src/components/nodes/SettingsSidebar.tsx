@@ -1,8 +1,9 @@
 import { getWidget, Graph } from "~/lib/types";
-import { For, Match, Switch, useContext} from "solid-js";
+import { For, Match, Switch, useContext } from "solid-js";
 import { SelectedElementContext } from "../editor/InteractiveCanvas";
 import { FormInput } from "../forms/FormInput";
 import { GraphAction } from "./FlowEditor";
+import { getDisplayName } from "~/lib/types";
 
 interface SidebarProps {
   graph: Graph;
@@ -20,7 +21,7 @@ export function SettingsSidebar(props: SidebarProps) {
     <Switch
       fallback={
         <div class="h-full bg-neutral-700 w-[360px]">
-          <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-4 font-mono">
+          <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-4 font-bold">
             Node Settings
           </h1>
           <div class="text-white grid place-items-center">Select a node</div>
@@ -29,11 +30,13 @@ export function SettingsSidebar(props: SidebarProps) {
     >
       <Match when={node()}>
         <div class="h-full bg-neutral-700 w-[360px] flex flex-col">
-          <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-4 font-mono">
+          <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-4 font-bold">
             Node Settings
           </h1>
           <div class=" text-white flex flex-col gap-4 p-4 bg-neutral-600 ml-2 mr-2 mb-2 rounded-md">
-            <span class="text-xl">{node()!.type}</span>
+            <span class="text-xl">
+              {getDisplayName("node_type", node()!.type)}
+            </span>
             <span class="text-xs select-all">{selected()}</span>
             <For each={Object.keys(node()!.settings)}>
               {(key) => {
@@ -51,7 +54,6 @@ export function SettingsSidebar(props: SidebarProps) {
                   });
 
                 return (
-                  //TODO handle list/optional settings
                   <Switch fallback={`Cannot edit type ${type()}`}>
                     <Match when={widget().name === "textbox"}>
                       <span class="capitalize">{key}:</span>
@@ -99,10 +101,12 @@ export function SettingsSidebar(props: SidebarProps) {
                       <span class="capitalize">{key}:</span>
                       <select
                         value={entry()!.value}
-                        onChange={(ev) => apply(ev.currentTarget.value)}>
-                        <For each={(widget() as {options: string[]}).options}>
+                        onChange={(ev) => apply(ev.currentTarget.value)}
+                        class="text-black capitalize bg-white/80 p-1 rounded-sm hover:bg-white/100"
+                      >
+                        <For each={(widget() as { options: string[] }).options}>
                           {(option) => (
-                            <option>{option}</option>
+                            <option class="capitalize">{option}</option>
                           )}
                         </For>
                       </select>

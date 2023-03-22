@@ -8,10 +8,12 @@ import { FaSolidCircleQuestion } from "solid-icons/fa";
  */
 export function ProcessNode(props: {
   title: JSX.Element;
+  displayName: JSX.Element;
   children?: JSX.Element;
 }) {
   const isSelected = useSelfSelected();
   const IconFetch = Icons_Dict[props.title as keyof typeof Icons_Dict];
+  console.log(props.title);
   const Icon = (
     <Switch
       fallback={
@@ -29,8 +31,8 @@ export function ProcessNode(props: {
   const sharedContent = (
     <div class="group flex-1 p-2 flex-col items-center justify-center text-center">
       <div class="flex items-center justify-center gap-2">{Icon}</div>
-      <p class="flex-col font-bold text-black select-none text-xl font-mono capitalize">
-        {props.title}
+      <p class="flex-col font-bold text-black select-none text-xl capitalize">
+        {props.displayName}
       </p>
       <div class="flex flex-col items-center justify-center gap-2 w-full">
         {props.children}

@@ -31,7 +31,7 @@ function NodeTypeList(props: { category: NodeType["category"] }) {
 export function NodeSidebar() {
   return (
     <div class="w-fit bg-neutral-700 min-h-0" style="overflow-y: auto;">
-      <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-2 font-mono">
+      <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-2 font-bold">
         Node Toolbox
       </h1>
       <div class="flex flex-col gap-2 pl-2 pr-2 font-bold mb-4">
