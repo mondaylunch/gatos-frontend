@@ -36,6 +36,12 @@ import {
   FaSolidDiagramSuccessor,
   FaSolidArrowDownAZ,
   FaBrandsDiscord,
+  FaSolidFileArrowDown,
+  FaSolidFileCircleCheck,
+  FaSolidFileCircleQuestion,
+  FaSolidFileCircleXmark,
+  FaSolidFileCirclePlus,
+  FaSolidFileExcel,
 } from "solid-icons/fa";
 
 export const Icons_Dict = {
@@ -96,4 +102,10 @@ export const Icons_Dict = {
   ["discord.slash_command_event"]: FaBrandsDiscord,
   ["discord.message"]: FaBrandsDiscord,
   ["discord.message_embed"]: FaBrandsDiscord,
+  get_flow_data: FaSolidFileArrowDown,
+  set_flow_data: FaSolidFileCircleCheck,
+  contains_flow_data: FaSolidFileCircleQuestion,
+  remove_flow_data: FaSolidFileCircleXmark,
+  increment_flow_data: FaSolidFileCirclePlus,
+  multiply_flow_data: FaSolidFileExcel,
 };
