@@ -102,9 +102,12 @@ export function SettingsSidebar(props: SidebarProps) {
                       <select
                         value={entry()!.value}
                         onChange={(ev) => apply(ev.currentTarget.value)}
+                        class="text-black capitalize bg-white/80 p-1 rounded-sm hover:bg-white/100"
                       >
                         <For each={(widget() as { options: string[] }).options}>
-                          {(option) => <option>{option}</option>}
+                          {(option) => (
+                            <option class="capitalize">{option}</option>
+                          )}
                         </For>
                       </select>
                     </Match>
