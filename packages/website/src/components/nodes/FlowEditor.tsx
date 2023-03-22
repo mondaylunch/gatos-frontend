@@ -10,6 +10,7 @@ import {
   Flow,
   Graph,
   GraphChanges,
+  isConversionValid,
   loadDynamicData,
   Metadata,
   NodeType,
@@ -368,6 +369,15 @@ export function FlowEditor(props: {
   }
 
   /**
+   * Execute the flow using a given node ID and data
+   * @param node_id Node ID
+   * @param data Data
+   */
+  function executeFlow(node_id: string, data: object) {
+    return sendRequest("POST", `run/${node_id}`, data);
+  }
+
+  /**
    * Handle move events from canvas
    * @param ref Reference object
    * @param param1 Movement information
@@ -437,18 +447,24 @@ export function FlowEditor(props: {
         // 1. If the input or output does not exist, reject.
         if (!inputNode || !outputNode) return;
 
-        // 2. If the variable types differ, reject.
+        // 2. Validate conversion from output to input
         const output = outputNode.outputs[ref.name];
         const input = inputNode.inputs[inputName];
         if (!output) throw `Output "${ref.name}" not defined in the node!`;
         if (!input) throw `Input "${inputName}" not defined in the node!`;
-        if (
-          output.type !== input.type &&
-          input.type !== "any" &&
-          output.type !== "any" &&
-          !(input.type === "optional" && output.type.startsWith("optional"))
-        )
-          return;
+
+        if (output.type !== input.type) {
+          const valid = await isConversionValid(output.type, input.type, () =>
+            sendBackendRequest({
+              route: `/api/v1/data-types/conversions`,
+              init: {
+                method: "GET",
+              },
+            }).then((res) => res.json())
+          );
+
+          if (!valid) return;
+        }
 
         // 3. If an input connection already exists, reject.
         if (
@@ -562,7 +578,13 @@ export function FlowEditor(props: {
           <NodeSidebar />
         </>
       }
-      postCanvas={<SettingsSidebar graph={graph} updateGraph={executeAction} />}
+      postCanvas={
+        <SettingsSidebar
+          graph={graph}
+          updateGraph={executeAction}
+          execute={executeFlow}
+        />
+      }
       handleMove={handleMove}
       handleDrop={handleDrop}
       handleSelect={setSelected}
