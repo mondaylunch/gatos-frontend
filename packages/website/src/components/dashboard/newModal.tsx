@@ -40,6 +40,7 @@ export function newModal(setShowModal: (val: boolean) => void) {
         <div class="mb-4">
           <label class="block text-sm font-bold mb-2 text-white">Name:</label>
           <input
+            data-testid="new_flow_name"
             value={name()}
             onInput={(e) => setName(e.currentTarget.value)}
             class={`shadow bg-zinc-800 appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline ${
@@ -57,6 +58,7 @@ export function newModal(setShowModal: (val: boolean) => void) {
             Description:
           </label>
           <input
+            data-testid="new_flow_description"
             value={description()}
             onInput={(e) => setDescription(e.currentTarget.value)}
             class="shadow bg-zinc-800 appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline"
@@ -66,6 +68,7 @@ export function newModal(setShowModal: (val: boolean) => void) {
         </div>
         <div class="flex justify-end">
           <button
+            data-testid="new_flow_confirm_button"
             class="flex-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             onClick={handleSubmit}
           >

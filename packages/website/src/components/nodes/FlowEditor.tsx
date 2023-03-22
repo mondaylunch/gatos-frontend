@@ -3,15 +3,18 @@ import styles from "./editor.module.css";
 import { createStore } from "solid-js/store";
 import { Meta } from "solid-start";
 import {
-  DataType,
+  Connection,
+  Connector,
+  DataTypeWithWidget,
+  DisplayNames,
   Flow,
   Graph,
+  GraphChanges,
+  loadDataTypeWidgets,
+  loadDisplayNames,
   loadNodeTypes,
   Metadata,
   NodeType,
-  GraphChanges,
-  Connection,
-  Connector,
 } from "~/lib/types";
 import { VariableNode } from "./Node";
 import { NodeSidebar } from "./NodeSidebar";
@@ -93,7 +96,7 @@ export type GraphAction =
         id: string;
         name: string;
       };
-      dataType: DataType;
+      dataType: string;
     }
   | {
       type: "DisconnectNode";
@@ -142,8 +145,10 @@ function clearRequests(id: string) {
     });
 }
 
-export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
+export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[], displayNames: DisplayNames, dataTypeWidgets: DataTypeWithWidget[] }) {
+  loadDisplayNames(props.displayNames);
   loadNodeTypes(props.nodeTypes);
+  loadDataTypeWidgets(props.dataTypeWidgets);
   const [graph, updateGraph] = createStore<Graph>(populate(props.flow.graph));
   const [selectedNode, setSelected] = createSignal<string>();
   const [_, sendBackendRequest] = createBackendFetchAction();
@@ -533,9 +538,6 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[] }) {
         <Match when={ref.type === "NodeType"}>
           <NodeTypeDrag
             name={(ref as Grabbable & { type: "NodeType" }).node.name}
-            displayName={
-              (ref as Grabbable & { type: "NodeType" }).node.displayName
-            }
           />
         </Match>
       </Switch>

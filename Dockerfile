@@ -4,8 +4,7 @@ WORKDIR /app
 COPY . .
 
 RUN pnpm i
-RUN pnpm build
+# RUN pnpm build
 
 EXPOSE 3000
-ENV PORT 3000
-CMD ["pnpm", "start"]
+CMD pnpm dev -- --host --port 3000

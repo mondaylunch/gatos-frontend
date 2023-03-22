@@ -1,9 +1,8 @@
-import { Graph } from "~/lib/types";
-import { For, Match, Switch, useContext } from "solid-js";
+import { getWidget, Graph } from "~/lib/types";
+import { For, Match, Switch, useContext} from "solid-js";
 import { SelectedElementContext } from "../editor/InteractiveCanvas";
 import { FormInput } from "../forms/FormInput";
 import { GraphAction } from "./FlowEditor";
-import { FaSolidXmark } from "solid-icons/fa";
 
 interface SidebarProps {
   graph: Graph;
@@ -21,27 +20,27 @@ export function SettingsSidebar(props: SidebarProps) {
     <Switch
       fallback={
         <div class="h-full bg-neutral-700 w-[360px]">
-          <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-2 font-mono">
+          <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-4 font-mono">
             Node Settings
           </h1>
-          <hr class="border-t-2 my-2 mx-2" />
           <div class="text-white grid place-items-center">Select a node</div>
         </div>
       }
     >
       <Match when={node()}>
-        <div class="h-full bg-neutral-700 w-[360px]">
-          <h1 class="text-white text-2xl text-center bg-indigo-500 rounded-md mt-2 ml-1 mr-1 mb-2 font-mono">
+        <div class="h-full bg-neutral-700 w-[360px] flex flex-col">
+          <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-4 font-mono">
             Node Settings
           </h1>
-          <hr class="border-t-2 my-2 mx-2" />
-          <div class=" text-white flex flex-col gap-4 p-4">
+          <div class=" text-white flex flex-col gap-4 p-4 bg-neutral-600 ml-2 mr-2 mb-2 rounded-md">
             <span class="text-xl">{node()!.type}</span>
             <span class="text-xs select-all">{selected()}</span>
             <For each={Object.keys(node()!.settings)}>
               {(key) => {
                 const entry = () => node()!.settings[key];
                 const type = () => entry().type;
+
+                const widget = () => getWidget(type());
 
                 const apply = (value: any) =>
                   props.updateGraph({
@@ -52,8 +51,9 @@ export function SettingsSidebar(props: SidebarProps) {
                   });
 
                 return (
+                  //TODO handle list/optional settings
                   <Switch fallback={`Cannot edit type ${type()}`}>
-                    <Match when={type() === "string"}>
+                    <Match when={widget().name === "textbox"}>
                       <span class="capitalize">{key}:</span>
                       <FormInput
                         label={""}
@@ -61,7 +61,14 @@ export function SettingsSidebar(props: SidebarProps) {
                         onChange={(ev) => apply(ev.currentTarget.value)}
                       />
                     </Match>
-                    <Match when={type() === "boolean"}>
+                    <Match when={widget().name === "textarea"}>
+                      <span class="capitalize">{key}:</span>
+                      <textarea
+                        value={entry()!.value as string}
+                        onChange={(ev) => apply(ev.currentTarget.value)}
+                      />
+                    </Match>
+                    <Match when={widget().name === "checkbox"}>
                       <span class="capitalize">{key}:</span>
                       <label
                         class={`group inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
@@ -79,7 +86,7 @@ export function SettingsSidebar(props: SidebarProps) {
                         />
                       </label>
                     </Match>
-                    <Match when={type() === "number"}>
+                    <Match when={widget().name === "numberbox"}>
                       <span class="capitalize">{key}:</span>
                       <FormInput
                         label={""}
@@ -88,20 +95,32 @@ export function SettingsSidebar(props: SidebarProps) {
                         onChange={(ev) => apply(ev.currentTarget.valueAsNumber)}
                       />
                     </Match>
+                    <Match when={widget().name === "dropdown"}>
+                      <span class="capitalize">{key}:</span>
+                      <select
+                        value={entry()!.value}
+                        onChange={(ev) => apply(ev.currentTarget.value)}>
+                        <For each={(widget() as {options: string[]}).options}>
+                          {(option) => (
+                            <option>{option}</option>
+                          )}
+                        </For>
+                      </select>
+                    </Match>
                   </Switch>
                 );
               }}
             </For>
-            <hr class="border-t-2 my-2" />
-            <button
-              class="bg-red-600 p-2 rounded-lg flex z-10 items-center justify-center font-bold"
-              onClick={() => {
-                props.updateGraph({ type: "DeleteNode", id: selected()! });
-              }}
-            >
-              Delete Node
-            </button>
           </div>
+          <button
+            data-testid="delete_node_button"
+            class="bg-red-600 rounded-lg flex z-10 items-center justify-center font-bold text-white m-2 pt-1 pb-1"
+            onClick={() => {
+              props.updateGraph({ type: "DeleteNode", id: selected()! });
+            }}
+          >
+            Delete Node
+          </button>
         </div>
       </Match>
     </Switch>
