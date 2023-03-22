@@ -21,7 +21,7 @@ export function SettingsSidebar(props: SidebarProps) {
     <Switch
       fallback={
         <div class="h-full bg-neutral-700 w-[360px]">
-          <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-4 font-mono">
+          <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-4 font-bold">
             Node Settings
           </h1>
           <div class="text-white grid place-items-center">Select a node</div>
@@ -30,7 +30,7 @@ export function SettingsSidebar(props: SidebarProps) {
     >
       <Match when={node()}>
         <div class="h-full bg-neutral-700 w-[360px] flex flex-col">
-          <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-4 font-mono">
+          <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-4 font-bold">
             Node Settings
           </h1>
           <div class=" text-white flex flex-col gap-4 p-4 bg-neutral-600 ml-2 mr-2 mb-2 rounded-md">

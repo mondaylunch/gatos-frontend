@@ -135,12 +135,12 @@ export function RenderNodes(props: { graph: Graph }) {
                             }
                           >
                             <Match when={nodeType().category == "process"}>
-                              <div class="text-black font-medium capitalize">
+                              <div class="text-black font-medium normal-case">
                                 {inputName}:{" "}
                                 {getDisplayName(
                                   "data_type",
                                   node.inputs[inputName].type
-                                )}
+                                ).replace("$", " of ")}
                               </div>
                             </Match>
                           </Switch>
@@ -158,7 +158,10 @@ export function RenderNodes(props: { graph: Graph }) {
                                     }}
                                   >
                                     <VariableNode
-                                      name={connection()!.output.name}
+                                      name={connection()!.output.name.replace(
+                                        "$",
+                                        " of "
+                                      )}
                                       id={connection()!.output.node_id}
                                     />
                                   </div>
@@ -186,7 +189,7 @@ export function RenderNodes(props: { graph: Graph }) {
                           name={`${output}: ${getDisplayName(
                             "data_type",
                             node.outputs[output].type
-                          )}`}
+                          ).replace("$", " of ")}`}
                           id={node.id}
                         />
                       </div>
