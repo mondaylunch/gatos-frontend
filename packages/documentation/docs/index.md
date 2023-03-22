@@ -2,10 +2,9 @@
 sidebar_position: 1
 ---
 
-# Welcome to Gatos
+# Gatos Documentation
 
-- Doc of the gato
-- Developed as a submission for the 5CCS2SEG (Software Engineering Group Project) major group assignment.
+Welcome to the documentation for Gatos, this software was developed as a submission for the 5CCS2SEG (Software Engineering Group Project) major group assignment.
 
 ## Data Types
 
@@ -15,9 +14,9 @@ sidebar_position: 1
 - String
 - Boolean
 - Object
-    - JSON
-    - Reference
-    - Node
+  - JSON
+  - Reference
+  - Node
 - Number
 - List[x]
 - Optional[x] (alternative syntax `?x`)
