@@ -58,7 +58,7 @@ test("it can create a node", async ({ page }) => {
     await passwordInput.press("Enter");
     await page.goto(dashURL);
     await page.getByText("Test Flow").click();
-    await page.getByText("Math").click();
+    await page.getByText("Boolean Operation").click();
     const testNode = page.getByTestId("process_node");
     await expect(testNode).toBeEnabled();
 });
@@ -95,6 +95,7 @@ test("it can delete a flow", async ({ page }) => {
     await page.getByText("Test Flow").hover();
     await page.getByTestId("delete_flow_button").click();
     await page.getByTestId("delete_confirm_button").click();
+    await page.waitForTimeout(1000);
     await expect(page).toHaveScreenshot();
 
 });
