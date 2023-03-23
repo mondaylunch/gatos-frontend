@@ -1,4 +1,4 @@
-# Webhook: End
+# Webhook: Respond to Webhook
 
 This node represents the end of a webhook.
 
