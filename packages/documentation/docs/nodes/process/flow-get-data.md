@@ -1,8 +1,8 @@
-# Flow: Get Flow Data
+# Flow: Get Data
 
-This node gets the data stored in a flow.
+This node gets the value by the key in the author's key-value store
 
-| Input           | Configuration  | Output            |
-| --------------- | -------------- | -------------     |
-| ?key: string    | key: string    | value: any        |
-| element: any    | type: any      |                   |
+| Input        | Configuration | Output     |
+| ------------ | ------------- | ---------- |
+| ?key: string | key: string   | value: any |
+| element: any | type: any     |            |

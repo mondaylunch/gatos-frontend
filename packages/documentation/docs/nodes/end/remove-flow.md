@@ -1,7 +1,7 @@
-# Flow: Delete Flow
+# Flow: Delete Key
 
-This node deletes a given flow's data
+This node deletes a value by the key in the author's key-value store.
 
-| Input         | Configuration   | Output   |
-| -----------   | --------------  | -------- |
-| ?key: string  | key: string     |          |
+| Input        | Configuration | Output |
+| ------------ | ------------- | ------ |
+| ?key: string | key: string   |        |
