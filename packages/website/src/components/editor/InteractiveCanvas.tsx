@@ -123,6 +123,11 @@ export const SelectedElementContext = createContext<Signal<string>>();
 export const SelectionSignalContext = createContext<Accessor<boolean>>();
 
 /**
+ * Signal children elements about this element's ID
+ */
+export const ElementIdContext = createContext<string>();
+
+/**
  * Create an accessor for whether the given element ID is selected
  * @param id Element reference
  * @returns Accessor

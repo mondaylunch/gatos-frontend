@@ -5,15 +5,16 @@ import { Meta } from "solid-start";
 import {
   Connection,
   Connector,
-  DataType,
+  DataTypeWithWidget,
   DisplayNames,
   Flow,
   Graph,
   GraphChanges,
-  loadDisplayNames,
-  loadNodeTypes,
+  isConversionValid,
+  loadDynamicData,
   Metadata,
   NodeType,
+  ValidationResult,
 } from "~/lib/types";
 import { VariableNode } from "./Node";
 import { NodeSidebar } from "./NodeSidebar";
@@ -21,11 +22,19 @@ import { RenderConnections } from "./RenderConnections";
 import { RenderNodes } from "./RenderNodes";
 import { InteractiveCanvas } from "../editor/InteractiveCanvas";
 import { SettingsSidebar } from "./SettingsSidebar";
-import { createSignal, Match, onCleanup, Switch } from "solid-js";
+import {
+  Accessor,
+  createSignal,
+  Match,
+  onCleanup,
+  onMount,
+  Switch,
+} from "solid-js";
 import { NodeTypeDrag } from "~/components/editor/NodeTypeDrag";
 import { createBackendFetchAction } from "~/lib/backend";
 import isEqual from "lodash.isequal";
 import pickBy from "lodash.pickby";
+import { createContext } from "solid-js";
 
 /**
  * Populate Graph with missing metadata
@@ -95,7 +104,7 @@ export type GraphAction =
         id: string;
         name: string;
       };
-      dataType: DataType;
+      dataType: string;
     }
   | {
       type: "DisconnectNode";
@@ -144,12 +153,21 @@ function clearRequests(id: string) {
     });
 }
 
-export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[], displayNames: DisplayNames }) {
-  loadDisplayNames(props.displayNames);
-  loadNodeTypes(props.nodeTypes);
+export const ValidationResultContext =
+  createContext<Accessor<ValidationResult>>();
+
+export function FlowEditor(props: {
+  flow: Flow;
+  nodeTypes: NodeType[];
+  displayNames: DisplayNames;
+  dataTypeWidgets: DataTypeWithWidget[];
+}) {
+  loadDynamicData(props.nodeTypes, props.displayNames, props.dataTypeWidgets);
   const [graph, updateGraph] = createStore<Graph>(populate(props.flow.graph));
   const [selectedNode, setSelected] = createSignal<string>();
   const [_, sendBackendRequest] = createBackendFetchAction();
+  const [validationResult, setValidationResult] =
+    createSignal<ValidationResult>({ errors: [] });
 
   function applyChanges(changes: GraphChanges) {
     console.info(changes);
@@ -210,6 +228,9 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[], displayNa
     }
 
     // We do not remove metadata from the client because we don't need to
+
+    // Re-validate the graph
+    validate();
   }
 
   /**
@@ -243,6 +264,15 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[], displayNa
           })
     );
   }
+
+  /**
+   * Validate the graph
+   */
+  function validate() {
+    sendRequest("GET", "validate").then(setValidationResult);
+  }
+
+  onMount(validate);
 
   /**
    * Execute an action against the graph
@@ -365,6 +395,15 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[], displayNa
   }
 
   /**
+   * Execute the flow using a given node ID and data
+   * @param node_id Node ID
+   * @param data Data
+   */
+  function executeFlow(node_id: string, data: object) {
+    return sendRequest("POST", `run/${node_id}`, data);
+  }
+
+  /**
    * Handle move events from canvas
    * @param ref Reference object
    * @param param1 Movement information
@@ -434,18 +473,24 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[], displayNa
         // 1. If the input or output does not exist, reject.
         if (!inputNode || !outputNode) return;
 
-        // 2. If the variable types differ, reject.
+        // 2. Validate conversion from output to input
         const output = outputNode.outputs[ref.name];
         const input = inputNode.inputs[inputName];
         if (!output) throw `Output "${ref.name}" not defined in the node!`;
         if (!input) throw `Input "${inputName}" not defined in the node!`;
-        if (
-          output.type !== input.type &&
-          input.type !== "any" &&
-          output.type !== "any" &&
-          !(input.type === "optional" && output.type.startsWith("optional"))
-        )
-          return;
+
+        if (output.type !== input.type) {
+          const valid = await isConversionValid(output.type, input.type, () =>
+            sendBackendRequest({
+              route: `/api/v1/data-types/conversions`,
+              init: {
+                method: "GET",
+              },
+            }).then((res) => res.json())
+          );
+
+          if (!valid) return;
+        }
 
         // 3. If an input connection already exists, reject.
         if (
@@ -543,30 +588,38 @@ export function FlowEditor(props: { flow: Flow; nodeTypes: NodeType[], displayNa
   }
 
   return (
-    <InteractiveCanvas
-      containerProps={{
-        class: styles.container,
-      }}
-      canvasProps={{
-        class: styles.canvas,
-      }}
-      preCanvas={
-        <>
-          <Meta
-            name="viewport"
-            content="width=device-width, initial-scale=1, user-scalable=no"
+    <ValidationResultContext.Provider value={validationResult}>
+      <InteractiveCanvas
+        containerProps={{
+          class: styles.container,
+        }}
+        canvasProps={{
+          class: styles.canvas,
+        }}
+        preCanvas={
+          <>
+            <Meta
+              name="viewport"
+              content="width=device-width, initial-scale=1, user-scalable=no"
+            />
+            <NodeSidebar />
+          </>
+        }
+        postCanvas={
+          <SettingsSidebar
+            graph={graph}
+            updateGraph={executeAction}
+            execute={executeFlow}
           />
-          <NodeSidebar />
-        </>
-      }
-      postCanvas={<SettingsSidebar graph={graph} updateGraph={executeAction} />}
-      handleMove={handleMove}
-      handleDrop={handleDrop}
-      handleSelect={setSelected}
-      renderVirtualElement={renderVirtualElement}
-    >
-      <RenderConnections graph={graph} />
-      <RenderNodes graph={graph} />
-    </InteractiveCanvas>
+        }
+        handleMove={handleMove}
+        handleDrop={handleDrop}
+        handleSelect={setSelected}
+        renderVirtualElement={renderVirtualElement}
+      >
+        <RenderConnections graph={graph} />
+        <RenderNodes graph={graph} />
+      </InteractiveCanvas>
+    </ValidationResultContext.Provider>
   );
 }

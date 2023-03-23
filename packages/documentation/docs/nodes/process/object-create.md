@@ -1,4 +1,4 @@
-# List: Create
+# Object: Create
 
 This node lets you create a object with arbitrary keys.
 
