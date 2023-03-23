@@ -58,7 +58,7 @@ test("it can create a node", async ({ page }) => {
     await passwordInput.press("Enter");
     await page.goto(dashURL);
     await page.getByText("Test Flow").click();
-    await page.getByText("Math").click();
+    await page.getByText("Boolean Operation").click();
     const testNode = page.getByTestId("process_node");
     await expect(testNode).toBeEnabled();
 });
