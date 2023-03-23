@@ -1,5 +1,4 @@
 import styles from "./editor.module.css";
-
 import { createStore } from "solid-js/store";
 import { Meta } from "solid-start";
 import {
@@ -35,6 +34,7 @@ import { createBackendFetchAction } from "~/lib/backend";
 import isEqual from "lodash.isequal";
 import pickBy from "lodash.pickby";
 import { createContext } from "solid-js";
+import { createServerAction$ } from "solid-start/server";
 
 /**
  * Populate Graph with missing metadata
@@ -168,6 +168,13 @@ export function FlowEditor(props: {
   const [_, sendBackendRequest] = createBackendFetchAction();
   const [validationResult, setValidationResult] =
     createSignal<ValidationResult>({ errors: [] });
+
+  // Load API URL
+  const [apiUrl, act] = createServerAction$(
+    async () => process.env.VITE_API_URL!
+  );
+
+  onMount(act);
 
   function applyChanges(changes: GraphChanges) {
     console.info(changes);
@@ -612,9 +619,7 @@ export function FlowEditor(props: {
             execute={executeFlow}
             copyWebhookURL={(node_id) =>
               navigator.clipboard.writeText(
-                `${import.meta.env.VITE_API_URL}/api/v1/flows/${
-                  props.flow._id
-                }/${node_id}`
+                `${apiUrl.result}/api/v1/flows/${props.flow._id}/${node_id}`
               )
             }
           />

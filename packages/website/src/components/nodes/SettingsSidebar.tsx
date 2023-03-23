@@ -1,10 +1,19 @@
 import { ExecuteModal } from "./modals/ExecuteModal";
 import { getWidget, Graph } from "~/lib/types";
-import { createSignal, For, Match, Show, Switch, useContext } from "solid-js";
+import {
+  createSignal,
+  For,
+  Match,
+  onMount,
+  Show,
+  Switch,
+  useContext,
+} from "solid-js";
 import { SelectedElementContext } from "../editor/InteractiveCanvas";
 import { FormInput } from "../forms/FormInput";
 import { GraphAction, ValidationResultContext } from "./FlowEditor";
 import { getDisplayName } from "~/lib/types";
+import { createServerAction$ } from "solid-start/server";
 
 interface SidebarProps {
   graph: Graph;
@@ -22,6 +31,13 @@ export function SettingsSidebar(props: SidebarProps) {
       : undefined;
 
   const [showExecute, setShowExecute] = createSignal(false);
+
+  // Load Discord invite URL
+  const [inviteUrl, act] = createServerAction$(
+    async () => process.env.VITE_DISCORD_INVITE!
+  );
+
+  onMount(act);
 
   const errors = () =>
     node()
@@ -95,9 +111,7 @@ export function SettingsSidebar(props: SidebarProps) {
         </h1>
         <button
           class="bg-blue-600 rounded-lg flex z-10 items-center justify-center font-bold text-white m-2 pt-1 pb-1"
-          onClick={() =>
-            window.open(import.meta.env.VITE_DISCORD_INVITE, "_blank")
-          }
+          onClick={() => window.open(inviteUrl.result, "_blank")}
         >
           Invite Bot
         </button>

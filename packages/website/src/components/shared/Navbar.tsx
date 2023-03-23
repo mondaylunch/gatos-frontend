@@ -6,10 +6,10 @@ import {
   Switch,
   Match,
 } from "solid-js";
-import {FaSolidCat} from "solid-icons/fa";
-import {A, useLocation} from "solid-start";
-import {signIn, signOut} from "@auth/solid-start/client";
-import {user} from "~/lib/session";
+import { FaSolidCat } from "solid-icons/fa";
+import { A, useLocation } from "solid-start";
+import { signIn, signOut } from "@auth/solid-start/client";
+import { user } from "~/lib/session";
 
 export function Navbar() {
   const [dropdownVisible, setDropdownVisible] = createSignal(false);
@@ -42,7 +42,11 @@ export function Navbar() {
           <div class="flex flex-1 items-stretch justify-start">
             <div class="flex items-center pr-2">
               <A href="/">
-                <img src="/images/gatosLogoSmall.png" class="w-8 h-8 object-contain rounded-[45px]" alt="Flow image"/>
+                <img
+                  src="/images/gatosLogoSmall.png"
+                  class="w-8 h-8 object-contain rounded-[45px]"
+                  alt="Flow image"
+                />
               </A>
             </div>
             <Switch
