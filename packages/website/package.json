@@ -2,7 +2,7 @@
   "name": "website",
   "scripts": {
     "dev": "solid-start dev",
-    "build": "solid-start build",
+    "build": "solid-start build && node monkeyPatch.js",
     "start": "solid-start start",
     "test": "vitest run",
     "test-watch": "vitest",
