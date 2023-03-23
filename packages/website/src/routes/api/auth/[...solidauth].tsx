@@ -6,7 +6,6 @@ import {
   AUTH0_ISSUER,
   AUTH0_SECRET,
 } from "~/lib/env";
-import { skipCSRFCheck } from "@auth/core";
 
 export const authOpts: SolidAuthConfig = {
   providers: [
@@ -19,7 +18,6 @@ export const authOpts: SolidAuthConfig = {
     }),
   ],
   debug: false,
-  skipCSRFCheck: skipCSRFCheck,
 };
 
 export const { GET, POST } = SolidAuth(authOpts);
