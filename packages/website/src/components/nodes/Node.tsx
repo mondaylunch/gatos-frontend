@@ -39,7 +39,6 @@ export function ProcessNode(props: {
 }) {
   const isSelected = useSelfSelected();
   const IconFetch = Icons_Dict[props.title as keyof typeof Icons_Dict];
-  console.log(props.title);
   const Icon = (
     <Switch
       fallback={
@@ -124,6 +123,7 @@ export function VariableNode(props: { name: JSX.Element; id: string }) {
  */
 export function InputNode(props: {
   title: JSX.Element;
+  displayName: JSX.Element;
   children?: JSX.Element;
 }) {
   const isSelected = useSelfSelected();
@@ -134,7 +134,7 @@ export function InputNode(props: {
           <ErrorIndicator flip />
           <div class="flex flex-col text-center items-center">
             <p class="flex-col font-bold text-white select-none text-2xl capitalize pt-4">
-              {props.title}
+              {props.displayName}
             </p>
           </div>
           <div class="flex flex-col text-center items-center p-2 gap-2">
@@ -148,7 +148,7 @@ export function InputNode(props: {
           <ErrorIndicator flip />
           <div class="flex flex-col text-center items-center">
             <p class="flex-col font-bold text-white select-none text-2xl capitalize pt-4">
-              {props.title}
+              {props.displayName}
             </p>
           </div>
           <div class="flex flex-col text-center items-center p-2 gap-2">
@@ -163,7 +163,11 @@ export function InputNode(props: {
 /**
  * Node signifying the end of a flow
  */
-export function OutputNode(props: { title: string; children?: JSX.Element }) {
+export function OutputNode(props: {
+  title: string;
+  displayName: JSX.Element;
+  children?: JSX.Element
+}) {
   const isSelected = useSelfSelected();
   return (
     <Switch
@@ -172,7 +176,7 @@ export function OutputNode(props: { title: string; children?: JSX.Element }) {
           <ErrorIndicator />
           <div class="flex flex-col text-center items-center">
             <p class="flex-col font-bold text-white select-none text-2xl capitalize pt-2">
-              {props.title}
+              {props.displayName}
             </p>
           </div>
           <div class="flex flex-col text-center items-center p-2 gap-2">
@@ -186,7 +190,7 @@ export function OutputNode(props: { title: string; children?: JSX.Element }) {
         <div class="rounded-b-full relative w-max h-max bg-slate-600 flex items-center justify-center flex-col outline outline-4 outline-indigo-600 p-2 pb-12">
           <div class="flex flex-col text-center items-center">
             <p class="flex-col font-bold text-white select-none text-2xl capitalize pt-2">
-              {props.title}
+              {props.displayName}
             </p>
           </div>
           <div class="flex flex-col text-center items-center p-2 gap-2">
