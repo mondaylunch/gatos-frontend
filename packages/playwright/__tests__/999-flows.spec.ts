@@ -95,6 +95,7 @@ test("it can delete a flow", async ({ page }) => {
     await page.getByText("Test Flow").hover();
     await page.getByTestId("delete_flow_button").click();
     await page.getByTestId("delete_confirm_button").click();
+    await page.waitForTimeout(1000);
     await expect(page).toHaveScreenshot();
 
 });
