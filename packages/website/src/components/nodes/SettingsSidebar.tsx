@@ -9,6 +9,7 @@ import { getDisplayName } from "~/lib/types";
 interface SidebarProps {
   graph: Graph;
   updateGraph: (action: GraphAction) => void;
+  copyWebhookURL: (node_id: string) => void;
   execute: (node_id: string, data: object) => Promise<unknown>;
 }
 
@@ -66,6 +67,12 @@ export function SettingsSidebar(props: SidebarProps) {
           onClick={() => setShowExecute(true)}
         >
           Execute
+        </button>
+        <button
+          class="bg-blue-600 rounded-lg flex z-10 items-center justify-center font-bold text-white m-2 pt-1 pb-1"
+          onClick={() => props.copyWebhookURL(webhookExecuteNodeId())}
+        >
+          Copy URL
         </button>
       </Show>
 
