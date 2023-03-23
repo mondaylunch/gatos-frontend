@@ -78,6 +78,10 @@ Give the backend application access to the `read:users` permission on the Auth0 
 
 ![Auth0 APIs](/img/examples/auth0-authorize-management-api.png)
 
+Open settings and make note of the client ID and client secret (this will be the `BACKEND_` prefixed variables later):
+
+![Auth0 Backend Settings](/img/examples/auth0-backend-settings.png)
+
 Auth0 is now set up.
 
 ## 3. Configure Discord
@@ -163,6 +167,7 @@ services:
       - database
     environment:
       - API_URL=http://backend:8080
+      - AUTH_TRUST_HOST=1
     restart: always
     ports:
       # change left-hand side assignment if not suitable
@@ -202,17 +207,9 @@ BACKEND_AUTH0_CLIENT_SECRET=<backend application client secret>
 # Discord Bot Token
 DISCORD_TOKEN=<Discord bot token>
 
-# Public Host
-NEXTAUTH_URL=https://<frontend origin>
-
 # JWT Secret
 # `openssl rand -base64 32`
 # or go to: https://generate-secret.vercel.app/32
-NEXTAUTH_SECRET=
-
-# Cookie Secret
-# `openssl rand -hex 32`
-# or go to: https://generate-secret.vercel.app/64
 AUTH_SECRET=
 ```
 
@@ -236,18 +233,13 @@ BACKEND_AUTH0_CLIENT_ID=WRCrcJ4VKL32ZRTr4SPr33fCgjsd324
 AUTH0_CLIENT_SECRET=supersecrettoken1234
 BACKEND_AUTH0_CLIENT_SECRET=anothersupersecrettoken5678
 
-# Public Host
-NEXTAUTH_URL=https://<frontend origin>
+# Discord Bot Token
+DISCORD_TOKEN=1234.abcdef.ghij
 
 # JWT Secret
 # `openssl rand -base64 32`
 # or go to: https://generate-secret.vercel.app/32
-NEXTAUTH_SECRET=4MODj149L2v5fDv5L2mcJ65gxCTqeCDoDoMa2oVeKxA=
-
-# Cookie Secret
-# `openssl rand -hex 32`
-# or go to: https://generate-secret.vercel.app/64
-AUTH_SECRET=35bed7f8f7d084168d61f1fd4ad2afd7e864260f6bcc15e8dfe32ca7329b90eb
+AUTH_SECRET=4MODj149L2v5fDv5L2mcJ65gxCTqeCDoDoMa2oVeKxA=
 ```
 
 :::
