@@ -20,3 +20,13 @@ Welcome to the documentation for Gatos, this software was developed as a submiss
 - Number
 - List[x]
 - Optional[x] (alternative syntax `?x`)
+
+## Discord Data Types
+- Guild ID
+- Channle ID
+- User ID
+- Role ID
+- Emoji ID
+- Slash Command Event
+- Message
+- Message Embed
