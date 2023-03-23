@@ -9,6 +9,7 @@ import { getDisplayName } from "~/lib/types";
 interface SidebarProps {
   graph: Graph;
   updateGraph: (action: GraphAction) => void;
+  copyWebhookURL: (node_id: string) => void;
   execute: (node_id: string, data: object) => Promise<unknown>;
 }
 
@@ -44,6 +45,19 @@ export function SettingsSidebar(props: SidebarProps) {
     }
   };
 
+  const showDiscordBotInvite = () => {
+    const current = node();
+    if (current) {
+      return current.type.startsWith("discord.receive_") ? true : false;
+    }
+
+    return props.graph.nodes.find((node) =>
+      node.type.startsWith("discord.receive_")
+    )
+      ? true
+      : false;
+  };
+
   return (
     <div class="h-full bg-neutral-700 w-[360px] flex flex-col">
       <Show when={errors().length}>
@@ -66,6 +80,26 @@ export function SettingsSidebar(props: SidebarProps) {
           onClick={() => setShowExecute(true)}
         >
           Execute
+        </button>
+        <button
+          class="bg-blue-600 rounded-lg flex z-10 items-center justify-center font-bold text-white m-2 pt-1 pb-1"
+          onClick={() => props.copyWebhookURL(webhookExecuteNodeId()!)}
+        >
+          Copy URL
+        </button>
+      </Show>
+
+      <Show when={showDiscordBotInvite()}>
+        <h1 class="text-white text-2xl text-center bg-slate-600 rounded-md mt-2 ml-1 mr-1 mb-2 font-bold">
+          Discord
+        </h1>
+        <button
+          class="bg-blue-600 rounded-lg flex z-10 items-center justify-center font-bold text-white m-2 pt-1 pb-1"
+          onClick={() =>
+            window.open(import.meta.env.VITE_DISCORD_INVITE, "_blank")
+          }
+        >
+          Invite Bot
         </button>
       </Show>
 

@@ -25,7 +25,7 @@ export function ExecuteModal(props: Props) {
   }
 
   return (
-    <div class="fixed inset-0 flex items-center justify-center flex-col bg-gray-500 bg-opacity-75">
+    <div class="fixed inset-0 flex items-center justify-center flex-col bg-gray-500 bg-opacity-75 z-20">
       <div class="bg-neutral-800 rounded-lg p-8 max-w-xs mx-auto outline outline-indigo-600 outline-offset-2">
         <Switch
           fallback={

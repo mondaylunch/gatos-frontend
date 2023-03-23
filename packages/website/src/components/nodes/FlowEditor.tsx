@@ -610,6 +610,13 @@ export function FlowEditor(props: {
             graph={graph}
             updateGraph={executeAction}
             execute={executeFlow}
+            copyWebhookURL={(node_id) =>
+              navigator.clipboard.writeText(
+                `${import.meta.env.VITE_API_URL}/api/v1/flows/${
+                  props.flow._id
+                }/${node_id}`
+              )
+            }
           />
         }
         handleMove={handleMove}
