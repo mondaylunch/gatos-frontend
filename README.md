@@ -14,6 +14,7 @@ The frontend component is deployed at https://mondaylunch.club.
 
 ## Prerequisites
 
+- Ensure you have [Git](https://git-scm.com/) installed
 - Install [Node.js 16 or later](https://nodejs.org/en/)
 - Install [pnpm](https://pnpm.io/installation)
 

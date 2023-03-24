@@ -8,8 +8,8 @@ This guide explains everything required to run Gatos in production.
 
 ## Prerequisites
 
-- Docker
-- Docker Compose v3+
+- Install [Docker](https://docs.docker.com/engine/install/)
+- Install [Docker Compose v3+](https://docs.docker.com/compose/install/)
 
 ## 1. Configure server and DNS
 
