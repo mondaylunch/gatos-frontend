@@ -86,7 +86,11 @@ function RenderWidget(props: {
           onChange={(ev) => props.apply(ev.currentTarget.value)}
           class="text-black capitalize bg-white/80 p-1 rounded-sm hover:bg-white/100"
         >
-          <For each={(props.widget() as { options: string[] }).options}>
+          <For
+            each={(props.widget() as { options: string[] }).options
+              .slice()
+              .sort()}
+          >
             {(option) => <option class="capitalize">{option}</option>}
           </For>
         </select>
