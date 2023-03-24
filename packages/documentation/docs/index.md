@@ -6,7 +6,7 @@ sidebar_position: 1
 
 Welcome to the documentation for Gatos, this software was developed as a submission for the 5CCS2SEG (Software Engineering Group Project) major group assignment.
 
-# Create Flow: Example
+## Getting Started with Flows
 
 1. To create a flow we need to surround the flow with one of the start and end nodes so that the flow is executable. For this example we will use trigger webhook like so:
 
@@ -51,10 +51,10 @@ Welcome to the documentation for Gatos, this software was developed as a submiss
 - List[x]
 - Optional[x] (alternative syntax `?x`)
 
-## Discord Data Types
+**Discord Data Types**
 
 - Guild ID
-- Channle ID
+- Channel ID
 - User ID
 - Role ID
 - Emoji ID
