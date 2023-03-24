@@ -243,7 +243,7 @@ BACKEND_AUTH0_CLIENT_SECRET=anothersupersecrettoken5678
 DISCORD_TOKEN=1234.abcdef.ghij
 
 # Discord Invite URL
-VITE_DISCORD_INVITE=https://discord.com/oauth2/authorize?client_id=1088446971871768586&scope=bot%20applications.commands
+VITE_DISCORD_INVITE=https://discord.com/oauth2/authorize?client_id=1088446971871768586&permissions=8&scope=bot%20applications.commands
 
 # Backend API URL
 VITE_API_URL=https://api.mondaylunch.club
