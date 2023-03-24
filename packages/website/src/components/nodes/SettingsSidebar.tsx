@@ -31,11 +31,7 @@ function RenderWidget(props: {
   apply: (value: any) => void;
 }) {
   return (
-    <Switch
-      fallback={`Cannot edit type ${props.type()} ${JSON.stringify(
-        props.widget()
-      )}`}
-    >
+    <Switch fallback={`Cannot edit type ${props.type()}`}>
       <Match when={props.widget().name === "textbox"}>
         <span class="capitalize">{props.key}:</span>
         <FormInput
@@ -90,14 +86,32 @@ function RenderWidget(props: {
           </For>
         </select>
       </Match>
-      {/*<Match when={props.widget().name.startsWith("list$")}>
+      <Match when={props.type().startsWith("list$")}>
+        <For each={props.value() ?? []}>
+          {(entry, index) => (
+            <RenderWidget
+              key={index().toString()}
+              type={() => props.type().substring(5)}
+              widget={() => getWidget(props.type().substring(5))}
+              value={() => entry}
+              apply={(value) =>
+                props.apply(
+                  (props.value() ?? []).map((v: any, i: number) =>
+                    i === index() ? value : v
+                  )
+                )
+              }
+            />
+          )}
+        </For>
+
         <button
           onClick={() => props.apply([...(props.value() ?? []), undefined])}
         >
           +
         </button>
         <button onClick={() => props.apply(props.value() ?? [])}>-</button>
-      </Match>*/}
+      </Match>
     </Switch>
   );
 }
