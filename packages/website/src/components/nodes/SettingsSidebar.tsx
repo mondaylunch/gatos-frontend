@@ -31,7 +31,11 @@ function RenderWidget(props: {
   apply: (value: any) => void;
 }) {
   return (
-    <Switch fallback={`Cannot edit type ${props.type()}`}>
+    <Switch
+      fallback={`Cannot edit type ${props.type()} ${JSON.stringify(
+        props.widget()
+      )}`}
+    >
       <Match when={props.widget().name === "textbox"}>
         <span class="capitalize">{props.key}:</span>
         <FormInput
