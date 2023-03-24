@@ -43,11 +43,11 @@ export function Square_File(props: DisplayProps) {
         class="absolute top-0 left-0 w-full h-full"
       >
         <div class="flex flex-col justify-center h-full items-center text-neutral-200 hover:text-neutral-300">
-          <p class="font-bold capitalize group-hover:text-sky-500 transition duration-150 ease-in-out">
+          <p class="font-bold capitalize group-hover:text-sky-500 transition duration-150 ease-in-out text-center">
             {props.title}
           </p>
           <hr class="border-neutral-500 w-5/6" />
-          <p>{props.description}</p>
+          <p class="text-center">{props.description}</p>
         </div>
       </A>
     </div>
