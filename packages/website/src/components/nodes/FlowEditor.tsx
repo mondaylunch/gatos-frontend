@@ -619,7 +619,7 @@ export function FlowEditor(props: {
             execute={executeFlow}
             copyWebhookURL={(node_id) =>
               navigator.clipboard.writeText(
-                `${apiUrl.result}/api/v1/flows/${props.flow._id}/${node_id}`
+                `${apiUrl.result}/api/v1/flows/${props.flow._id}/run/${node_id}`
               )
             }
           />
