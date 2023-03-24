@@ -91,7 +91,7 @@ function RenderWidget(props: {
         <For each={props.value() ?? []}>
           {(entry, index) => (
             <RenderWidget
-              key={index().toString()}
+              key={`Element ${index()}`}
               type={() => props.type().substring(5)}
               widget={() => getWidget(props.type().substring(5))}
               value={() => entry}
@@ -109,9 +109,17 @@ function RenderWidget(props: {
         <button
           onClick={() => props.apply([...(props.value() ?? []), undefined])}
         >
-          +
+          + Add Element
         </button>
-        <button onClick={() => props.apply(props.value() ?? [])}>-</button>
+        <button
+          onClick={() =>
+            props.apply(
+              (props.value() ?? []).slice(0, (props.value() ?? []).length - 1)
+            )
+          }
+        >
+          - Remove Element
+        </button>
       </Match>
     </Switch>
   );
