@@ -44,6 +44,7 @@ function RenderWidget(props: {
       <Match when={props.widget().name === "textarea"}>
         <span class="capitalize">{props.key}:</span>
         <textarea
+          class="text-black"
           value={props.value() as string}
           onChange={(ev) => props.apply(ev.currentTarget.value)}
         />
