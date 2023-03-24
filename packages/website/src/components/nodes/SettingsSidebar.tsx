@@ -1,6 +1,7 @@
 import { ExecuteModal } from "./modals/ExecuteModal";
-import { getWidget, Graph } from "~/lib/types";
+import { getWidget, Graph, Widget } from "~/lib/types";
 import {
+  Accessor,
   createSignal,
   For,
   Match,
@@ -20,6 +21,74 @@ interface SidebarProps {
   updateGraph: (action: GraphAction) => void;
   copyWebhookURL: (node_id: string) => void;
   execute: (node_id: string, data: object) => Promise<unknown>;
+}
+
+function RenderWidget(props: {
+  key: string;
+  type: Accessor<string>;
+  widget: Accessor<Widget>;
+  value: () => any;
+  apply: (value: any) => void;
+}) {
+  return (
+    <Switch fallback={`Cannot edit type ${props.type()}`}>
+      <Match when={props.widget().name === "textbox"}>
+        <span class="capitalize">{props.key}:</span>
+        <FormInput
+          label={""}
+          value={props.value() as string}
+          onChange={(ev) => props.apply(ev.currentTarget.value)}
+        />
+      </Match>
+      <Match when={props.widget().name === "textarea"}>
+        <span class="capitalize">{props.key}:</span>
+        <textarea
+          value={props.value() as string}
+          onChange={(ev) => props.apply(ev.currentTarget.value)}
+        />
+      </Match>
+      <Match when={props.widget().name === "checkbox"}>
+        <span class="capitalize">{props.key}:</span>
+        <label
+          class={`group inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
+            props.value()
+              ? "bg-green-500 hover:bg-green-600 focus:ring-green-500"
+              : "bg-red-500 hover:bg-red-600 focus:ring-red-500"
+          } focus:outline-none focus:ring-2 focus:ring-offset-2`}
+        >
+          {props.value() ? "True" : "False"}
+          <input
+            type="checkbox"
+            checked={props.value() as boolean}
+            onChange={(ev) => props.apply(ev.currentTarget.checked)}
+            class="sr-only"
+          />
+        </label>
+      </Match>
+      <Match when={props.widget().name === "numberbox"}>
+        <span class="capitalize">{props.key}:</span>
+        <FormInput
+          label={""}
+          type="number"
+          value={props.value() as number}
+          onChange={(ev) => props.apply(ev.currentTarget.valueAsNumber)}
+        />
+      </Match>
+      <Match when={props.widget().name === "dropdown"}>
+        <span class="capitalize">{props.key}:</span>
+        <select
+          value={props.value()}
+          onChange={(ev) => props.apply(ev.currentTarget.value)}
+          class="text-black capitalize bg-white/80 p-1 rounded-sm hover:bg-white/100"
+        >
+          <For each={(props.widget() as { options: string[] }).options}>
+            {(option) => <option class="capitalize">{option}</option>}
+          </For>
+        </select>
+      </Match>
+      <Match when={props.widget().name.startsWith("list$")}>list</Match>
+    </Switch>
+  );
 }
 
 export function SettingsSidebar(props: SidebarProps) {
@@ -142,6 +211,7 @@ export function SettingsSidebar(props: SidebarProps) {
                 const type = () => entry().type;
 
                 const widget = () => getWidget(type());
+                const value = () => entry().value;
 
                 const apply = (value: any) =>
                   props.updateGraph({
@@ -152,64 +222,13 @@ export function SettingsSidebar(props: SidebarProps) {
                   });
 
                 return (
-                  <Switch fallback={`Cannot edit type ${type()}`}>
-                    <Match when={widget().name === "textbox"}>
-                      <span class="capitalize">{key}:</span>
-                      <FormInput
-                        label={""}
-                        value={entry()!.value as string}
-                        onChange={(ev) => apply(ev.currentTarget.value)}
-                      />
-                    </Match>
-                    <Match when={widget().name === "textarea"}>
-                      <span class="capitalize">{key}:</span>
-                      <textarea
-                        value={entry()!.value as string}
-                        onChange={(ev) => apply(ev.currentTarget.value)}
-                      />
-                    </Match>
-                    <Match when={widget().name === "checkbox"}>
-                      <span class="capitalize">{key}:</span>
-                      <label
-                        class={`group inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
-                          entry()!.value
-                            ? "bg-green-500 hover:bg-green-600 focus:ring-green-500"
-                            : "bg-red-500 hover:bg-red-600 focus:ring-red-500"
-                        } focus:outline-none focus:ring-2 focus:ring-offset-2`}
-                      >
-                        {entry()!.value ? "True" : "False"}
-                        <input
-                          type="checkbox"
-                          checked={entry()!.value as boolean}
-                          onChange={(ev) => apply(ev.currentTarget.checked)}
-                          class="sr-only"
-                        />
-                      </label>
-                    </Match>
-                    <Match when={widget().name === "numberbox"}>
-                      <span class="capitalize">{key}:</span>
-                      <FormInput
-                        label={""}
-                        type="number"
-                        value={entry()!.value as number}
-                        onChange={(ev) => apply(ev.currentTarget.valueAsNumber)}
-                      />
-                    </Match>
-                    <Match when={widget().name === "dropdown"}>
-                      <span class="capitalize">{key}:</span>
-                      <select
-                        value={entry()!.value}
-                        onChange={(ev) => apply(ev.currentTarget.value)}
-                        class="text-black capitalize bg-white/80 p-1 rounded-sm hover:bg-white/100"
-                      >
-                        <For each={(widget() as { options: string[] }).options}>
-                          {(option) => (
-                            <option class="capitalize">{option}</option>
-                          )}
-                        </For>
-                      </select>
-                    </Match>
-                  </Switch>
+                  <RenderWidget
+                    key={key}
+                    type={type}
+                    widget={widget}
+                    value={value}
+                    apply={apply}
+                  />
                 );
               }}
             </For>

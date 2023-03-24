@@ -25,6 +25,9 @@ export type Widget =
   | {
       name: "dropdown";
       options: string[];
+    }
+  | {
+      name: `list$${string}`;
     };
 
 export type DataTypeWithWidget = {
