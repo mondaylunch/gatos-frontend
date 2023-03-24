@@ -6,6 +6,12 @@ sidebar_position: 1
 
 Welcome to the documentation for Gatos, this software was developed as a submission for the 5CCS2SEG (Software Engineering Group Project) major group assignment.
 
+:::info
+
+If you are viewing this in PDF format, you can see the full documentation (including API and nodes) in a web format at https://docs.mondaylunch.club.
+
+:::
+
 ## Getting Started with Flows
 
 1. To create a flow we need to surround the flow with one of the start and end nodes so that the flow is executable. For this example we will use trigger webhook like so:
