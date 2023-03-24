@@ -133,7 +133,7 @@ export function InputNode(props: {
         <div class="rounded-t-full relative w-max h-max bg-slate-600 flex items-center justify-center flex-col pl-6 pr-6 pt-2 pb-2">
           <ErrorIndicator flip />
           <div class="flex flex-col text-center items-center">
-            <p class="flex-col font-bold text-white select-none text-2xl capitalize pt-4">
+            <p class="flex-col font-bold text-white select-none text-xl capitalize pt-4">
               {props.displayName}
             </p>
           </div>
@@ -147,7 +147,7 @@ export function InputNode(props: {
         <div class="rounded-t-full relative w-max h-max bg-slate-600 flex items-center justify-center flex-col outline outline-4 outline-indigo-600 pl-6 pr-6 pt-2 pb-2">
           <ErrorIndicator flip />
           <div class="flex flex-col text-center items-center">
-            <p class="flex-col font-bold text-white select-none text-2xl capitalize pt-4">
+            <p class="flex-col font-bold text-white select-none text-xl capitalize pt-4">
               {props.displayName}
             </p>
           </div>
@@ -166,7 +166,7 @@ export function InputNode(props: {
 export function OutputNode(props: {
   title: string;
   displayName: JSX.Element;
-  children?: JSX.Element
+  children?: JSX.Element;
 }) {
   const isSelected = useSelfSelected();
   return (
@@ -175,7 +175,7 @@ export function OutputNode(props: {
         <div class="rounded-b-full relative w-max h-max bg-slate-600 flex items-center justify-center flex-col p-2 pb-12">
           <ErrorIndicator />
           <div class="flex flex-col text-center items-center">
-            <p class="flex-col font-bold text-white select-none text-2xl capitalize pt-2">
+            <p class="flex-col font-bold text-white select-none text-xl capitalize pt-2">
               {props.displayName}
             </p>
           </div>
@@ -189,7 +189,7 @@ export function OutputNode(props: {
         <ErrorIndicator />
         <div class="rounded-b-full relative w-max h-max bg-slate-600 flex items-center justify-center flex-col outline outline-4 outline-indigo-600 p-2 pb-12">
           <div class="flex flex-col text-center items-center">
-            <p class="flex-col font-bold text-white select-none text-2xl capitalize pt-2">
+            <p class="flex-col font-bold text-white select-none text-xl capitalize pt-2">
               {props.displayName}
             </p>
           </div>
