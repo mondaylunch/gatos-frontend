@@ -92,6 +92,7 @@ function RenderWidget(props: {
         </select>
       </Match>
       <Match when={props.type().startsWith("list$")}>
+        <span class="capitalize">{props.key}</span>
         <For each={props.value() ?? []}>
           {(entry, index) => (
             <RenderWidget
