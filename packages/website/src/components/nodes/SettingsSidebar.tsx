@@ -86,7 +86,14 @@ function RenderWidget(props: {
           </For>
         </select>
       </Match>
-      <Match when={props.widget().name.startsWith("list$")}>list</Match>
+      {/*<Match when={props.widget().name.startsWith("list$")}>
+        <button
+          onClick={() => props.apply([...(props.value() ?? []), undefined])}
+        >
+          +
+        </button>
+        <button onClick={() => props.apply(props.value() ?? [])}>-</button>
+      </Match>*/}
     </Switch>
   );
 }
