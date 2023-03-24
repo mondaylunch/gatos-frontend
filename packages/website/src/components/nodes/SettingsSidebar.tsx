@@ -39,6 +39,7 @@ function RenderWidget(props: {
           label={""}
           value={props.value() as string}
           onChange={(ev) => props.apply(ev.currentTarget.value)}
+          onKeyDown={(e) => e.stopPropagation()}
         />
       </Match>
       <Match when={props.widget().name === "textarea"}>
@@ -47,6 +48,7 @@ function RenderWidget(props: {
           class="text-black"
           value={props.value() as string}
           onChange={(ev) => props.apply(ev.currentTarget.value)}
+          onKeyDown={(e) => e.stopPropagation()}
         />
       </Match>
       <Match when={props.widget().name === "checkbox"}>
@@ -74,6 +76,7 @@ function RenderWidget(props: {
           type="number"
           value={props.value() as number}
           onChange={(ev) => props.apply(ev.currentTarget.valueAsNumber)}
+          onKeyDown={(e) => e.stopPropagation()}
         />
       </Match>
       <Match when={props.widget().name === "dropdown"}>
