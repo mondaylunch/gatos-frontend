@@ -3,6 +3,7 @@ import { getWidget, Graph, Widget } from "~/lib/types";
 import {
   Accessor,
   createSignal,
+  ErrorBoundary,
   For,
   Match,
   onMount,
@@ -247,13 +248,15 @@ export function SettingsSidebar(props: SidebarProps) {
                   });
 
                 return (
-                  <RenderWidget
-                    key={key}
-                    type={type}
-                    widget={widget}
-                    value={value}
-                    apply={apply}
-                  />
+                  <ErrorBoundary fallback={"Failed to render widget."}>
+                    <RenderWidget
+                      key={key}
+                      type={type}
+                      widget={widget}
+                      value={value}
+                      apply={apply}
+                    />
+                  </ErrorBoundary>
                 );
               }}
             </For>
